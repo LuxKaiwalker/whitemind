@@ -10,7 +10,7 @@ import { BrowserModule } from '@angular/platform-browser';
     `,
 })
 export class AppComponent {
-    message = 'This should display some messageS';
+    message = 'This should display some messages';
 }
 
 // Define a module
@@ -23,3 +23,4 @@ export class AppModule {}
 
 // Bootstrap the Angular app
 platformBrowserDynamic().bootstrapModule(AppModule);
+console.log('hello there\n');
