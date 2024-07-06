@@ -8,8 +8,6 @@ div.button{
     padding-right: 5vw;
     width: 13vw;
     height: 13vw;
-    box-shadow: 1vw 2vw 1vw rgb(30, 134, 75);
-
 }
 div.button:hover{
     background-color: #17a04c;
