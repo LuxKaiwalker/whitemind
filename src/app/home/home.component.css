@@ -1,6 +1,6 @@
 div.button{
 
-    background-color: #101010;
+    background-color: #665959;
     border-radius: 4vw;
     padding-bottom: 5vw;
     padding-top: 5vw;
@@ -8,9 +8,9 @@ div.button{
     padding-right: 5vw;
     width: 13vw;
     height: 13vw;
-    box-shadow: 1vw 2vw 1vw black;
+    box-shadow: 1vw 2vw 1vw rgb(30, 134, 75);
 
 }
 div.button:hover{
-    background-color: #070707;
+    background-color: #17a04c;
 }
