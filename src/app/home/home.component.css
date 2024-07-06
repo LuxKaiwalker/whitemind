@@ -1,14 +1,8 @@
-div.button{
-
-    background-color: #665959;
-    border-radius: 4vw;
-    padding-bottom: 5vw;
-    padding-top: 5vw;
-    padding-left: 5vw;
-    padding-right: 5vw;
-    width: 13vw;
-    height: 13vw;
+div.home {
+    margin-top: 4vw;
 }
+
+
 div.button:hover{
     background-color: #17a04c;
 }
