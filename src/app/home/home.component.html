@@ -1,13 +1,30 @@
+<app-header />
+
 <div class = "home">
-    <h1>Whitemind.</h1>
-    <p>This is where the homepage goes. Important links:</p>
-    
+    <div class = "Intro">
+        <h1>Whitemind.</h1>
+        <h2> 
+            Framework for building neural networks. No Programming knowledge required.
+        </h2>
+        <div class = "buttons">
+            <button routerLink = "/tutorials">Get Started</button>
+    </div>
+    <div class = "about">
+        <h2>What is Whitemind?</h2>
+        <p>Whitemind is a framework for building neural networks from Scratch. It is designed to be easy to use and requires no programming knowledge.</p>
+        <div class = "button">
+            <li><a routerLink = "/brainet">To the Framework</a></li>
+        </div>
+    </div>
+
+
     <ul>
-      <li><a routerLink = "/">Home</a></li>
-      <li><a routerLink = "/brainet">Brainet</a></li>
+        <li><a routerLink = "/brainet">Check out Whitemind</a></li>
       <li><a routerLink = "/tutorials">Tutorials</a></li>
       <li><a routerLink = "/about">About</a></li>
       <li><a routerLink = "/contact">Contact</a></li>
     </ul>
   </div>
+
+  <app-footer />
   <router-outlet />
