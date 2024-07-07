@@ -1,28 +1,40 @@
 <app-header />
+<body>
+    <section id="home">
+        <div class="container">
+            <h1>Whitemind.</h1>
+            <p>Framework for building neural networks. No Programming knowledge required.
+            </p>
+            <a routerLink = "/tutorials" class="btn">Get Started</a>
+        </div>
+    </section>
+    <section id="about">
+        <div class="container">
+            <h2>About Us</h2>
+            <p>Whitemind is a framework for building neural networks from Scratch. It is designed to be easy to use and requires no programming knowledge.</p>
+            <a routerLink = "/tutorials" class="btn">Check it out!</a>
+        </div>
+    </section>
+    <section id="services">
+        <div class="container">
+            <h2>Our Services</h2>
+            <div class="service">
+                <h3>Service One</h3>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quisquam, quod.</p>
+            </div>
+            <div class="service">
+                <h3>Service Two</h3>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quisquam, quod.</p>
+            </div>
+            <div class="service">
+                <h3>Service Three</h3>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quisquam, quod.</p>
+            </div>
+        </div>
+    </section>
+</body>
 
-<div class = "home">
-    <div class = "Intro">
-        <h1>Whitemind.</h1>
-        <h2> 
-            Framework for building neural networks. No Programming knowledge required.
-        </h2>
-        <div class = "buttons">
-            <button routerLink = "/tutorials">Get Started</button>
-    </div>
-    <div class = "about">
-        <h2>What is Whitemind?</h2>
-        <p>Whitemind is a framework for building neural networks from Scratch. It is designed to be easy to use and requires no programming knowledge.</p>
-        <button routerLink = "">Check it out!</button>
-    </div>
 
-
-    <ul>
-        <li><a routerLink = "/brainet">Check out Whitemind</a></li>
-      <li><a routerLink = "/tutorials">Tutorials</a></li>
-      <li><a routerLink = "/about">About</a></li>
-      <li><a routerLink = "/contact">Contact</a></li>
-    </ul>
-  </div>
 
   <app-footer />
   <router-outlet />
