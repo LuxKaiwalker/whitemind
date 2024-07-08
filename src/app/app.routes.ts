@@ -6,6 +6,8 @@ import { AboutComponent } from './about/about.component';
 import { ContactComponent } from './contact/contact.component';
 
 
+
+
 export const routes: Routes = [
     {
         path:'',
@@ -31,5 +33,5 @@ export const routes: Routes = [
         path: 'contact',
         title: 'Contact',
         component: ContactComponent,
-    }
+    },
 ];

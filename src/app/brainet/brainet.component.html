@@ -1,9 +1,12 @@
 <app-header />
 
-<div class="example-box" cdkDrag>
-    Drag me around
-  </div>
-  
+<button (click) = "addNewBox()">Add new item</button>
+
+<div class="example-box" *ngFor="let box of boxes" cdkDrag>
+    {{box}}
+</div>
+
+
 
 <app-footer />
 <router-outlet />
