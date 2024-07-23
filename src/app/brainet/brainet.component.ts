@@ -6,12 +6,12 @@ import { NgFor } from '@angular/common';
 
 import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
-import { GraphComponent } from '../graph/graph.component';
+import { NetworkComponent } from './network/network.component';
 
 @Component({
   selector: 'app-brainet',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, FooterComponent, DragDropModule, CommonModule, NgFor, GraphComponent],
+  imports: [RouterOutlet, HeaderComponent, FooterComponent, DragDropModule, CommonModule, NgFor, NetworkComponent],
   templateUrl: './brainet.component.html',
   styleUrl: './brainet.component.css'
 })
