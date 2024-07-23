@@ -16,10 +16,7 @@ import { NetworkComponent } from './network/network.component';
   styleUrl: './brainet.component.css'
 })
 export class BrainetComponent {
-  boxes: string [] = [];
-  addNewBox(value: string){
-    const newBox = `item ${this.boxes.length + 1},${value}`;
-    this.boxes.push(newBox);
-
+  addNewBos(value: string){
+    //TODO
   }
 }

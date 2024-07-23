@@ -1,1 +1,7 @@
 <p>network works!</p>
+<div class="main-container">
+    <p>Drag and drop the boxes</p>
+        <div class="example-box" *ngFor="let box of boxes" cdkDrag>
+            {{box}}
+        </div>
+</div>

@@ -4,13 +4,7 @@
     <button (click)="addNewBox('a')">Add item a</button>
     <button (click)="addNewBox('b')">Add item b</button>
 </div>>
-<div class="main-container">
-    <p>Drag and drop the boxes</p>
-        <div class="example-box" *ngFor="let box of boxes" cdkDrag>
-            {{box}}
-            <app-network></app-network>
-        </div>
-</div>
 
+<app-network></app-network>
 
 <router-outlet />
