@@ -16,7 +16,13 @@ import { NetworkComponent } from './network/network.component';
   styleUrl: './brainet.component.css'
 })
 export class BrainetComponent {
-  addNewBos(value: string){
-    //TODO
+  value: any;
+
+  constructor() {
+    this.value = null; // Initialize value to null
+  }
+
+  setValue(input: any) {
+    this.value = input; // Set the variable value to the input parameter
   }
 }
