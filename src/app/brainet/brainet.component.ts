@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 import { HeaderComponent } from '../header/header.component';
@@ -11,30 +11,30 @@ import { FooterComponent } from '../footer/footer.component';
   templateUrl: './brainet.component.html',
   styleUrl: './brainet.component.css'
 })
-export class BrainetComponent implements OnInit {
+export class BrainetComponent{
+  @ViewChild('canvas')
+  private canvas: ElementRef = {} as ElementRef;
 
-  @ViewChild('myCanvas', { static: false }) canvasRef!: ElementRef<HTMLCanvasElement>;
-  private context!: CanvasRenderingContext2D;
+  ngAfterViewInit(): void {
+    const canvas = this.canvas.nativeElement as HTMLCanvasElement;
+    const context = canvas.getContext('2d');
 
-  ngOnInit(): void {
-    // Initialize canvas context when component is initialized
-    this.initializeCanvas();
-  }
+    // Set canvas size
+    canvas.width = 500;
+    canvas.height = 500;
 
-  private initializeCanvas(): void {
-    const canvas = this.canvasRef.nativeElement;
-    this.context = canvas.getContext('2d')!;
-    
-    // Example: Draw a red rectangle
-    this.context.fillStyle = 'red';
-    this.context.fillRect(10, 10, 100, 100);
-  }
-
-  // Example method to draw something on the canvas
-  drawCircle(x: number, y: number, radius: number): void {
-    this.context.beginPath();
-    this.context.arc(x, y, radius, 0, 2 * Math.PI);
-    this.context.stroke();
+    // Draw a random rectangle
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    const width = Math.random() * 100;
+    const height = Math.random() * 100;
+    if (context) {
+      context.fillStyle = 'red';
+    }
+    if (context) {
+      context.fillRect(x, y, width, height);
+    }
   }
 }
+
 
