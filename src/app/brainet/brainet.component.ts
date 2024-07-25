@@ -1,28 +1,40 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { DragDropModule } from '@angular/cdk/drag-drop';
-import { CommonModule } from '@angular/common';
-import { NgFor } from '@angular/common';
 
 import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
-import { NetworkComponent } from './network/network.component';
 
 @Component({
   selector: 'app-brainet',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, FooterComponent, DragDropModule, CommonModule, NgFor, NetworkComponent],
+  imports: [RouterOutlet, HeaderComponent, FooterComponent],
   templateUrl: './brainet.component.html',
   styleUrl: './brainet.component.css'
 })
-export class BrainetComponent {
-  value: any;
+export class BrainetComponent implements OnInit {
 
-  constructor() {
-    this.value = null; // Initialize value to null
+  @ViewChild('myCanvas', { static: false }) canvasRef!: ElementRef<HTMLCanvasElement>;
+  private context!: CanvasRenderingContext2D;
+
+  ngOnInit(): void {
+    // Initialize canvas context when component is initialized
+    this.initializeCanvas();
   }
 
-  setValue(input: any) {
-    this.value = input; // Set the variable value to the input parameter
+  private initializeCanvas(): void {
+    const canvas = this.canvasRef.nativeElement;
+    this.context = canvas.getContext('2d')!;
+    
+    // Example: Draw a red rectangle
+    this.context.fillStyle = 'red';
+    this.context.fillRect(10, 10, 100, 100);
+  }
+
+  // Example method to draw something on the canvas
+  drawCircle(x: number, y: number, radius: number): void {
+    this.context.beginPath();
+    this.context.arc(x, y, radius, 0, 2 * Math.PI);
+    this.context.stroke();
   }
 }
+
