@@ -1,4 +1,14 @@
 <app-header />
+
+<div class="vertical-bar">
+    <button (click)="addNewBox('a')">Add item a</button>
+    <button (click)="addNewBox('b')">Add item b</button>
+
+    <div class="example-box" *ngFor="let box of boxes" cdkDrag>
+        {{box}}
+    </div>
+</div>>
+
 <app-canvas></app-canvas>
 
 <router-outlet />
