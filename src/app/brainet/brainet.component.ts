@@ -17,10 +17,17 @@ import { CanvasComponent } from './canvas/canvas.component';
 })
 
 export class BrainetComponent{
-  boxes: string [] = [];
-  addNewBox(value: string){
-    const newBox = `item ${this.boxes.length + 1},${value}`;
-    this.boxes.push(newBox);  
+
+  //list of all boxes on screen or available
+  boxes: string[][] = [];//dim 1: type of box; dim 2: num of box
+
+  addBox(typ: number){
+    if(!this.boxes[typ]){//constructor for new box category if not initialized
+      this.boxes[typ] = [];
+    }
+    const newBox = `box nummer ${this.boxes[typ].length + 1}, typ:${typ}`;
+    this.boxes[typ].push(newBox);
+    console.log(this.boxes);
   }
 }
 
