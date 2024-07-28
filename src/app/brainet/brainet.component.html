@@ -8,13 +8,13 @@
     </div>
     
     <div *ngFor="let row of boxes">
-        <div class = example-box *ngFor="let box of row" cdkDrag cdkDragBoundary=".ui">
+        <div class = example-box *ngFor="let box of row" cdkDrag cdkDragBoundary=".ui" (cdkDragMoved)="dragMoved($event)" (cdkDragEnded)="dragEnd($event)">
             {{box}}
         </div>
     </div>
 
     
-    <app-canvas class = workspace></app-canvas>
+    <app-canvas class="workspace" [message]="message" [position]="position"></app-canvas>
 </div>
 
 <router-outlet />
