@@ -49,7 +49,7 @@ export class BrainetComponent{
  * @note may be useful for drag and drop animations later
  */
   dragMoved($event: CdkDragMove) {
-    //console.log($event.source.getFreeDragPosition());
+    console.log($event.source.getFreeDragPosition());
   }
 
 }
