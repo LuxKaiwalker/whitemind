@@ -2,7 +2,19 @@
  * here the drawn shapes are implemented andf this file is exported to brainet.component.ts
  */
 
-export class CanvasShapes{
+export class ExampleBox{
+    ctx: any;
+    x: number;
+    y: number;
+    message: string;
+
+    constructor(ctx: any, x: number, y: number, message: string){
+        this.ctx = ctx;
+        this.x = x;
+        this.y = y;
+        this.message = message;
+    }
+
     /**
      * @brief draw the og test draggable box onto the canvas
      * @param ctx 
@@ -10,7 +22,7 @@ export class CanvasShapes{
      * @param y 
      * @note TODO: ajust type of ctx
      */
-    static drawExampleBox(ctx: any, x: number, y: number, message: string) {
+    draw() {
         const width = 200;
         const height = 200;
         const borderRadius = 4;
@@ -24,44 +36,49 @@ export class CanvasShapes{
         { x: 0, y: 1, blur: 5, spread: 0, color: 'rgba(0, 0, 0, 0.12)' }
         ];
     
-        ctx.save();
+        this.ctx.save();
     
         // Draw box shadow
         boxShadow.forEach(shadow => {
-        ctx.shadowOffsetX = shadow.x;
-        ctx.shadowOffsetY = shadow.y;
-        ctx.shadowBlur = shadow.blur;
-        ctx.shadowColor = shadow.color;
-        ctx.fillStyle = backgroundColor;
-        ctx.fillRect(x, y, width, height);
+        this.ctx.shadowOffsetX = shadow.x;
+        this.ctx.shadowOffsetY = shadow.y;
+        this.ctx.shadowBlur = shadow.blur;
+        this.ctx.shadowColor = shadow.color;
+        this.ctx.fillStyle = backgroundColor;
+        this.ctx.fillRect(this.x, this.y, width, height);
+        this.ctx.shadowOffsetY = shadow.y;
+        this.ctx.shadowBlur = shadow.blur;
+        this.ctx.shadowColor = shadow.color;
+        this.ctx.fillStyle = backgroundColor;
+        this.ctx.fillRect(this.x, this.y, width, height);
         });
     
-        ctx.restore();
+        this.ctx.restore();
         
         // Draw border and background
-        ctx.fillStyle = backgroundColor;
-        ctx.strokeStyle = borderColor;
-        ctx.lineWidth = borderWidth;
-        ctx.beginPath();
-        ctx.moveTo(x + borderRadius, y);
-        ctx.lineTo(x + width - borderRadius, y);
-        ctx.quadraticCurveTo(x + width, y, x + width, y + borderRadius);
-        ctx.lineTo(x + width, y + height - borderRadius);
-        ctx.quadraticCurveTo(x + width, y + height, x + width - borderRadius, y + height);
-        ctx.lineTo(x + borderRadius, y + height);
-        ctx.quadraticCurveTo(x, y + height, x, y + height - borderRadius);
-        ctx.lineTo(x, y + borderRadius);
-        ctx.quadraticCurveTo(x, y, x + borderRadius, y);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
+        this.ctx.fillStyle = backgroundColor;
+        this.ctx.strokeStyle = borderColor;
+        this.ctx.lineWidth = borderWidth;
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.x + borderRadius, this.y);
+        this.ctx.lineTo(this.x + width - borderRadius, this.y);
+        this.ctx.quadraticCurveTo(this.x + width, this.y, this.x + width, this.y + borderRadius);
+        this.ctx.lineTo(this.x + width, this.y + height - borderRadius);
+        this.ctx.quadraticCurveTo(this.x + width, this.y + height, this.x + width - borderRadius, this.y + height);
+        this.ctx.lineTo(this.x + borderRadius, this.y + height);
+        this.ctx.quadraticCurveTo(this.x, this.y + height, this.x, this.y + height - borderRadius);
+        this.ctx.lineTo(this.x, this.y + borderRadius);
+        this.ctx.quadraticCurveTo(this.x, this.y, this.x + borderRadius, this.y);
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.stroke();
         
         // Draw centered text
-        ctx.fillStyle = textColor;
-        ctx.font = '16px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(message, x + width / 2, y + height / 2);
+        this.ctx.fillStyle = textColor;
+        this.ctx.font = '16px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.fillText(this.message, this.x + width / 2, this.y + height / 2);
     }
 }
 
