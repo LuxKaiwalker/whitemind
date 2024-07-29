@@ -6,11 +6,12 @@ import { CommonModule } from '@angular/common';
 
 import { HeaderComponent } from '../header/header.component';
 import { FooterComponent } from '../footer/footer.component';
+import { CanvasComponent } from './canvas/canvas.component';
 
 @Component({
   selector: 'app-brainet',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, FooterComponent, DragDropModule, NgFor, CommonModule],
+  imports: [RouterOutlet, HeaderComponent, FooterComponent, CanvasComponent, DragDropModule, NgFor, CommonModule],
   templateUrl: './brainet.component.html',
   styleUrl: './brainet.component.css'
 })
