@@ -39,8 +39,8 @@ export class BrainetComponent{
   dragEnd($event: CdkDragEnd) {
     console.log($event.source.getFreeDragPosition());
 
-    this.message = $event.source.element.nativeElement.innerText;
-    this.position = $event.source.getFreeDragPosition();
+    this.message= $event.source.element.nativeElement.innerText;
+    this.position= $event.source.getFreeDragPosition();
   }
 
  /**
