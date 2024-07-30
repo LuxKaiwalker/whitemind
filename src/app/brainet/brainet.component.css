@@ -5,7 +5,7 @@
     color: #333;
     background-color: #fff;
     position: absolute;
-    top: 4em;
+    top: 5em;
     left: 0;
     bottom: 0;
     right: 0;
@@ -26,13 +26,35 @@
     padding: 20px;
   }
 
+  #canvas {
+    position: absolute;
+    top: 0;
+    left: 12em;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    background-color: #f4f4f4;
+    border: 1px solid #000;
+}
+
+  button {
+    background-color: #f0f0f0;
+    color: black;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+  }
+
 .example-box {
-  width: 200px;
-  height: 200px;
+  width: 130px;
+  height: 100px;
   border: solid 1px #ccc;
   color: rgba(0, 0, 0, 0.87);
   cursor: move;
   display: flex;
+  position: absolute;
   justify-content: center;
   align-items: center;
   text-align: center;

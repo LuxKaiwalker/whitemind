@@ -1,55 +1,104 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnChanges, ViewChild, ElementRef } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { DragDropModule, CdkDragEnd, CdkDragMove } from '@angular/cdk/drag-drop';
+import { DragDropModule, CdkDragEnd, CdkDragMove, CdkDragStart } from '@angular/cdk/drag-drop';
 import { NgFor } from '@angular/common';
 import { CommonModule } from '@angular/common';
 
 import { HeaderComponent } from '../header/header.component';
-import { FooterComponent } from '../footer/footer.component';
-import { CanvasComponent } from './canvas/canvas.component';
+import { Canvas } from './canvas/brainet.canvas'
+import { ExampleBox } from './draggables/brainet.draggable';
 
 @Component({
   selector: 'app-brainet',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, FooterComponent, CanvasComponent, DragDropModule, NgFor, CommonModule],
+  imports: [RouterOutlet, HeaderComponent, DragDropModule, NgFor, CommonModule],
   templateUrl: './brainet.component.html',
   styleUrl: './brainet.component.css'
 })
 
-export class BrainetComponent{
+export class BrainetComponent implements OnInit, OnChanges {
+
+  @ViewChild('canvas', { static: true })
+  myCanvas!: ElementRef;
 
   //list of all boxes on screen or available
-  boxes: string[][] = [];//dim 1: type of box; dim 2: num of box
+  boxes: ExampleBox[][] = [];//dim 1: type of box; dim 2: num of box
   message: string = '';
   position: {x: number, y: number} = {x: 0, y: 0};
 
+  canvasInstance!: Canvas;
+
+  ngOnInit(){
+      const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
+      const ctx = this.myCanvas.nativeElement.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+
+      //should work later
+      //this.addBox(0);
+      //this.addBox(1);
+      //this.addBox(2);
+
+
+      this.canvasInstance = new Canvas(ctx);
+  
+  }
+
+  ngOnChanges(){//nothing yet
+  }
+
+  /**
+   * @brief function to add a new box to the screen
+   * @param typ 
+   * @note typ is the type of box to be added
+   */
   addBox(typ: number){
     if(!this.boxes[typ]){//constructor for new box category if not initialized
       this.boxes[typ] = [];
     }
-    const newBox = `box nummer ${this.boxes[typ].length + 1}, typ:${typ}`;
+    const newBox = new ExampleBox(typ, this.boxes[typ].length + 1);
     this.boxes[typ].push(newBox);
   }
 
   /**
    * @brief function to be called when a drag event is detected
    * @param $event 
+   * @param box
    * @note used to pass down component data to canvas
    */
-  dragEnd($event: CdkDragEnd) {
+  dragEnd($event: CdkDragEnd, box: ExampleBox) {
     console.log($event.source.getFreeDragPosition());
 
     this.message= $event.source.element.nativeElement.innerText;
     this.position= $event.source.getFreeDragPosition();
+
+    this.canvasInstance.drawBox(this.position.x, this.position.y, this.message);
   }
 
  /**
  * @brief function to be called when a drag event is detected
  * @param $event 
+ * @param box
  * @note may be useful for drag and drop animations later
  */
-  dragMoved($event: CdkDragMove) {
-    console.log($event.source.getFreeDragPosition());
+  dragMoved($event: CdkDragMove, box: ExampleBox) {
+    
+    box.position = $event.source.getFreeDragPosition();
   }
 
+  /**
+   * @brief function to be called when a drag event starts.
+   * mainly used to update drag panel to check if we need to spawn new box
+   * @param $event 
+   * @param box 
+   */
+  dragStart($event: CdkDragStart, box: ExampleBox){
+    const typ:number = box.typ;
+    const num:number = box.num;
+    if (this.boxes[typ][num-1].dragged === false) {
+      this.addBox(typ);
+      this.boxes[typ][num-1].dragged = true;
+    }
+  }
 }
