@@ -1,17 +1,17 @@
 import { Component, OnInit, OnChanges, ViewChild, ElementRef } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { DragDropModule, CdkDragEnd, CdkDragMove } from '@angular/cdk/drag-drop';
+import { DragDropModule, CdkDragEnd, CdkDragMove, CdkDragStart } from '@angular/cdk/drag-drop';
 import { NgFor } from '@angular/common';
 import { CommonModule } from '@angular/common';
 
 import { HeaderComponent } from '../header/header.component';
-import { FooterComponent } from '../footer/footer.component';
 import { Canvas } from './canvas/brainet.canvas'
+import { ExampleBox } from './draggables/brainet.draggable';
 
 @Component({
   selector: 'app-brainet',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, FooterComponent, DragDropModule, NgFor, CommonModule],
+  imports: [RouterOutlet, HeaderComponent, DragDropModule, NgFor, CommonModule],
   templateUrl: './brainet.component.html',
   styleUrl: './brainet.component.css'
 })
@@ -22,7 +22,7 @@ export class BrainetComponent implements OnInit, OnChanges {
   myCanvas!: ElementRef;
 
   //list of all boxes on screen or available
-  boxes: string[][] = [];//dim 1: type of box; dim 2: num of box
+  boxes: ExampleBox[][] = [];//dim 1: type of box; dim 2: num of box
   message: string = '';
   position: {x: number, y: number} = {x: 0, y: 0};
 
@@ -33,6 +33,10 @@ export class BrainetComponent implements OnInit, OnChanges {
       const ctx = this.myCanvas.nativeElement.getContext('2d');
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+
+      this.addBox(0);
+      this.addBox(1);
+      this.addBox(2);
 
 
       this.canvasInstance = new Canvas(ctx);
@@ -46,7 +50,7 @@ export class BrainetComponent implements OnInit, OnChanges {
     if(!this.boxes[typ]){//constructor for new box category if not initialized
       this.boxes[typ] = [];
     }
-    const newBox = `box nummer ${this.boxes[typ].length + 1}, typ:${typ}`;
+    const newBox = new ExampleBox(typ, this.boxes[typ].length + 1);
     this.boxes[typ].push(newBox);
   }
 
@@ -73,4 +77,14 @@ export class BrainetComponent implements OnInit, OnChanges {
    //console.log($event.source.getFreeDragPosition());
   }
 
+  dragStart($event: CdkDragStart){
+
+
+
+    const typ:string = $event.source.element.nativeElement.innerText.slice(-1);//ajust later, quick workaround rn 
+    if(this.boxes[+typ][-1].dragged === false){
+    this.addBox(+typ);
+    this.boxes[+typ][-1].dragged = true;
+    }
+  }
 }

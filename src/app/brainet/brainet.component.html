@@ -8,8 +8,8 @@
     </div>
     
     <div *ngFor="let row of boxes">
-        <div class = example-box *ngFor="let box of row" cdkDrag cdkDragBoundary=".ui" (cdkDragMoved)="dragMoved($event)" (cdkDragEnded)="dragEnd($event)">
-            {{box}}
+        <div class = example-box *ngFor="let box of row" cdkDrag cdkDragBoundary=".ui"  (cdkDragStarted)="dragStart($event)" (cdkDragMoved)="dragMoved($event)" (cdkDragEnded)="dragEnd($event)" >
+            {{box.message}}
         </div>
     </div>
 
