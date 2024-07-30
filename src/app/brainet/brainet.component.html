@@ -2,9 +2,9 @@
 
 <div class = ui>
     <div class="vertical-bar">
-        <button (click)="addBox(0)">Add item a</button>
-        <button (click)="addBox(1)">Add item b</button>
-        <button (click)="addBox(2)">Add item c</button>
+        <button (mousedown)="addBox(0)">Add item a</button>
+        <button (mousedown)="addBox(1)">Add item b</button>
+        <button (mousedown)="addBox(2)">Add item c</button>
     </div>
     
     <div *ngFor="let row of boxes">
