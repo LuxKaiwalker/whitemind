@@ -16,26 +16,30 @@ import { Canvas } from './brainet.canvas'
   styleUrl: './brainet.component.css'
 })
 
-export class BrainetComponent{
+export class BrainetComponent implements OnInit, OnChanges {
 
-  //@ViewChild('canvas', { static: true }) myCanvas!: ElementRef;
-
-  //MyCanvas = new Canvas(this.myCanvas.nativeElement.getContext('2d'), 0, 0, 'test');
-
-  /*ngOnInit(){
-    const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }*/
-
-  /*ngOnChanges(changes: SimpleChanges){
-      this.MyCanvas.draw()
-  }*/
+  @ViewChild('myCanvas', { static: true }) myCanvas!: ElementRef<HTMLCanvasElement>;
+  canvas: any;
 
   //list of all boxes on screen or available
   boxes: string[][] = [];//dim 1: type of box; dim 2: num of box
   message: string = '';
   position: {x: number, y: number} = {x: 0, y: 0};
+
+  ngOnInit(){
+      const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
+      const ctx = this.myCanvas.nativeElement.getContext('2d');
+      this.canvas = new Canvas(ctx);
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+
+    this.canvas.draw(300, 300, this.message);
+  
+  }
+
+  ngOnChanges(){//nothing yet
+  }
 
   addBox(typ: number){
     if(!this.boxes[typ]){//constructor for new box category if not initialized
@@ -56,6 +60,7 @@ export class BrainetComponent{
     this.message= $event.source.element.nativeElement.innerText;
     this.position= $event.source.getFreeDragPosition();
 
+    this.canvas.draw(this.position.x, this.position.y, this.message);
   }
 
  /**

@@ -1,14 +1,8 @@
 export class Canvas{
     ctx: any;
-    x: number;
-    y: number;
-    message: string;
 
-    constructor(ctx: any, x: number, y: number, message: string){
+    constructor(ctx: any){
         this.ctx = ctx;
-        this.x = x;
-        this.y = y;
-        this.message = message;
     }
 
     /**
@@ -18,7 +12,7 @@ export class Canvas{
      * @param y 
      * @note TODO: ajust type of ctx
      */
-    draw() {
+    draw(x: number, y: number, message: string) {
         const width = 200;
         const height = 200;
         const borderRadius = 4;
@@ -41,12 +35,12 @@ export class Canvas{
         this.ctx.shadowBlur = shadow.blur;
         this.ctx.shadowColor = shadow.color;
         this.ctx.fillStyle = backgroundColor;
-        this.ctx.fillRect(this.x, this.y, width, height);
+        this.ctx.fillRect(x, y, width, height);
         this.ctx.shadowOffsetY = shadow.y;
         this.ctx.shadowBlur = shadow.blur;
         this.ctx.shadowColor = shadow.color;
         this.ctx.fillStyle = backgroundColor;
-        this.ctx.fillRect(this.x, this.y, width, height);
+        this.ctx.fillRect(x, y, width, height);
         });
     
         this.ctx.restore();
@@ -56,24 +50,33 @@ export class Canvas{
         this.ctx.strokeStyle = borderColor;
         this.ctx.lineWidth = borderWidth;
         this.ctx.beginPath();
-        this.ctx.moveTo(this.x + borderRadius, this.y);
-        this.ctx.lineTo(this.x + width - borderRadius, this.y);
-        this.ctx.quadraticCurveTo(this.x + width, this.y, this.x + width, this.y + borderRadius);
-        this.ctx.lineTo(this.x + width, this.y + height - borderRadius);
-        this.ctx.quadraticCurveTo(this.x + width, this.y + height, this.x + width - borderRadius, this.y + height);
-        this.ctx.lineTo(this.x + borderRadius, this.y + height);
-        this.ctx.quadraticCurveTo(this.x, this.y + height, this.x, this.y + height - borderRadius);
-        this.ctx.lineTo(this.x, this.y + borderRadius);
-        this.ctx.quadraticCurveTo(this.x, this.y, this.x + borderRadius, this.y);
+        this.ctx.beginPath();
+        this.ctx.moveTo(x + borderRadius, y);
+        this.ctx.lineTo(x + width - borderRadius, y);
+        this.ctx.quadraticCurveTo(x + width, y, x + width, y + borderRadius);
+        this.ctx.lineTo(x + width, y + height - borderRadius);
+        this.ctx.quadraticCurveTo(x + width, y + height, x + width - borderRadius, y + height);
+        this.ctx.lineTo(x + borderRadius, y + height);
+        this.ctx.quadraticCurveTo(x, y + height, x, y + height - borderRadius);
+        this.ctx.lineTo(x, y + borderRadius);
+        this.ctx.quadraticCurveTo(x, y, x + borderRadius, y);
+        this.ctx.closePath();
+        this.ctx.lineTo(x + width - borderRadius, y);
+        this.ctx.quadraticCurveTo(x + width, y, x + width, y + borderRadius);
+        this.ctx.lineTo(x + width, y + height - borderRadius);
+        this.ctx.quadraticCurveTo(x + width, y + height, x + width - borderRadius, y + height);
+        this.ctx.lineTo(x + borderRadius, y + height);
+        this.ctx.quadraticCurveTo(x, y + height, x, y + height - borderRadius);
+        this.ctx.lineTo(x, y + borderRadius);
+        this.ctx.quadraticCurveTo(x, y, x + borderRadius, y);
         this.ctx.closePath();
         this.ctx.fill();
         this.ctx.stroke();
-        
         // Draw centered text
         this.ctx.fillStyle = textColor;
         this.ctx.font = '16px Arial';
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
-        this.ctx.fillText(this.message, this.x + width / 2, this.y + height / 2);
+        this.ctx.fillText(message, x + width / 2, y + height / 2);
     }
 }

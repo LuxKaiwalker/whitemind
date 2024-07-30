@@ -5,7 +5,7 @@
     color: #333;
     background-color: #fff;
     position: absolute;
-    top: 4em;
+    top: 5em;
     left: 0;
     bottom: 0;
     right: 0;
@@ -33,9 +33,19 @@
     right: 0;
     bottom: 0;
     height: 100%;
-    background-color: #f0f0f0;
+    background-color: #f4f4f4;
     border: 1px solid #000;
-}c
+}
+
+  button {
+    background-color: #f0f0f0;
+    color: black;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+  }
 
 .example-box {
   width: 200px;
