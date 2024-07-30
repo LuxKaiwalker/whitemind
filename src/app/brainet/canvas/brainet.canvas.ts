@@ -12,7 +12,7 @@ export class Canvas{
      * @param y 
      * @note TODO: ajust type of ctx
      */
-    draw(x: number, y: number, message: string) {
+    drawBox(x: number, y: number, message: string) {
         const width = 200;
         const height = 200;
         const borderRadius = 4;
@@ -78,5 +78,20 @@ export class Canvas{
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
         this.ctx.fillText(message, x + width / 2, y + height / 2);
+    }
+
+    drawLine(box1: any, box2: any){
+        this.ctx.beginPath();
+        this.ctx.moveTo(box1.x, box1.y);
+        this.ctx.lineTo(box2.x, box2.y);
+        this.ctx.stroke();
+    }
+
+    deleteLine(box1: any, box2: any){
+        this.ctx.beginPath();
+        this.ctx.moveTo(box1.x, box1.y);
+        this.ctx.lineTo(box2.x, box2.y);
+        this.ctx.clearRect(box1.x, box1.y, box2.x - box1.x, box2.y - box1.y);
+        this.ctx.stroke();
     }
 }
