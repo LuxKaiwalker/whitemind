@@ -82,11 +82,15 @@ export class BrainetComponent implements OnInit, OnChanges {
     this.message= $event.source.element.nativeElement.innerText;
     this.position= $event.source.getFreeDragPosition();
 
-    if(this.position.y > window.innerHeight*0.5){//ajusting to bin height
+    const divElement = document.querySelector('.ui');
+    const divHeight:number = divElement?.clientHeight || 0;
+    
+    if(this.position.y+50 > divHeight*0.85){//ajusting to bin height, bit crappy. +50 because if half of box inside
       this.removeBox(box);
     }
-
+    
     this.canvasInstance.drawBox(this.position.x, this.position.y, this.message);
+    this.canvasInstance.drawLine(box, this.boxes[0][0]);
   }
 
  /**
