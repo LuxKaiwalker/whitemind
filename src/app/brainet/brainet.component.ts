@@ -61,6 +61,15 @@ export class BrainetComponent implements OnInit, OnChanges {
     this.boxes[typ].push(newBox);
   }
 
+  removeBox(box: ExampleBox){
+    const typ:number = box.typ;
+    const num:number = box.num;
+    this.boxes[typ].splice(num-1, 1);
+    for(let i = num-1; i < this.boxes[typ].length; i++){
+      this.boxes[typ][i].num = i+1;
+    }
+  }
+
   /**
    * @brief function to be called when a drag event is detected
    * @param $event 
@@ -73,6 +82,13 @@ export class BrainetComponent implements OnInit, OnChanges {
     this.message= $event.source.element.nativeElement.innerText;
     this.position= $event.source.getFreeDragPosition();
 
+    const divElement = document.querySelector('.ui');
+    const divHeight:number = divElement?.clientHeight || 0;
+    
+    if(this.position.y+50 > divHeight*0.85){//ajusting to bin height, bit crappy. +50 because if half of box inside
+      this.removeBox(box);
+    }
+    
     this.canvasInstance.drawBox(this.position.x, this.position.y, this.message);
   }
 
@@ -83,8 +99,14 @@ export class BrainetComponent implements OnInit, OnChanges {
  * @note may be useful for drag and drop animations later
  */
   dragMoved($event: CdkDragMove, box: ExampleBox) {
-    
+
+    this.canvasInstance.deleteLine(box, this.boxes[0][0]);
+
     box.position = $event.source.getFreeDragPosition();
+    console.log(box.position);
+    console.log(window.innerHeight)
+
+    this.canvasInstance.drawLine(box, this.boxes[0][0]);
   }
 
   /**

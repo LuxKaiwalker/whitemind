@@ -1,3 +1,5 @@
+import { ExampleBox } from "../draggables/brainet.draggable";
+
 export class Canvas{
     ctx: any;
 
@@ -14,7 +16,7 @@ export class Canvas{
      */
     drawBox(x: number, y: number, message: string) {
         const width = 200;
-        const height = 200;
+        const height = 400;
         const borderRadius = 4;
         const borderColor = '#ccc';
         const borderWidth = 1;
@@ -80,18 +82,26 @@ export class Canvas{
         this.ctx.fillText(message, x + width / 2, y + height / 2);
     }
 
-    drawLine(box1: any, box2: any){
+    drawLine(box1: ExampleBox, box2: ExampleBox){
         this.ctx.beginPath();
-        this.ctx.moveTo(box1.x, box1.y);
-        this.ctx.lineTo(box2.x, box2.y);
+        this.ctx.moveTo(box1.position.x, box1.position.y);
+        this.ctx.lineTo(box2.position.x, box2.position.y);
         this.ctx.stroke();
     }
 
-    deleteLine(box1: any, box2: any){
+    deleteLine(box1: ExampleBox, box2: ExampleBox){
         this.ctx.beginPath();
-        this.ctx.moveTo(box1.x, box1.y);
-        this.ctx.lineTo(box2.x, box2.y);
-        this.ctx.clearRect(box1.x, box1.y, box2.x - box1.x, box2.y - box1.y);
+        this.ctx.moveTo(box1.position.x, box1.position.y);
+        this.ctx.lineTo(box2.position.x, box2.position.y);
+        const width = Math.abs(box2.position.x - box1.position.x);
+        const height = Math.abs(box2.position.y - box1.position.y);
+        const minX = Math.min(box1.position.x, box2.position.x);
+        const minY = Math.min(box1.position.y, box2.position.y);
+        for (let x = minX; x <= minX + width; x++) {
+            for (let y = minY; y <= minY + height; y++) {
+                this.ctx.clearRect(x, y, 1, 1);
+            }
+        }
         this.ctx.stroke();
     }
 }
