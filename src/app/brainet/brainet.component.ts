@@ -90,7 +90,6 @@ export class BrainetComponent implements OnInit, OnChanges {
     }
     
     this.canvasInstance.drawBox(this.position.x, this.position.y, this.message);
-    this.canvasInstance.drawLine(box, this.boxes[0][0]);
   }
 
  /**
@@ -100,9 +99,14 @@ export class BrainetComponent implements OnInit, OnChanges {
  * @note may be useful for drag and drop animations later
  */
   dragMoved($event: CdkDragMove, box: ExampleBox) {
+
+    this.canvasInstance.deleteLine(box, this.boxes[0][0]);
+
     box.position = $event.source.getFreeDragPosition();
     console.log(box.position);
     console.log(window.innerHeight)
+
+    this.canvasInstance.drawLine(box, this.boxes[0][0]);
   }
 
   /**
