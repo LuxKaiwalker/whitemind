@@ -23,8 +23,6 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   //list of all boxes on screen or available
   boxes: ExampleBox[][] = [];//dim 1: type of box; dim 2: num of box
-  message: string = '';
-  position: {x: number, y: number} = {x: 0, y: 0};
 
   canvasInstance!: Canvas;
 
@@ -79,17 +77,16 @@ export class BrainetComponent implements OnInit, OnChanges {
   dragEnd($event: CdkDragEnd, box: ExampleBox) {
     console.log($event.source.getFreeDragPosition());
 
-    this.message= $event.source.element.nativeElement.innerText;
-    this.position= $event.source.getFreeDragPosition();
+    box.message= $event.source.element.nativeElement.innerText;
 
     const divElement = document.querySelector('.ui');
     const divHeight:number = divElement?.clientHeight || 0;
     
-    if(this.position.y+50 > divHeight*0.85){//ajusting to bin height, bit crappy. +50 because if half of box inside
+    if(box.position.y+50 > divHeight*0.85){//ajusting to bin height, bit crappy. +50 because if half of box inside
       this.removeBox(box);
     }
     
-    this.canvasInstance.drawBox(this.position.x, this.position.y, this.message);
+    this.canvasInstance.drawBox(box.position.x, box.position.y, box.message);
   }
 
  /**
@@ -101,7 +98,7 @@ export class BrainetComponent implements OnInit, OnChanges {
   dragMoved($event: CdkDragMove, box: ExampleBox) {
 
     this.canvasInstance.deleteLine(box, this.boxes[0][0]);
-
+    console.log(box.position);
     box.position = $event.source.getFreeDragPosition();
     console.log(box.position);
     console.log(window.innerHeight)
