@@ -3,19 +3,17 @@
 <div class="ui"><!-- check cdk drop list group-->
   
   <div class="vertical-bar">
-    <button (mousedown)="addBox(0)">Add item a</button>
+    <!-- <button (mousedown)="addBox(0)">Add item a</button>
     <button (mousedown)="addBox(1)">Add item b</button>
-    <button (mousedown)="addBox(2)">Add item c</button>
+    <button (mousedown)="addBox(2)">Add item c</button> -->
   </div>
 
+
+  
   <div *ngFor="let row of boxes">
-    <div class="example-box" *ngFor="let box of row" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEnd($event, box)">
+    <div class="example-box" id="box.id" *ngFor="let box of row" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEnd($event, box)">
       {{box.message}}
     </div>
-  </div>
-
-  <div class = "bin">
-    drop here to remove
   </div>
 
   <canvas #canvas>Canvas not properly loaded</canvas>

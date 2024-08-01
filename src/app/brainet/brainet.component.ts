@@ -34,9 +34,9 @@ export class BrainetComponent implements OnInit, OnChanges {
 
 
       //should work later
-      //this.addBox(0);
-      //this.addBox(1);
-      //this.addBox(2);
+      this.addBox(0);
+      this.addBox(1);
+      this.addBox(2);
 
 
       this.canvasInstance = new Canvas(ctx);
@@ -52,19 +52,16 @@ export class BrainetComponent implements OnInit, OnChanges {
    * @note typ is the type of box to be added
    */
   addBox(typ: number){
-    if(!this.boxes[typ]){//constructor for new box category if not initialized
-      this.boxes[typ] = [];
-    }
     const newBox = new ExampleBox(typ, this.boxes[typ].length + 1);
     this.boxes[typ].push(newBox);
   }
 
   removeBox(box: ExampleBox){
     const typ:number = box.typ;
-    const num:number = box.num;
+    const num:number = box.id;
     this.boxes[typ].splice(num-1, 1);
-    for(let i = num-1; i < this.boxes[typ].length; i++){
-      this.boxes[typ][i].num = i+1;
+    for (let i = num-1; i < this.boxes[typ].length; i++) {
+      this.boxes[typ][i].id = i+1;
     }
   }
 
@@ -103,7 +100,7 @@ export class BrainetComponent implements OnInit, OnChanges {
     console.log(box.position);
     console.log(window.innerHeight)
 
-    this.canvasInstance.drawLine(box, this.boxes[0][0]);
+    //this.canvasInstance.drawLine(box, this.boxes[0][0]);
   }
 
   /**
@@ -113,11 +110,10 @@ export class BrainetComponent implements OnInit, OnChanges {
    * @param box 
    */
   dragStart($event: CdkDragStart, box: ExampleBox){
-    const typ:number = box.typ;
-    const num:number = box.num;
-    if (this.boxes[typ][num-1].dragged === false) {
-      this.addBox(typ);
-      this.boxes[typ][num-1].dragged = true;
-    }
+    
+  }
+
+  newBoxStart($event: CdkDragStart, typ: number){
+
   }
 }
