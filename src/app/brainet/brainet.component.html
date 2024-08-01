@@ -3,9 +3,13 @@
 <div class="ui"><!-- check cdk drop list group-->
   
   <div class="vertical-bar">
-    <button (mousedown)="addBox(0)">Add item a</button>
-    <button (mousedown)="addBox(1)">Add item b</button>
-    <button (mousedown)="addBox(2)">Add item c</button>
+    <div cdkDropList class="example-list" (cdkDropListDropped)="drop($event)">
+      @for (row of boxes; track row) {
+        @for (box of row; track box) {
+          <div class="example-box" cdkDrag>{{box.message}}</div>
+        }
+      }
+    </div>
   </div>
 
   <div *ngFor="let row of boxes">

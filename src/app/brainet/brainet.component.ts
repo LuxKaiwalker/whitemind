@@ -1,6 +1,6 @@
 import { Component, OnInit, OnChanges, ViewChild, ElementRef } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { DragDropModule, CdkDragEnd, CdkDragMove, CdkDragStart } from '@angular/cdk/drag-drop';
+import { DragDropModule, CdkDragEnd, CdkDragMove, CdkDragStart, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { NgFor } from '@angular/common';
 import { CommonModule } from '@angular/common';
 
@@ -11,7 +11,7 @@ import { ExampleBox } from './draggables/brainet.draggable';
 @Component({
   selector: 'app-brainet',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, DragDropModule, NgFor, CommonModule],
+  imports: [RouterOutlet, HeaderComponent, DragDropModule, NgFor, CommonModule, CdkDropList],
   templateUrl: './brainet.component.html',
   styleUrl: './brainet.component.css'
 })
@@ -34,9 +34,9 @@ export class BrainetComponent implements OnInit, OnChanges {
 
 
       //should work later
-      //this.addBox(0);
-      //this.addBox(1);
-      //this.addBox(2);
+      this.addBox(0);
+      this.addBox(1);
+      this.addBox(2);
 
 
       this.canvasInstance = new Canvas(ctx);
@@ -119,5 +119,9 @@ export class BrainetComponent implements OnInit, OnChanges {
       this.addBox(typ);
       this.boxes[typ][num-1].dragged = true;
     }
+  }
+
+  drop($event: CdkDragDrop<ExampleBox[]>) {
+    //nothing yet, placeholder for drop event 
   }
 }
