@@ -3,10 +3,10 @@
 <div class="ui"><!-- check cdk drop list group-->
   
   <div class="vertical-bar">
-    <div cdkDropList class="example-list" (cdkDropListDropped)="drop($event)">
+    <div cdkDropList class="example-list">
       @for (row of boxes; track row) {
         @for (box of row; track box) {
-          <div class="example-box" cdkDrag>{{box.message}}</div>
+          <div class="example-box" cdkDrag (cdkDragStarted)="dragStart($event, box)">{{box.message}}</div>
         }
       }
     </div>
