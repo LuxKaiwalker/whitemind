@@ -90,18 +90,11 @@ export class Canvas{
     }
 
     deleteLine(box1: ExampleBox, box2: ExampleBox){
-        this.ctx.beginPath();
-        this.ctx.moveTo(box1.position.x, box1.position.y);
-        this.ctx.lineTo(box2.position.x, box2.position.y);
-        const width = Math.abs(box2.position.x - box1.position.x);
-        const height = Math.abs(box2.position.y - box1.position.y);
-        const minX = Math.min(box1.position.x, box2.position.x);
-        const minY = Math.min(box1.position.y, box2.position.y);
-        for (let x = minX; x <= minX + width; x++) {
-            for (let y = minY; y <= minY + height; y++) {
-                this.ctx.clearRect(x, y, 1, 1);
-            }
-        }
-        this.ctx.stroke();
+        const lineWidth = 10;
+        const width = Math.abs(box2.position.x - box1.position.x) + lineWidth;
+        const height = Math.abs(box2.position.y - box1.position.y) + lineWidth;
+        const minX = Math.min(box1.position.x, box2.position.x) - lineWidth / 2;
+        const minY = Math.min(box1.position.y, box2.position.y) - lineWidth / 2;
+        this.ctx.clearRect(minX, minY, width, height);
     }
 }
