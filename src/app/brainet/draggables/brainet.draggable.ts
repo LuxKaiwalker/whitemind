@@ -1,15 +1,17 @@
 export class ExampleBox {
     typ: number;
-    num: number;
+    id: number;
     position: {x: number, y: number};
-    dragged: boolean;
     message: string;
 
-    constructor(typ: number, num: number){
+    constructor(typ: number, id: number){
         this.typ = typ;
-        this.num = num;
+        this.id = id;
         this.position = {x: 0, y: 0};
-        this.dragged = false;
-        this.message = 'Box ' + this.num + ' of type ' + this.typ;
+        this.message = 'Box ' + this.id + ' of type ' + this.typ;
+    }
+
+    moveBox(x: number, y: number){
+        this.position = {x: x, y: y};
     }
 }

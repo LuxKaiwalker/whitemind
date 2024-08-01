@@ -22,7 +22,8 @@ export class BrainetComponent implements OnInit, OnChanges {
   myCanvas!: ElementRef;
 
   //list of all boxes on screen or available
-  boxes: ExampleBox[][] = [];//dim 1: type of box; dim 2: num of box
+  usedBoxes: ExampleBox[][] = [[],[],[]];//dim 1: type of box; dim 2: num of box ; all boxes in use
+  unusedBoxes: ExampleBox[] = []; // all boxes ready to be used
   message: string = '';
   position: {x: number, y: number} = {x: 0, y: 0};
 
@@ -36,9 +37,9 @@ export class BrainetComponent implements OnInit, OnChanges {
 
 
       //should work later
-      //this.addBox(0);
-      //this.addBox(1);
-      //this.addBox(2);
+      this.addBox(0);
+      this.addBox(1);
+      this.addBox(2);
 
 
       this.canvasInstance = new Canvas(ctx);
@@ -54,19 +55,16 @@ export class BrainetComponent implements OnInit, OnChanges {
    * @note typ is the type of box to be added
    */
   addBox(typ: number){
-    if(!this.boxes[typ]){//constructor for new box category if not initialized
-      this.boxes[typ] = [];
-    }
-    const newBox = new ExampleBox(typ, this.boxes[typ].length + 1);
-    this.boxes[typ].push(newBox);
+    const newBox = new ExampleBox(typ, this.usedBoxes[typ].length + 1);
+    this.unusedBoxes[typ] = newBox;
   }
 
   removeBox(box: ExampleBox){
     const typ:number = box.typ;
-    const num:number = box.num;
-    this.boxes[typ].splice(num-1, 1);
-    for(let i = num-1; i < this.boxes[typ].length; i++){
-      this.boxes[typ][i].num = i+1;
+    const num:number = box.id;
+    this.usedBoxes[typ].splice(num-1, 1);
+    for (let i = num-1; i < this.usedBoxes[typ].length; i++) {
+      this.usedBoxes[typ][i].id = i+1;
     }
   }
 
@@ -85,11 +83,16 @@ export class BrainetComponent implements OnInit, OnChanges {
     const divElement = document.querySelector('.ui');
     const divHeight:number = divElement?.clientHeight || 0;
     
-    if(this.position.y+50 > divHeight*0.85){//ajusting to bin height, bit crappy. +50 because if half of box inside
+    const typ:number = box.typ;
+    const num:number = box.id;
+    if(this.unusedBoxes[typ] == box){
+      this.usedBoxes[typ].push(box);
+      this.addBox(typ);
+    }
+    if(this.position.x < 12) {
       this.removeBox(box);
     }
-    
-    this.canvasInstance.drawBox(this.position.x, this.position.y, this.message);
+    // this.canvasInstance.drawBox(this.position.x, this.position.y, this.message);
   }
 
  /**
@@ -100,13 +103,13 @@ export class BrainetComponent implements OnInit, OnChanges {
  */
   dragMoved($event: CdkDragMove, box: ExampleBox) {
 
-    this.canvasInstance.deleteLine(box, this.boxes[0][0]);
+    //this.canvasInstance.deleteLine(box, this.boxes[0][0]);
 
     box.position = $event.source.getFreeDragPosition();
     console.log(box.position);
     console.log(window.innerHeight)
 
-    this.canvasInstance.drawLine(box, this.boxes[0][0]);
+    //this.canvasInstance.drawLine(box, this.boxes[0][0]);
   }
 
   /**
@@ -116,11 +119,11 @@ export class BrainetComponent implements OnInit, OnChanges {
    * @param box 
    */
   dragStart($event: CdkDragStart, box: ExampleBox){
-    const typ:number = box.typ;
-    const num:number = box.num;
-    if (this.boxes[typ][num-1].dragged === false) {
-      this.addBox(typ);
-      this.boxes[typ][num-1].dragged = true;
-    }
+
+    
+  }
+
+  newBoxStart($event: CdkDragStart, typ: number){
+    
   }
 }

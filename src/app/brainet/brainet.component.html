@@ -3,12 +3,17 @@
 <div class="ui"><!-- check cdk drop list group-->
   
   <div class="vertical-bar">
-    <button (mousedown)="addBox(0)">Add item a</button>
+    <!-- <button (mousedown)="addBox(0)">Add item a</button>
     <button (mousedown)="addBox(1)">Add item b</button>
-    <button (mousedown)="addBox(2)">Add item c</button>
+    <button (mousedown)="addBox(2)">Add item c</button> -->
   </div>
 
-  <div *ngFor="let row of boxes">
+
+  <div *ngFor="let box of unusedBoxes" class="example-box" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEnd($event, box)">
+    {{box.message}}
+  </div> 
+
+  <div *ngFor="let row of usedBoxes">
     <div class="example-box" *ngFor="let box of row" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEnd($event, box)">
       {{box.message}}
     </div>
