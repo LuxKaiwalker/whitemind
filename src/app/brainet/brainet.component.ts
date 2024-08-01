@@ -22,8 +22,7 @@ export class BrainetComponent implements OnInit, OnChanges {
   myCanvas!: ElementRef;
 
   //list of all boxes on screen or available
-  usedBoxes: ExampleBox[][] = [[],[],[]];//dim 1: type of box; dim 2: num of box ; all boxes in use
-  unusedBoxes: ExampleBox[] = []; // all boxes ready to be used
+  boxes: ExampleBox[][] = [[],[],[]];//dim 1: type of box; dim 2: num of box ; all boxes in use
   message: string = '';
   position: {x: number, y: number} = {x: 0, y: 0};
 
@@ -55,16 +54,16 @@ export class BrainetComponent implements OnInit, OnChanges {
    * @note typ is the type of box to be added
    */
   addBox(typ: number){
-    const newBox = new ExampleBox(typ, this.usedBoxes[typ].length + 1);
-    this.unusedBoxes[typ] = newBox;
+    const newBox = new ExampleBox(typ, this.boxes[typ].length + 1);
+    this.boxes[typ].push(newBox);
   }
 
   removeBox(box: ExampleBox){
     const typ:number = box.typ;
     const num:number = box.id;
-    this.usedBoxes[typ].splice(num-1, 1);
-    for (let i = num-1; i < this.usedBoxes[typ].length; i++) {
-      this.usedBoxes[typ][i].id = i+1;
+    this.boxes[typ].splice(num-1, 1);
+    for (let i = num-1; i < this.boxes[typ].length; i++) {
+      this.boxes[typ][i].id = i+1;
     }
   }
 
@@ -85,9 +84,9 @@ export class BrainetComponent implements OnInit, OnChanges {
     
     const typ:number = box.typ;
     const num:number = box.id;
-    if(this.unusedBoxes[typ] == box){
-      this.usedBoxes[typ].push(box);
+    if(box.unused){
       this.addBox(typ);
+
     }
     if(this.position.x < 12) {
       this.removeBox(box);
@@ -119,11 +118,10 @@ export class BrainetComponent implements OnInit, OnChanges {
    * @param box 
    */
   dragStart($event: CdkDragStart, box: ExampleBox){
-
     
   }
 
   newBoxStart($event: CdkDragStart, typ: number){
-    
+
   }
 }

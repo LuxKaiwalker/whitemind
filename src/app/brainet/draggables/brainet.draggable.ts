@@ -3,6 +3,7 @@ export class ExampleBox {
     id: number;
     position: {x: number, y: number};
     message: string;
+    unused: boolean = true;
 
     constructor(typ: number, id: number){
         this.typ = typ;
@@ -13,5 +14,6 @@ export class ExampleBox {
 
     moveBox(x: number, y: number){
         this.position = {x: x, y: y};
+        
     }
 }
