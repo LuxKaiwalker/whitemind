@@ -47,7 +47,7 @@ export class BrainetComponent implements OnInit, OnChanges {
   }
 
   /**
-   * @brief function to add a new box to the screen
+   * @brief function to add a new bs[typ] iox to the screen
    * @param typ 
    * @note typ is the type of box to be added
    */
@@ -115,9 +115,5 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   newBoxStart($event: CdkDragStart, typ: number){
 
-  }
-
-  drop($event: CdkDragDrop<ExampleBox[]>) {
-    //nothing yet, placeholder for drop event 
   }
 }

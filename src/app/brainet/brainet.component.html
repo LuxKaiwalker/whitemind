@@ -3,19 +3,13 @@
 <div class="ui"><!-- check cdk drop list group-->
   
   <div class="vertical-bar">
-<<<<<<< HEAD
     <div cdkDropList class="example-list">
       @for (row of boxes; track row) {
-        @for (box of row; track box) {
-          <div class="example-box" cdkDrag (cdkDragStarted)="dragStart($event, box)">{{box.message}}</div>
+        @for (box of row; track box){
+          <div class="example-box" cdkDrag>{{box.message}}</div>
         }
       }
     </div>
-=======
-    <!-- <button (mousedown)="addBox(0)">Add item a</button>
-    <button (mousedown)="addBox(1)">Add item b</button>
-    <button (mousedown)="addBox(2)">Add item c</button> -->
->>>>>>> c2e16681f9ab13e26332e60bb8333f6d8525ed98
   </div>
 
 
@@ -27,6 +21,10 @@
   </div>
 
   <canvas #canvas>Canvas not properly loaded</canvas>
+</div>
+
+<div class = "bin">
+  drop here to remove
 </div>
 
 <router-outlet></router-outlet>
