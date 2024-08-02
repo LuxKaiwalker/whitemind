@@ -3,12 +3,14 @@ header {
   background-color: #333;
   color: #fff;
   padding: 10px 0;
-  height: 5em;
+  height: 4em;
   font-size: 20px;
 }
 
 nav {
   float: right;
+  margin-top: 10px; 
+  margin-right: 10px;
 }
 
 nav a {
