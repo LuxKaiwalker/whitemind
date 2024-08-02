@@ -5,20 +5,40 @@
 <div class="ui"><!-- check cdk drop list group-->
   
   <div class="vertical-bar">
-    <div cdkDropList class="example-list">
-      @for (row of boxes; track row) {
-        @for (box of row; track box){
-          <div class="example-box" cdkDrag>{{box.message}}</div>
+    <div cdkDropList
+    #panellist = "cdkDropList"
+    class="example-list"
+    [cdkDropListData]="panel"
+    [cdkDropListConnectedTo]="[workspacelist]"
+    >
+      @for (row of panel; track row) {
+        @for (box of row; track box) {
+          <div class="example-box" cdkDrag cdkDragBoundary=".ui">{{box.message}}</div>
+
         }
       }
     </div>
   </div>
 
-
+  <div class="example-container">
+    <h2>Done</h2>
   
-  <div *ngFor="let row of boxes">
+    <div
+      cdkDropList
+      #workspacelist="cdkDropList"
+      [cdkDropListData]="workspace"
+      [cdkDropListConnectedTo]="[panellist]"
+      class="example-list">
+      @for (row of workspace; track row) {
+        @for (box of row; track box) {
+          <div class="example-box" cdkDrag cdkDragBoundary=".ui">{{box.message}}</div>
+        }
+      }
+
+  <!-- <div *ngFor="let row of boxes">
     <div class="example-box" id="box.id" *ngFor="let box of row" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEnd($event, box)">
-      {{box.message}}
+      {{box.message}} -->
+
     </div>
   </div>
 
