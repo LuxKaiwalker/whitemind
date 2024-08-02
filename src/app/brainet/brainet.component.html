@@ -14,11 +14,11 @@
       @for (row of panel; track row) {
         @for (box of row; track box) {
           <div class="example-box" cdkDrag cdkDragBoundary=".ui">{{box.message}}</div>
+
         }
       }
     </div>
   </div>
-
 
   <div class="example-container">
     <h2>Done</h2>
@@ -34,14 +34,19 @@
           <div class="example-box" cdkDrag cdkDragBoundary=".ui">{{box.message}}</div>
         }
       }
+
+  <!-- <div *ngFor="let row of boxes">
+    <div class="example-box" id="box.id" *ngFor="let box of row" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEnd($event, box)">
+      {{box.message}} -->
+
     </div>
   </div>
 
-  <div class = "bin">
-    drop here to remove
-  </div>
-
   <canvas #canvas>Canvas not properly loaded</canvas>
+</div>
+
+<div class = "bin">
+  drop here to remove
 </div>
 
 <router-outlet></router-outlet>

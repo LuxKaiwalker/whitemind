@@ -48,25 +48,26 @@ export class BrainetComponent implements OnInit, OnChanges {
   }
 
   /**
-   * @brief function to add a new box to the screen
+   * @brief function to add a new bs[typ] iox to the screen
    * @param typ 
    * @note typ is the type of box to be added
    */
-  
+
   addBox(area: ExampleBox[][], typ: number){
       if(!area[typ]){//constructor for new box category if not initialized
         area[typ] = [];
       }
       const newBox = new ExampleBox(typ, area[typ].length + 1);
       area[typ].push(newBox);
+
   }
   /*
     removeBox(box: ExampleBox){
     const typ:number = box.typ;
-    const num:number = box.num;
+    const num:number = box.id;
     this.boxes[typ].splice(num-1, 1);
-    for(let i = num-1; i < this.boxes[typ].length; i++){
-      this.boxes[typ][i].num = i+1;
+    for (let i = num-1; i < this.boxes[typ].length; i++) {
+      this.boxes[typ][i].id = i+1;
     }
   }*/
 
@@ -110,6 +111,7 @@ export class BrainetComponent implements OnInit, OnChanges {
     this.canvasInstance.drawLine(box, this.boxes[0][0]);
   }*/
 
+
   /**
    * @brief function to be called when a drag event starts.
    * mainly used to update drag panel to check if we need to spawn new box
@@ -118,6 +120,7 @@ export class BrainetComponent implements OnInit, OnChanges {
    */
   /*
   dragStart($event: CdkDragStart, box: ExampleBox){
+
     const typ:number = box.typ;
     const num:number = box.num;
     if (this.boxes[typ][num-1].dragged === false) {
@@ -137,5 +140,6 @@ export class BrainetComponent implements OnInit, OnChanges {
       );
     }
   }
+
 
 }
