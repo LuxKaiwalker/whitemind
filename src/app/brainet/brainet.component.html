@@ -1,22 +1,52 @@
 <app-header></app-header>
 
+<p>commit revert works!</p>
+
 <div class="ui"><!-- check cdk drop list group-->
   
   <div class="vertical-bar">
-    <!-- <button (mousedown)="addBox(0)">Add item a</button>
-    <button (mousedown)="addBox(1)">Add item b</button>
-    <button (mousedown)="addBox(2)">Add item c</button> -->
+    <div cdkDropList
+    #panellist = "cdkDropList"
+    class="example-list"
+    [cdkDropListData]="panel"
+    [cdkDropListConnectedTo]="[workspacelist]"
+    >
+      @for (row of panel; track row) {
+        @for (box of row; track box) {
+          <div class="example-box" cdkDrag cdkDragBoundary=".ui">{{box.message}}</div>
+
+        }
+      }
+    </div>
   </div>
 
-
+  <div class="example-container">
+    <h2>Done</h2>
   
-  <div *ngFor="let row of boxes">
+    <div
+      cdkDropList
+      #workspacelist="cdkDropList"
+      [cdkDropListData]="workspace"
+      [cdkDropListConnectedTo]="[panellist]"
+      class="example-list">
+      @for (row of workspace; track row) {
+        @for (box of row; track box) {
+          <div class="example-box" cdkDrag cdkDragBoundary=".ui">{{box.message}}</div>
+        }
+      }
+
+  <!-- <div *ngFor="let row of boxes">
     <div class="example-box" id="box.id" *ngFor="let box of row" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEnd($event, box)">
-      {{box.message}}
+      {{box.message}} -->
+
     </div>
   </div>
 
   <canvas #canvas>Canvas not properly loaded</canvas>
+</div>
+
+<div class = "bin">
+  drop here to remove
 </div>
 
 <router-outlet></router-outlet>
