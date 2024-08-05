@@ -22,7 +22,8 @@ export class BrainetComponent implements OnInit, OnChanges {
   myCanvas!: ElementRef;
 
   //list of all boxes on screen or available
-  boxes: ExampleBox[][] = [];//dim 1: type of box; dim 2: num of box
+  panel: ExampleBox[][] = [];//dim 1: type of box; dim 2: num of box
+  workspace: ExampleBox[][] = [];//dim 1: type of box; dim 2: num of box
 
   canvasInstance!: Canvas;
 
@@ -34,9 +35,9 @@ export class BrainetComponent implements OnInit, OnChanges {
 
 
       //should work later
-      //this.addBox(0);
-      //this.addBox(1);
-      //this.addBox(2);
+      //this.addBox(0, panel);
+      //this.addBox(1, panel);
+      //this.addBox(2, panel);
 
 
       this.canvasInstance = new Canvas(ctx);
@@ -51,20 +52,21 @@ export class BrainetComponent implements OnInit, OnChanges {
    * @param typ 
    * @note typ is the type of box to be added
    */
-  addBox(typ: number){
-    if(!this.boxes[typ]){//constructor for new box category if not initialized
-      this.boxes[typ] = [];
+  addBox(typ: number, boxes: ExampleBox[][]){
+    if(!boxes[typ]){//constructor for new box category if not initialized
+      boxes[typ] = [];
     }
-    const newBox = new ExampleBox(typ, this.boxes[typ].length + 1);
-    this.boxes[typ].push(newBox);
+    const newBox = new ExampleBox(typ, boxes[typ].length + 1);
+    newBox.position = {x: 0, y: typ*100};
+    boxes[typ].push(newBox);
   }
 
-  removeBox(box: ExampleBox){
+  removeBox(box: ExampleBox, boxes: ExampleBox[][]){
     const typ:number = box.typ;
     const num:number = box.num;
-    this.boxes[typ].splice(num-1, 1);
-    for(let i = num-1; i < this.boxes[typ].length; i++){
-      this.boxes[typ][i].num = i+1;
+    boxes[typ].splice(num-1, 1);
+    for(let i = num-1; i < boxes[typ].length; i++){
+      boxes[typ][i].num = i+1;
     }
   }
 
@@ -83,7 +85,7 @@ export class BrainetComponent implements OnInit, OnChanges {
     const divHeight:number = divElement?.clientHeight || 0;
     
     if(box.position.y+50 > divHeight*0.85){//ajusting to bin height, bit crappy. +50 because if half of box inside
-      this.removeBox(box);
+      this.removeBox(box, this.workspace);
     }
     
     this.canvasInstance.drawBox(box.position.x, box.position.y, box.message);
@@ -97,13 +99,13 @@ export class BrainetComponent implements OnInit, OnChanges {
  */
   dragMoved($event: CdkDragMove, box: ExampleBox) {
 
-    this.canvasInstance.deleteLine(box, this.boxes[0][0]);
+    this.canvasInstance.deleteLine(box, this.workspace[0][0]);
     console.log(box.position);
     box.position = $event.source.getFreeDragPosition();
     console.log(box.position);
     console.log(window.innerHeight)
 
-    this.canvasInstance.drawLine(box, this.boxes[0][0]);
+    this.canvasInstance.drawLine(box, this.workspace[0][0]);
   }
 
   /**
@@ -114,10 +116,9 @@ export class BrainetComponent implements OnInit, OnChanges {
    */
   dragStart($event: CdkDragStart, box: ExampleBox){
     const typ:number = box.typ;
-    const num:number = box.num;
-    if (this.boxes[typ][num-1].dragged === false) {
-      this.addBox(typ);
-      this.boxes[typ][num-1].dragged = true;
+    if (this.panel[typ] && this.panel[typ].includes(box)) {
+      this.addBox(typ, this.panel);
+      this.addBox(typ, this.workspace);//has to be fixed later
     }
   }
 }
