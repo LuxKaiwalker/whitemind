@@ -9,7 +9,7 @@
   </div>
 
   <div *ngFor="let row of panel">
-    <div class="example-box" *ngFor="let box of row" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEnd($event, box)" [cdkDragFreeDragPosition]="box.position">
+    <div class="example-box" *ngFor="let box of row" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEndPanel($event, box)" [cdkDragFreeDragPosition]="box.position">
       {{box.message}}
     </div>
   </div>

@@ -35,9 +35,9 @@ export class BrainetComponent implements OnInit, OnChanges {
 
 
       //should work later
-      //this.addBox(0, panel);
-      //this.addBox(1, panel);
-      //this.addBox(2, panel);
+      this.addBox(0, this.panel, {x: 0, y: 0});
+      this.addBox(1, this.panel, {x: 0, y: 100});
+      this.addBox(2, this.panel, {x: 0, y: 200});
 
 
       this.canvasInstance = new Canvas(ctx);
@@ -52,13 +52,18 @@ export class BrainetComponent implements OnInit, OnChanges {
    * @param typ 
    * @note typ is the type of box to be added
    */
-  addBox(typ: number, boxes: ExampleBox[][]){
-    if(!boxes[typ]){//constructor for new box category if not initialized
+  addBox(typ: number, boxes: ExampleBox[][], position: {x: number, y: number} = {x: 0, y: 0}) {
+    if (!boxes[typ]) {//constructor for new box category if not initialized
       boxes[typ] = [];
     }
     const newBox = new ExampleBox(typ, boxes[typ].length + 1);
-    newBox.position = {x: 0, y: typ*100};
+    newBox.position = position;
     boxes[typ].push(newBox);
+  }
+
+  removePanelBox(box: ExampleBox, boxes: ExampleBox[][]){
+    const typ:number = box.typ;
+    boxes[typ].splice(0, 1);
   }
 
   removeBox(box: ExampleBox, boxes: ExampleBox[][]){
@@ -79,6 +84,8 @@ export class BrainetComponent implements OnInit, OnChanges {
   dragEnd($event: CdkDragEnd, box: ExampleBox) {
     console.log($event.source.getFreeDragPosition());
 
+    box.position = $event.source.getFreeDragPosition();
+
     box.message= $event.source.element.nativeElement.innerText;
 
     const divElement = document.querySelector('.ui');
@@ -89,6 +96,11 @@ export class BrainetComponent implements OnInit, OnChanges {
     }
     
     this.canvasInstance.drawBox(box.position.x, box.position.y, box.message);
+  }
+
+  dragEndPanel($event: CdkDragEnd, box: ExampleBox){
+    this.removePanelBox(box, this.panel);
+    this.addBox(box.typ, this.workspace);
   }
 
  /**
@@ -117,8 +129,7 @@ export class BrainetComponent implements OnInit, OnChanges {
   dragStart($event: CdkDragStart, box: ExampleBox){
     const typ:number = box.typ;
     if (this.panel[typ] && this.panel[typ].includes(box)) {
-      this.addBox(typ, this.panel);
-      this.addBox(typ, this.workspace);//has to be fixed later
+      this.addBox(typ, this.panel, {x:0, y:100*typ});
     }
   }
 }
