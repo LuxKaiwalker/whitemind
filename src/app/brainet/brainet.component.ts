@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 
 import { HeaderComponent } from '../header/header.component';
 import { Canvas } from './canvas/brainet.canvas'
-import { ExampleBox } from './draggables/brainet.draggable';
+import { Box } from './draggables/brainet.draggable';
 
 @Component({
   selector: 'app-brainet',
@@ -22,8 +22,10 @@ export class BrainetComponent implements OnInit, OnChanges {
   myCanvas!: ElementRef;
 
   //list of all boxes on screen or available
-  panel: ExampleBox[][] = [];//dim 1: type of box; dim 2: num of box
-  workspace: ExampleBox[][] = [];//dim 1: type of box; dim 2: num of box
+  panel: Box[] = [];//dim 1: type of box;
+  workspace: Box[][] = [];//dim 1: type of box; dim 2: num of box
+
+  box_count: number = 0;
 
   canvasInstance!: Canvas;
 
@@ -35,9 +37,6 @@ export class BrainetComponent implements OnInit, OnChanges {
 
 
       //should work later
-      this.addBox(0, this.panel, {x: 0, y: 0});
-      this.addBox(1, this.panel, {x: 0, y: 100});
-      this.addBox(2, this.panel, {x: 0, y: 200});
 
 
       this.canvasInstance = new Canvas(ctx);
@@ -52,28 +51,28 @@ export class BrainetComponent implements OnInit, OnChanges {
    * @param typ 
    * @note typ is the type of box to be added
    */
-  addBox(typ: number, boxes: ExampleBox[][], position: {x: number, y: number} = {x: 0, y: 0}) {
-    if (!boxes[typ]) {//constructor for new box category if not initialized
-      boxes[typ] = [];
+  newWorkspaceBox(typ: number, id: number, position: {x: number, y: number} = {x: 0, y: 0}) {
+    if (!this.workspace[typ]) {//constructor for new box category if not initialized
+      this.workspace[typ] = [];
     }
-    const newBox = new ExampleBox(typ, boxes[typ].length + 1);
-    newBox.position = position;
-    boxes[typ].push(newBox);
+    this.workspace[typ].push(new Box(typ, id, position));
+    this.workspace[typ][this.workspace[typ].length - 1].position = position;
   }
 
-  removePanelBox(box: ExampleBox, boxes: ExampleBox[][]){
-    const typ:number = box.typ;
-    boxes[typ].splice(0, 1);
+  newPanelBox(typ: number){
+    this.panel[typ] = new Box(typ, this.box_count);
+    this.box_count++;
+    this.panel[typ].position = {x: 0, y: typ*100};
   }
 
-  removeBox(box: ExampleBox, boxes: ExampleBox[][]){
-    const typ:number = box.typ;
-    const num:number = box.num;
-    boxes[typ].splice(num-1, 1);
-    for(let i = num-1; i < boxes[typ].length; i++){
-      boxes[typ][i].num = i+1;
-    }
-  }
+  // removeBox(box: Box, boxes: Box[][]){
+  //   const typ:number = box.typ;
+  //   const num:number = box.num;
+  //   boxes[typ].splice(num-1, 1);
+  //   for(let i = num-1; i < boxes[typ].length; i++){
+  //     boxes[typ][i].num = i+1;
+  //   }
+  // }
 
   /**
    * @brief function to be called when a drag event is detected
@@ -81,26 +80,27 @@ export class BrainetComponent implements OnInit, OnChanges {
    * @param box
    * @note used to pass down component data to canvas
    */
-  dragEnd($event: CdkDragEnd, box: ExampleBox) {
-    console.log($event.source.getFreeDragPosition());
+  dragEnd($event: CdkDragEnd, box: Box) {
+    // console.log($event.source.getFreeDragPosition());
 
     box.position = $event.source.getFreeDragPosition();
 
     box.message= $event.source.element.nativeElement.innerText;
 
-    const divElement = document.querySelector('.ui');
-    const divHeight:number = divElement?.clientHeight || 0;
+    // const divElement = document.querySelector('.ui');
+    // const divHeight:number = divElement?.clientHeight || 0;
     
-    if(box.position.y+50 > divHeight*0.85){//ajusting to bin height, bit crappy. +50 because if half of box inside
-      this.removeBox(box, this.workspace);
-    }
+    // if(box.position.y+50 > divHeight*0.85){//ajusting to bin height, bit crappy. +50 because if half of box inside
+    //   this.removeBox(box, this.workspace);
+    // }
     
-    this.canvasInstance.drawBox(box.position.x, box.position.y, box.message);
+    // this.canvasInstance.drawBox(box.position.x, box.position.y, box.message);
   }
 
-  dragEndPanel($event: CdkDragEnd, box: ExampleBox){
-    this.removePanelBox(box, this.panel);
-    this.addBox(box.typ, this.workspace);
+  dragEndPanel($event: CdkDragEnd, box: Box){
+    this.newWorkspaceBox(box.typ, box.num, $event.source.getFreeDragPosition());
+    this.newPanelBox(box.typ);
+    
   }
 
  /**
@@ -109,15 +109,14 @@ export class BrainetComponent implements OnInit, OnChanges {
  * @param box
  * @note may be useful for drag and drop animations later
  */
-  dragMoved($event: CdkDragMove, box: ExampleBox) {
+  dragMoved($event: CdkDragMove, box: Box) {
 
-    this.canvasInstance.deleteLine(box, this.workspace[0][0]);
-    console.log(box.position);
-    box.position = $event.source.getFreeDragPosition();
-    console.log(box.position);
-    console.log(window.innerHeight)
+    // this.canvasInstance.deleteLine(box, this.workspace[0][0]);
+    // console.log(box.position);
+    // console.log(box.position);
+    // console.log(window.innerHeight)
 
-    this.canvasInstance.drawLine(box, this.workspace[0][0]);
+    // this.canvasInstance.drawLine(box, this.workspace[0][0]);
   }
 
   /**
@@ -126,10 +125,7 @@ export class BrainetComponent implements OnInit, OnChanges {
    * @param $event 
    * @param box 
    */
-  dragStart($event: CdkDragStart, box: ExampleBox){
-    const typ:number = box.typ;
-    if (this.panel[typ] && this.panel[typ].includes(box)) {
-      this.addBox(typ, this.panel, {x:0, y:100*typ});
-    }
+  dragStart($event: CdkDragStart, box: Box){
+    
   }
 }

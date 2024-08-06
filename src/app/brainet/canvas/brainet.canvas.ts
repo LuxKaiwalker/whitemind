@@ -1,4 +1,4 @@
-import { ExampleBox } from "../draggables/brainet.draggable";
+import { Box } from "../draggables/brainet.draggable";
 
 export class Canvas{
     ctx: any;
@@ -82,14 +82,14 @@ export class Canvas{
         this.ctx.fillText(message, x + width / 2, y + height / 2);
     }
 
-    drawLine(box1: ExampleBox, box2: ExampleBox){
+    drawLine(box1: Box, box2: Box){
         this.ctx.beginPath();
         this.ctx.moveTo(box1.position.x, box1.position.y);
         this.ctx.lineTo(box2.position.x, box2.position.y);
         this.ctx.stroke();
     }
 
-    deleteLine(box1: ExampleBox, box2: ExampleBox){
+    deleteLine(box1: Box, box2: Box){
         const lineWidth = 10;
         const width = Math.abs(box2.position.x - box1.position.x) + lineWidth;
         const height = Math.abs(box2.position.y - box1.position.y) + lineWidth;
