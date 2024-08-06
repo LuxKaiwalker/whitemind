@@ -3,18 +3,20 @@
 <div class="ui"><!-- check cdk drop list group-->
   
   <div class="vertical-bar">
-    <div cdkDropList
-    #panellist = "cdkDropList"
-    class="example-list"
-    [cdkDropListData]="panel"
-    [cdkDropListConnectedTo]="[workspacelist]"
-    >
-      @for (row of panel; track row) {
-        @for (box of row; track box) {
-          <div class="example-box" cdkDrag cdkDragBoundary=".ui">{{box.message}}</div>
+    <button (mousedown)="addBox(0, panel)">Add item a</button>
+    <button (mousedown)="addBox(1, panel)">Add item b</button>
+    <button (mousedown)="addBox(2, panel)">Add item c</button>
+  </div>
 
-        }
-      }
+  <div *ngFor="let row of panel">
+    <div class="example-box" *ngFor="let box of row" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEndPanel($event, box)" [cdkDragFreeDragPosition]="box.position">
+      {{box.message}}
+    </div>
+  </div>
+
+  <div *ngFor="let row of workspace">
+    <div class="example-box" *ngFor="let box of row" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEnd($event, box)">
+      {{box.message}}
     </div>
   </div>
 

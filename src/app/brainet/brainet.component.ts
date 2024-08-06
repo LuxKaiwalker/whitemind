@@ -22,8 +22,8 @@ export class BrainetComponent implements OnInit, OnChanges {
   myCanvas!: ElementRef;
 
   //list of all boxes on screen or available
-  workspace: ExampleBox[][] = [];//dim 1: type of box; dim 2: num of box
   panel: ExampleBox[][] = [];//dim 1: type of box; dim 2: num of box
+  workspace: ExampleBox[][] = [];//dim 1: type of box; dim 2: num of box
 
   canvasInstance!: Canvas;
 
@@ -35,9 +35,9 @@ export class BrainetComponent implements OnInit, OnChanges {
 
 
       //should work later
-      this.addBox(this.panel, 0);
-      this.addBox(this.panel, 1);
-      this.addBox(this.panel, 2);
+      this.addBox(0, this.panel, {x: 0, y: 0});
+      this.addBox(1, this.panel, {x: 0, y: 100});
+      this.addBox(2, this.panel, {x: 0, y: 200});
 
 
       this.canvasInstance = new Canvas(ctx);
@@ -52,22 +52,26 @@ export class BrainetComponent implements OnInit, OnChanges {
    * @param typ 
    * @note typ is the type of box to be added
    */
-
-  addBox(area: ExampleBox[][], typ: number){
-      if(!area[typ]){//constructor for new box category if not initialized
-        area[typ] = [];
-      }
-      const newBox = new ExampleBox(typ, area[typ].length + 1);
-      area[typ].push(newBox);
-
+  addBox(typ: number, boxes: ExampleBox[][], position: {x: number, y: number} = {x: 0, y: 0}) {
+    if (!boxes[typ]) {//constructor for new box category if not initialized
+      boxes[typ] = [];
+    }
+    const newBox = new ExampleBox(typ, boxes[typ].length + 1);
+    newBox.position = position;
+    boxes[typ].push(newBox);
   }
-  /*
-    removeBox(box: ExampleBox){
+
+  removePanelBox(box: ExampleBox, boxes: ExampleBox[][]){
     const typ:number = box.typ;
-    const num:number = box.id;
-    this.boxes[typ].splice(num-1, 1);
-    for (let i = num-1; i < this.boxes[typ].length; i++) {
-      this.boxes[typ][i].id = i+1;
+    boxes[typ].splice(0, 1);
+  }
+
+  removeBox(box: ExampleBox, boxes: ExampleBox[][]){
+    const typ:number = box.typ;
+    const num:number = box.num;
+    boxes[typ].splice(num-1, 1);
+    for(let i = num-1; i < boxes[typ].length; i++){
+      boxes[typ][i].num = i+1;
     }
   }*/
 
@@ -80,16 +84,23 @@ export class BrainetComponent implements OnInit, OnChanges {
   dragEnd($event: CdkDragEnd, box: ExampleBox) {
     console.log($event.source.getFreeDragPosition());
 
+    box.position = $event.source.getFreeDragPosition();
+
     box.message= $event.source.element.nativeElement.innerText;
 
     const divElement = document.querySelector('.ui');
     const divHeight:number = divElement?.clientHeight || 0;
     
     if(box.position.y+50 > divHeight*0.85){//ajusting to bin height, bit crappy. +50 because if half of box inside
-      //this.removeBox(box);
+      this.removeBox(box, this.workspace);
     }
     
     this.canvasInstance.drawBox(box.position.x, box.position.y, box.message);
+  }
+
+  dragEndPanel($event: CdkDragEnd, box: ExampleBox){
+    this.removePanelBox(box, this.panel);
+    this.addBox(box.typ, this.workspace);
   }
 
  /**
@@ -102,15 +113,14 @@ export class BrainetComponent implements OnInit, OnChanges {
  /*
   dragMoved($event: CdkDragMove, box: ExampleBox) {
 
-    this.canvasInstance.deleteLine(box, this.boxes[0][0]);
+    this.canvasInstance.deleteLine(box, this.workspace[0][0]);
     console.log(box.position);
     box.position = $event.source.getFreeDragPosition();
     console.log(box.position);
     console.log(window.innerHeight)
 
-    this.canvasInstance.drawLine(box, this.boxes[0][0]);
-  }*/
-
+    this.canvasInstance.drawLine(box, this.workspace[0][0]);
+  }
 
   /**
    * @brief function to be called when a drag event starts.
@@ -122,10 +132,8 @@ export class BrainetComponent implements OnInit, OnChanges {
   dragStart($event: CdkDragStart, box: ExampleBox){
 
     const typ:number = box.typ;
-    const num:number = box.num;
-    if (this.boxes[typ][num-1].dragged === false) {
-      this.addBox(typ);
-      this.boxes[typ][num-1].dragged = true;
+    if (this.panel[typ] && this.panel[typ].includes(box)) {
+      this.addBox(typ, this.panel, {x:0, y:100*typ});
     }
   }*/
 
