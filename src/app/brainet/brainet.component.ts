@@ -1,6 +1,6 @@
 import { Component, OnInit, OnChanges, ViewChild, ElementRef } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { DragDropModule, CdkDragEnd, CdkDragMove, CdkDragStart } from '@angular/cdk/drag-drop';
+import { DragDropModule, CdkDragEnd, CdkDragMove, CdkDragStart, CdkDragDrop, CdkDropList, transferArrayItem } from '@angular/cdk/drag-drop';
 import { NgFor } from '@angular/common';
 import { CommonModule } from '@angular/common';
 
@@ -11,7 +11,7 @@ import { ExampleBox } from './draggables/brainet.draggable';
 @Component({
   selector: 'app-brainet',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, DragDropModule, NgFor, CommonModule],
+  imports: [RouterOutlet, HeaderComponent, DragDropModule, NgFor, CommonModule, CdkDropList],
   templateUrl: './brainet.component.html',
   styleUrl: './brainet.component.css'
 })
@@ -48,7 +48,7 @@ export class BrainetComponent implements OnInit, OnChanges {
   }
 
   /**
-   * @brief function to add a new box to the screen
+   * @brief function to add a new bs[typ] iox to the screen
    * @param typ 
    * @note typ is the type of box to be added
    */
@@ -73,7 +73,7 @@ export class BrainetComponent implements OnInit, OnChanges {
     for(let i = num-1; i < boxes[typ].length; i++){
       boxes[typ][i].num = i+1;
     }
-  }
+  }*/
 
   /**
    * @brief function to be called when a drag event is detected
@@ -109,6 +109,8 @@ export class BrainetComponent implements OnInit, OnChanges {
  * @param box
  * @note may be useful for drag and drop animations later
  */
+
+ /*
   dragMoved($event: CdkDragMove, box: ExampleBox) {
 
     this.canvasInstance.deleteLine(box, this.workspace[0][0]);
@@ -126,10 +128,26 @@ export class BrainetComponent implements OnInit, OnChanges {
    * @param $event 
    * @param box 
    */
+  /*
   dragStart($event: CdkDragStart, box: ExampleBox){
+
     const typ:number = box.typ;
     if (this.panel[typ] && this.panel[typ].includes(box)) {
       this.addBox(typ, this.panel, {x:0, y:100*typ});
     }
+  }*/
+
+  drop(event: CdkDragDrop<ExampleBox[]>) {
+    if (event.previousContainer === event.container) {
+    } else {
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex,
+      );
+    }
   }
+
+
 }

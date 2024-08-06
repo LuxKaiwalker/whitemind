@@ -1,4 +1,4 @@
-<app-header></app-header>
+<p>commit revert works!</p>
 
 <div class="ui"><!-- check cdk drop list group-->
   
@@ -20,11 +20,31 @@
     </div>
   </div>
 
-  <div class = "bin">
-    drop here to remove
+  <div class="example-container">
+    <h2>Done</h2>
+  
+    <div
+      cdkDropList
+      #workspacelist="cdkDropList"
+      [cdkDropListData]="workspace"
+      [cdkDropListConnectedTo]="[panellist]"
+      class="example-list">
+      @for (row of workspace; track row) {
+        @for (box of row; track box) {
+          <div class="example-box" cdkDrag cdkDragBoundary=".ui">{{box.message}}</div>
+        }
+      }
+
+  <!-- <div *ngFor="let row of boxes">
+    <div class="example-box" id="box.id" *ngFor="let box of row" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEnd($event, box)">
+      {{box.message}} -->
+
+    </div>
   </div>
 
   <canvas #canvas>Canvas not properly loaded</canvas>
 </div>
 
-<router-outlet></router-outlet>
+<div class = "bin">
+  drop here to remove
+</div>
