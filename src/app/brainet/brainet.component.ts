@@ -8,6 +8,9 @@ import { HeaderComponent } from '../header/header.component';
 import { Canvas } from './canvas/brainet.canvas'
 import { ExampleBox } from './draggables/brainet.draggable';
 
+
+//bug fix
+
 @Component({
   selector: 'app-brainet',
   standalone: true,
