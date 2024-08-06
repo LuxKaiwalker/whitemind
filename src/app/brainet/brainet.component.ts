@@ -22,10 +22,10 @@ export class BrainetComponent implements OnInit, OnChanges {
   myCanvas!: ElementRef;
 
   //list of all boxes on screen or available
-  panel: Box[] = [];//dim 1: type of box;
   workspace: Box[][] = [];//dim 1: type of box; dim 2: num of box
 
   box_count: number = 0;
+  zindex_count: number = 0;
 
   canvasInstance!: Canvas;
 
@@ -36,43 +36,47 @@ export class BrainetComponent implements OnInit, OnChanges {
       canvas.height = window.innerHeight;
 
 
-      //should work later
+      this.newPanelBox(0);
+      this.newPanelBox(1);
+      this.newPanelBox(2);
 
 
       this.canvasInstance = new Canvas(ctx);
-  
   }
 
-  ngOnChanges(){//nothing yet
-  }
+  ngOnChanges(){}
 
-  /**
-   * @brief function to add a new box to the screen
-   * @param typ 
-   * @note typ is the type of box to be added
-   */
-  newWorkspaceBox(typ: number, id: number, position: {x: number, y: number} = {x: 0, y: 0}) {
+
+  // box handling
+  newBox(typ: number, position: {x: number, y: number}) {
     if (!this.workspace[typ]) {//constructor for new box category if not initialized
       this.workspace[typ] = [];
     }
-    this.workspace[typ].push(new Box(typ, id, position));
+    this.workspace[typ].push(new Box(typ, this.box_count++,this.zindex_count , position));
     this.workspace[typ][this.workspace[typ].length - 1].position = position;
+    this.zindex_count++;
   }
 
-  newPanelBox(typ: number){
-    this.panel[typ] = new Box(typ, this.box_count);
-    this.box_count++;
-    this.panel[typ].position = {x: 10, y: typ*100};
+  deleteBox(box: Box){
+    this.workspace[box.typ].splice(this.workspace[box.typ].indexOf(box), 1);
   }
 
-  /**
-   * @brief function to be called when a drag event is detected
-   * @param $event 
-   * @param box
-   * @note used to pass down component data to canvas
-   */
+  newPanelBox(typ: number)
+  {
+    this.newBox(typ, {x: 20, y: typ*110 + 20});
+  }
+
+
+  //drag handling
+
+  dragStart($event: CdkDragStart, box: Box){
+    this.newPanelBox(box.typ);
+    box.zIndex = this.zindex_count;
+  }
+
+  dragMoved($event: CdkDragMove, box: Box) {}
+
   dragEnd($event: CdkDragEnd, box: Box) {
-    // console.log($event.source.getFreeDragPosition());
 
     box.position = $event.source.getFreeDragPosition();
 
@@ -81,36 +85,8 @@ export class BrainetComponent implements OnInit, OnChanges {
     // const divElement = document.querySelector('.ui');
     // const divHeight:number = divElement?.clientHeight || 0;
     
-    // if(box.position.y+50 > divHeight*0.85){//ajusting to bin height, bit crappy. +50 because if half of box inside
-    //   this.removeBox(box, this.workspace);
-    // }
-    
-    // this.canvasInstance.drawBox(box.position.x, box.position.y, box.message);
-  }
-
-  dragEndPanel($event: CdkDragEnd, box: Box){
-    this.newWorkspaceBox(box.typ, box.id, $event.source.getFreeDragPosition());
-    this.newPanelBox(box.typ);
-    
-  }
-
- /**
- * @brief function to be called when a drag event is detected
- * @param $event 
- * @param box
- * @note may be useful for drag and drop animations later
- */
-  dragMoved($event: CdkDragMove, box: Box) {
-
-  }
-
-  /**
-   * @brief function to be called when a drag event starts.
-   * mainly used to update drag panel to check if we need to spawn new box
-   * @param $event 
-   * @param box 
-   */
-  dragStart($event: CdkDragStart, box: Box){
-    
+    if(box.position.x < 170){//ajusting to bin height, bit crappy. +50 because if half of box inside
+      this.deleteBox(box);
+    }
   }
 }

@@ -10,11 +10,17 @@
 }
 
   .vertical-bar {
-    width: 12em;
+    width: 170px;
     height: 100%;
-    background: #ccc;
+    background: #b6b1b1;
     position: absolute;
     left: 0;
+  }
+
+  .horizontal-bar {
+    width: 100px;
+    height: 100px;
+    background: #fff;
   }
   
   .main-container {

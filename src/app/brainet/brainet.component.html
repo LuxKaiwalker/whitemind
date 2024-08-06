@@ -1,25 +1,14 @@
-<app-header></app-header>
-
 <div class="ui"><!-- check cdk drop list group-->
   
-  <div class="vertical-bar">
-    <button (mousedown)="newPanelBox(0)">Add item a</button>
-    <button (mousedown)="newPanelBox(1)">Add item b</button>
-    <button (mousedown)="newPanelBox(2)">Add item c</button>
-  </div>
-
-
-  <div class="example-box" *ngFor="let box of panel" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEndPanel($event, box)" [cdkDragFreeDragPosition]="box.position">
-    {{box.message}}
-  </div>
+  <div class="vertical-bar"></div>
 
   <div *ngFor="let row of workspace">
-    <div class="example-box" *ngFor="let box of row" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEnd($event, box)" [cdkDragFreeDragPosition]="box.position">
+    <div class="example-box" *ngFor="let box of row" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEnd($event, box)" [cdkDragFreeDragPosition]="box.position" [ngStyle]="{'z-index': box.zIndex}">
       {{box.message}}
     </div>
   </div>
 
+  <div class="horizontal-bar"></div>
+
   <canvas #canvas>Canvas not properly loaded</canvas>
 </div>
-
-<router-outlet></router-outlet>
