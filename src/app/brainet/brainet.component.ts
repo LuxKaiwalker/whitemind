@@ -70,8 +70,11 @@ export class BrainetComponent implements OnInit, OnChanges {
   //drag handling
 
   dragStart($event: CdkDragStart, box: Box){
-    this.newPanelBox(box.typ);
+    if(!box.dragged){
+      this.newPanelBox(box.typ);
+    }
     box.zIndex = this.zindex_count;
+    box.dragged = true;
   }
 
   dragMoved($event: CdkDragMove, box: Box) {}

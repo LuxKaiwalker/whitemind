@@ -16,12 +16,6 @@
     position: absolute;
     left: 0;
   }
-
-  .horizontal-bar {
-    width: 100px;
-    height: 100px;
-    background: #fff;
-  }
   
   .main-container {
     height: 100%;
