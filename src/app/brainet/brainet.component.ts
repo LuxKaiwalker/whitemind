@@ -62,17 +62,8 @@ export class BrainetComponent implements OnInit, OnChanges {
   newPanelBox(typ: number){
     this.panel[typ] = new Box(typ, this.box_count);
     this.box_count++;
-    this.panel[typ].position = {x: 0, y: typ*100};
+    this.panel[typ].position = {x: 10, y: typ*100};
   }
-
-  // removeBox(box: Box, boxes: Box[][]){
-  //   const typ:number = box.typ;
-  //   const num:number = box.num;
-  //   boxes[typ].splice(num-1, 1);
-  //   for(let i = num-1; i < boxes[typ].length; i++){
-  //     boxes[typ][i].num = i+1;
-  //   }
-  // }
 
   /**
    * @brief function to be called when a drag event is detected
@@ -98,7 +89,7 @@ export class BrainetComponent implements OnInit, OnChanges {
   }
 
   dragEndPanel($event: CdkDragEnd, box: Box){
-    this.newWorkspaceBox(box.typ, box.num, $event.source.getFreeDragPosition());
+    this.newWorkspaceBox(box.typ, box.id, $event.source.getFreeDragPosition());
     this.newPanelBox(box.typ);
     
   }
@@ -111,12 +102,6 @@ export class BrainetComponent implements OnInit, OnChanges {
  */
   dragMoved($event: CdkDragMove, box: Box) {
 
-    // this.canvasInstance.deleteLine(box, this.workspace[0][0]);
-    // console.log(box.position);
-    // console.log(box.position);
-    // console.log(window.innerHeight)
-
-    // this.canvasInstance.drawLine(box, this.workspace[0][0]);
   }
 
   /**
