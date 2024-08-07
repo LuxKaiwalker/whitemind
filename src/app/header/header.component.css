@@ -3,8 +3,15 @@ header {
   background-color: #333;
   color: #fff;
   padding: 10px 0;
-  height: 7vh;
+  height: 4em;
   font-size: 20px;
+}
+
+.header-container {
+  width: 80%;
+  margin: auto;
+  overflow: hidden;
+  text-align: center;
 }
 
 nav {

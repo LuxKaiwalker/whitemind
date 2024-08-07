@@ -1,9 +1,9 @@
 <div class="ui"><!-- check cdk drop list group-->
   
-  <div vertical-bar></div>
+  <div class="vertical-bar"></div>
 
   <div *ngFor="let row of workspace">
-    <div box *ngFor="let box of row" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEnd($event, box)" [cdkDragFreeDragPosition]="box.position" [ngStyle]="{'z-index': box.zIndex}">
+    <div class="example-box" *ngFor="let box of row" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEnd($event, box)" [cdkDragFreeDragPosition]="box.position" [ngStyle]="{'z-index': box.zIndex}">
       {{box.message}}
     </div>
   </div>

@@ -18,22 +18,22 @@ import { Box } from './draggables/brainet.draggable';
 
 export class BrainetComponent implements OnInit, OnChanges {
 
-  // @ViewChild('canvas', { static: true })
-  // myCanvas!: ElementRef;
+  @ViewChild('canvas', { static: true })
+  myCanvas!: ElementRef;
 
   //list of all boxes on screen or available
   workspace: Box[][] = [];//dim 1: type of box; dim 2: num of box
 
   box_count: number = 0;
-  zindex_count: number = 10;
+  zindex_count: number = 0;
 
-  // canvasInstance!: Canvas;
+  canvasInstance!: Canvas;
 
   ngOnInit(){
-      // const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
-      // const ctx = this.myCanvas.nativeElement.getContext('2d');
-      // canvas.width = window.innerWidth;
-      // canvas.height = window.innerHeight;
+      const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
+      const ctx = this.myCanvas.nativeElement.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
 
 
       this.newPanelBox(0);
@@ -41,7 +41,7 @@ export class BrainetComponent implements OnInit, OnChanges {
       this.newPanelBox(2);
 
 
-      // this.canvasInstance = new Canvas(ctx);
+      this.canvasInstance = new Canvas(ctx);
   }
 
   ngOnChanges(){}
@@ -70,13 +70,11 @@ export class BrainetComponent implements OnInit, OnChanges {
   //drag handling
 
   dragStart($event: CdkDragStart, box: Box){
-    if(box.in_panel)
-    {
+    if(!box.dragged){
       this.newPanelBox(box.typ);
-      box.in_panel = false;
     }
-    
-    box.zIndex = ++this.zindex_count;
+    box.zIndex = this.zindex_count;
+    box.dragged = true;
   }
 
   dragMoved($event: CdkDragMove, box: Box) {}
