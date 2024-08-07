@@ -7,6 +7,10 @@ import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../header/header.component';
 import { Canvas } from './canvas/brainet.canvas'
 import { Box } from './draggables/brainet.draggable';
+import { __setFunctionName } from 'tslib';
+
+
+//adding stuff so i can merge
 
 @Component({
   selector: 'app-brainet',
