@@ -4,14 +4,13 @@ import { DragDropModule, CdkDragEnd, CdkDragMove, CdkDragStart } from '@angular/
 import { NgFor } from '@angular/common';
 import { CommonModule } from '@angular/common';
 
-import { HeaderComponent } from '../header/header.component';
 import { Canvas } from './canvas/brainet.canvas'
 import { Box } from './draggables/brainet.draggable';
 
 @Component({
   selector: 'app-brainet',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, DragDropModule, NgFor, CommonModule],
+  imports: [RouterOutlet, DragDropModule, NgFor, CommonModule],
   templateUrl: './brainet.component.html',
   styleUrl: './brainet.component.css'
 })
@@ -91,5 +90,7 @@ export class BrainetComponent implements OnInit, OnChanges {
     if(box.position.x < 170){//ajusting to bin height, bit crappy. +50 because if half of box inside
       this.deleteBox(box);
     }
+
+    this.canvasInstance.drawBox(box.position.x, box.position.y, box.message);
   }
 }
