@@ -28,20 +28,22 @@ export class BrainetComponent implements OnInit, OnChanges {
   zindex_count: number = 10;
 
   canvasInstance!: Canvas;
+  
 
   ngOnInit(){
       const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
       const ctx = this.myCanvas.nativeElement.getContext('2d');
+
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
 
+      this.canvasInstance = new Canvas(ctx);
+
       this.newPanelBox(0);
       this.newPanelBox(1);
       this.newPanelBox(2);
-
-
-      this.canvasInstance = new Canvas(ctx);
+      console.log(this.workspace);
   }
 
   ngOnChanges(){}
@@ -52,7 +54,7 @@ export class BrainetComponent implements OnInit, OnChanges {
     if (!this.workspace[typ]) {//constructor for new box category if not initialized
       this.workspace[typ] = [];
     }
-    this.workspace[typ].push(new Box(typ, this.box_count++,this.zindex_count , position));
+    this.workspace[typ].push(new Box(typ, this.box_count++, this.zindex_count, position));
     this.workspace[typ][this.workspace[typ].length - 1].position = position;
     this.zindex_count++;
   }
