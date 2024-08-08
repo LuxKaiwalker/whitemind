@@ -65,7 +65,7 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   newPanelBox(typ: number)
   {
-    this.newBox(typ, {x: 20, y: typ*110 + 20});
+    this.newBox(typ, {x: 20, y: typ*110 + 20});//60 = header area.
   }
 
 
@@ -96,6 +96,6 @@ export class BrainetComponent implements OnInit, OnChanges {
       this.deleteBox(box);
     }
 
-    this.canvasInstance.drawBox(box.position.x, box.position.y, box.message);
+    this.canvasInstance.drawBox(box.position.x, box.position.y + 60, box.message); //60 = header area
   }
 }
