@@ -1,12 +1,17 @@
+
 <div class="ui"><!-- check cdk drop list group-->
   
   <div vertical-bar></div>
-
-  <div *ngFor="let row of workspace">
-    <div box *ngFor="let box of row" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEnd($event, box)" [cdkDragFreeDragPosition]="box.position" [ngStyle]="{'z-index': box.zIndex}">
-      {{box.message}}
+    <div box *ngFor="let box of workspace" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEnd($event, box)" [cdkDragFreeDragPosition]="box.position" [ngStyle]="{'z-index': box.zIndex}">
+      <p>{{box.message}} <br><br></p>
+      <label for="boxInput">
+        <input type="number" [(ngModel)]="box.pointTo" (keydown.enter) = "addArrow(box, workspace[box.pointTo])">
+      </label>
+      <button (click)="addArrow(box, workspace[box.pointTo])">point to box</button>
     </div>
-  </div>
-
-  <!-- <canvas #canvas>Canvas not properly loaded</canvas> -->
 </div>
+
+
+<canvas #canvas class = "canvas">Canvas not properly loaded</canvas>
+
+

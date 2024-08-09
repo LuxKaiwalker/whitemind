@@ -6,6 +6,10 @@ export class Box {
     message: string;
     in_panel: boolean = true;
     zIndex: number;
+    connectedFrom: number[] = [];//list of all box ids connected from
+    connectedTo: number[] = [];//list of all box ids connected to
+
+    pointTo: number = 0;//for html interactivity: pointing to a box
 
     constructor(typ: number, num: number, zIndex: number, position: {x: number, y: number} = {x: 100, y: 100}){
         this.typ = typ;
