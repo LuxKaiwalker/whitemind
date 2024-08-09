@@ -37,7 +37,7 @@ export class BrainetComponent implements OnInit, OnChanges {
       const ctx = this.myCanvas.nativeElement.getContext('2d');
 
       canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      canvas.height = window.innerHeight - 60;//60 = header area.
 
 
       this.canvasInstance = new Canvas(ctx);
@@ -99,6 +99,11 @@ export class BrainetComponent implements OnInit, OnChanges {
   //arrow handling
 
   addArrow(from: Box, to: Box){
+
+    if(from.connectedTo.includes(to.id) || to.connectedFrom.includes(from.id)){//guard for multiple arrows
+      return;
+    }
+
     this.arrows.push({lineTo: to.id, lineFrom: from.id});
 
     this.workspace[from.id].connectedTo.push(to.id);
