@@ -37,7 +37,7 @@ export class BrainetComponent implements OnInit, OnChanges {
       const ctx = this.myCanvas.nativeElement.getContext('2d');
 
       canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      canvas.height = window.innerHeight - 60;//60 = header area.
 
 
       this.canvasInstance = new Canvas(ctx);
