@@ -19,10 +19,10 @@
 }
 
 .canvas {
-  position: relative;
+  position: absolute;
   width: 100%;
   height: calc(100% - 60px);
-  top: 0;
+  top: 60px;
   z-index: 0;
 }
 
