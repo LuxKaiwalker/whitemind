@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { DragDropModule, CdkDragEnd, CdkDragMove, CdkDragStart } from '@angular/cdk/drag-drop';
 import { NgFor } from '@angular/common';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 import { HeaderComponent } from '../header/header.component';
 import { Canvas } from './canvas/brainet.canvas'
@@ -11,7 +12,7 @@ import { Box } from './draggables/brainet.draggable';
 @Component({
   selector: 'app-brainet',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, DragDropModule, NgFor, CommonModule],
+  imports: [RouterOutlet, HeaderComponent, DragDropModule, NgFor, CommonModule, FormsModule],
   templateUrl: './brainet.component.html',
   styleUrl: './brainet.component.css'
 })
@@ -23,7 +24,7 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   //list of all boxes on screen or available
   workspace: Box[] = [];//dim 1: num of box.
-  arrows: {lineTo: number, lineFrom: number}[][] = [];//dim 1: different lines, dim2: if multiple boxes have same line
+  arrows: {lineTo: number, lineFrom: number}[] = [];//dim 1: different lines. think about multi line integration!
 
   box_count: number = 0;
   zindex_count: number = 10;
@@ -81,26 +82,8 @@ export class BrainetComponent implements OnInit, OnChanges {
   }
 
   dragMoved($event: CdkDragMove, box: Box) {
-
-    this.canvasInstance.clearCanvas();//clear all that have been drawn
-
     const pos = $event.source.getFreeDragPosition();
-
-    for (const arrow of this.arrows) {
-      const lineTo = arrow.lineTo;
-      const lineFrom = arrow.lineFrom;
-
-      let pos1 = this.workspace[lineFrom].position;
-      let pos2 = this.workspace[lineTo].position;
-      if (lineFrom === box.id) {
-        pos1 = pos;
-      }
-      if (lineTo === box.id) {
-        pos2 = pos;
-      }
-
-      this.canvasInstance.drawArrow(pos1.x, pos1.y, pos2.x, pos2.y);
-    }
+    this.updateCanvas(box, pos);
   }
 
   dragEnd($event: CdkDragEnd, box: Box) {
@@ -115,9 +98,33 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   //arrow handling
   addArrow(from: Box, to: Box){
-
-    //here is still some space
-
     this.arrows.push({lineTo: to.id, lineFrom: from.id});
+
+    this.workspace[from.id].connectedTo.push(to.id);
+    this.workspace[to.id].connectedFrom.push(from.id);
+
+    this.updateCanvas(from);
+  }
+
+
+  //canvas handling
+  updateCanvas(box: Box, pos?: {x: number, y: number}){
+    this.canvasInstance.clearCanvas();//clear all that have been drawn
+
+    for (const arrow of this.arrows) {
+      const lineTo = arrow.lineTo;
+      const lineFrom = arrow.lineFrom;
+
+      let pos1 = this.workspace[lineFrom].position;
+      let pos2 = this.workspace[lineTo].position;
+      if (lineFrom === box.id && pos) {
+        pos1 = pos;
+      }
+      if (lineTo === box.id && pos) {
+        pos2 = pos;
+      }
+
+      this.canvasInstance.drawArrow(pos1.x, pos1.y, pos2.x, pos2.y);
+    }
   }
 }
