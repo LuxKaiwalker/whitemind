@@ -9,7 +9,6 @@ export class Canvas{
 
     /**
      * @brief draw the og test draggable box onto the canvas
-     * @param ctx 
      * @param x 
      * @param y 
      * @note TODO: ajust type of ctx
@@ -28,6 +27,8 @@ export class Canvas{
         { x: 0, y: 1, blur: 5, spread: 0, color: 'rgba(0, 0, 0, 0.12)' }
         ];
     
+        y += 60;//ajust to header height
+
         this.ctx.save();
     
         // Draw box shadow
@@ -82,19 +83,62 @@ export class Canvas{
         this.ctx.fillText(message, x + width / 2, y + height / 2);
     }
 
-    drawLine(box1: Box, box2: Box){
+    drawLine(box1: Box, box2: Box, highest: number): [arrowFrom: number, arrowTo: number, arrowId: number]{
         this.ctx.beginPath();
         this.ctx.moveTo(box1.position.x, box1.position.y);
         this.ctx.lineTo(box2.position.x, box2.position.y);
         this.ctx.stroke();
+
+        box1.connectedTo.push(box2.id);
+        box2.connectedTo.push(box1.id);
+
+        return [box1.id, box2.id, highest + 1]; // Replace 1 with the appropriate lineId value
     }
 
-    deleteLine(box1: Box, box2: Box){
-        const lineWidth = 10;
-        const width = Math.abs(box2.position.x - box1.position.x) + lineWidth;
-        const height = Math.abs(box2.position.y - box1.position.y) + lineWidth;
-        const minX = Math.min(box1.position.x, box2.position.x) - lineWidth / 2;
-        const minY = Math.min(box1.position.y, box2.position.y) - lineWidth / 2;
-        this.ctx.clearRect(minX, minY, width, height);
+    deleteLine(){//to do
+
+    }
+
+    drawArrow(startX: number, startY: number, endX: number, endY: number) {
+
+        startY+=60;
+        endY+=60;//ajust for wrong canvas size 
+
+        // Control points for the cubic bezier curve (can be adjusted for the desired curve shape)
+        const controlX1 = startX + (endX - startX) / 3;
+        const controlY1 = startY - 50;  // Adjust these values to change the curve
+        const controlX2 = endX - (endX - startX) / 3;
+        const controlY2 = endY - 50;  // Adjust these values to change the curve
+    
+        // Draw the cubic bezier curve
+        this.ctx.beginPath();
+        this.ctx.moveTo(startX, startY);
+        this.ctx.bezierCurveTo(controlX1, controlY1, controlX2, controlY2, endX, endY);
+        this.ctx.stroke();
+        
+        // Calculate arrowhead angle based on the tangent to the curve at the end point
+        const angle = Math.atan2(endY - controlY2, endX - controlX2);
+        
+        // Draw arrowhead
+        const arrowLength = 10;
+        const arrowWidth = 5;
+        this.ctx.beginPath();
+        this.ctx.moveTo(endX, endY);
+        this.ctx.lineTo(
+            endX - arrowLength * Math.cos(angle - Math.PI / 6),
+            endY - arrowLength * Math.sin(angle - Math.PI / 6)
+        );
+        this.ctx.moveTo(endX, endY);
+        this.ctx.lineTo(
+            endX - arrowLength * Math.cos(angle + Math.PI / 6),
+            endY - arrowLength * Math.sin(angle + Math.PI / 6)
+        );
+        this.ctx.stroke();
+    }
+    
+    
+
+    deleteArrow() {//need to write
+        
     }
 }

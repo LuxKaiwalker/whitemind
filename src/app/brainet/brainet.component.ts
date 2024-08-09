@@ -23,6 +23,7 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   //list of all boxes on screen or available
   workspace: Box[][] = [];//dim 1: type of box; dim 2: num of box
+  arrows: {lineTo: number, lineFrom: number}[] = [];
 
   box_count: number = 0;
   zindex_count: number = 10;
@@ -96,6 +97,7 @@ export class BrainetComponent implements OnInit, OnChanges {
       this.deleteBox(box);
     }
 
-    this.canvasInstance.drawBox(box.position.x, box.position.y + 60, box.message); //60 = header area
+
+    this.canvasInstance.drawArrow(box.position.x+50, box.position.y+50, 500, 500);
   }
 }

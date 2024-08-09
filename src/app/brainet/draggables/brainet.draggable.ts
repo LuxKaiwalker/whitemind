@@ -6,6 +6,7 @@ export class Box {
     message: string;
     in_panel: boolean = true;
     zIndex: number;
+    connectedTo: number[] = [];//list of all box ids connected to
 
     constructor(typ: number, num: number, zIndex: number, position: {x: number, y: number} = {x: 100, y: 100}){
         this.typ = typ;
