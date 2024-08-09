@@ -98,8 +98,6 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   //arrow handling
 
-  id: number = 0; //var for current id connected to
-
   addArrow(from: Box, to: Box){
     this.arrows.push({lineTo: to.id, lineFrom: from.id});
 
