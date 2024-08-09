@@ -135,10 +135,8 @@ export class Canvas{
         );
         this.ctx.stroke();
     }
-    
-    
 
-    deleteArrow() {//need to write
-        
+    clearCanvas(){
+        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     }
 }

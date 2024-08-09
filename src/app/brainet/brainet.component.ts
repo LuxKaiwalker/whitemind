@@ -22,8 +22,8 @@ export class BrainetComponent implements OnInit, OnChanges {
   myCanvas!: ElementRef;
 
   //list of all boxes on screen or available
-  workspace: Box[][] = [];//dim 1: type of box; dim 2: num of box
-  arrows: {lineTo: number, lineFrom: number}[] = [];
+  workspace: Box[] = [];//dim 1: num of box.
+  arrows: {lineTo: number, lineFrom: number}[][] = [];//dim 1: different lines, dim2: if multiple boxes have same line
 
   box_count: number = 0;
   zindex_count: number = 10;
@@ -47,21 +47,19 @@ export class BrainetComponent implements OnInit, OnChanges {
       console.log(this.workspace);
   }
 
-  ngOnChanges(){}
+  ngOnChanges(){
+  }
 
 
   // box handling
   newBox(typ: number, position: {x: number, y: number}) {
-    if (!this.workspace[typ]) {//constructor for new box category if not initialized
-      this.workspace[typ] = [];
-    }
-    this.workspace[typ].push(new Box(typ, this.box_count++, this.zindex_count, position));
-    this.workspace[typ][this.workspace[typ].length - 1].position = position;
+    this.workspace.push(new Box(typ, this.box_count++, this.zindex_count, position));
+    this.workspace[this.workspace.length - 1].position = position;
     this.zindex_count++;
   }
 
   deleteBox(box: Box){
-    this.workspace[box.typ].splice(this.workspace[box.typ].indexOf(box), 1);
+    this.workspace.splice(this.workspace.indexOf(box), 1);
   }
 
   newPanelBox(typ: number)
@@ -82,22 +80,44 @@ export class BrainetComponent implements OnInit, OnChanges {
     box.zIndex = ++this.zindex_count;
   }
 
-  dragMoved($event: CdkDragMove, box: Box) {}
+  dragMoved($event: CdkDragMove, box: Box) {
+
+    this.canvasInstance.clearCanvas();//clear all that have been drawn
+
+    const pos = $event.source.getFreeDragPosition();
+
+    for (const arrow of this.arrows) {
+      const lineTo = arrow.lineTo;
+      const lineFrom = arrow.lineFrom;
+
+      let pos1 = this.workspace[lineFrom].position;
+      let pos2 = this.workspace[lineTo].position;
+      if (lineFrom === box.id) {
+        pos1 = pos;
+      }
+      if (lineTo === box.id) {
+        pos2 = pos;
+      }
+
+      this.canvasInstance.drawArrow(pos1.x, pos1.y, pos2.x, pos2.y);
+    }
+  }
 
   dragEnd($event: CdkDragEnd, box: Box) {
 
     box.position = $event.source.getFreeDragPosition();
-
-    box.message= $event.source.element.nativeElement.innerText;
-
-    // const divElement = document.querySelector('.ui');
-    // const divHeight:number = divElement?.clientHeight || 0;
     
-    if(box.position.x < 170){//ajusting to bin height, bit crappy. +50 because if half of box inside
+    if(box.position.x < 170){//170 = constant for panel width
       this.deleteBox(box);
     }
+  }
 
 
-    this.canvasInstance.drawArrow(box.position.x+50, box.position.y+50, 500, 500);
+  //arrow handling
+  addArrow(from: Box, to: Box){
+
+    //here is still some space
+
+    this.arrows.push({lineTo: to.id, lineFrom: from.id});
   }
 }
