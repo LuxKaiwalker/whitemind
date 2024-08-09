@@ -4,10 +4,10 @@
   <div vertical-bar></div>
     <div box *ngFor="let box of workspace" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEnd($event, box)" [cdkDragFreeDragPosition]="box.position" [ngStyle]="{'z-index': box.zIndex}">
       {{box.message}}
-      <label>
-        <input type="text" [(ngModel)]="box.message">
+      <label for="input">
+        <input type="number" [(ngModel)]="id">
       </label>
-      <button class="box-button" (click)="addArrow(box, workspace[0])">point to 0, 0</button>
+      <button class="box-button" (click)="addArrow(box, workspace[id])">point to box {{id}}</button>
     </div>
 </div>
 
