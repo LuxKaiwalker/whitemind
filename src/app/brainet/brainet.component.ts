@@ -24,7 +24,6 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   //list of all boxes on screen or available
   workspace: Box[] = [];//dim 1: num of box.
-  arrows: {lineTo: number, lineFrom: number}[] = [];//dim 1: different lines. think about multi line integration!
 
   box_count: number = 0;
   zindex_count: number = 10;
@@ -92,6 +91,7 @@ export class BrainetComponent implements OnInit, OnChanges {
     
     if(box.position.x < 170){//170 = constant for panel width
       this.deleteBox(box);
+      this.updateCanvas(box);
     }
   }
 
@@ -100,37 +100,43 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   addArrow(from: Box, to: Box){
 
-    if(from.connectedTo.includes(to.id) || to.connectedFrom.includes(from.id)){//guard for multiple arrows
+    if(from.connections_out.includes(to.id) || to.connections_in.includes(from.id)){//guard for multiple arrows
+      return;
+    }
+    if(to===from){//guard for self pointing
+      return;
+    }
+    if(from.in_panel || to.in_panel){//guard for pointing to panel
       return;
     }
 
-    this.arrows.push({lineTo: to.id, lineFrom: from.id});
-
-    this.workspace[from.id].connectedTo.push(to.id);
-    this.workspace[to.id].connectedFrom.push(from.id);
+    this.workspace[from.id].connections_out.push(to.id);
+    this.workspace[to.id].connections_in.push(from.id);
 
     this.updateCanvas(from);
   }
 
 
   //canvas handling
-  updateCanvas(box: Box, pos?: {x: number, y: number}){
+  updateCanvas(current:Box, pos?: {x: number, y: number}){
     this.canvasInstance.clearCanvas();//clear all that have been drawn
 
-    for (const arrow of this.arrows) {
-      const lineTo = arrow.lineTo;
-      const lineFrom = arrow.lineFrom;
+    for (const box of this.workspace) {
+      const lineFrom = box.id;
 
-      let pos1 = this.workspace[lineFrom].position;
-      let pos2 = this.workspace[lineTo].position;
-      if (lineFrom === box.id && pos) {
-        pos1 = pos;
-      }
-      if (lineTo === box.id && pos) {
-        pos2 = pos;
-      }
+      for(const lineTo of box.connections_out){
 
-      this.canvasInstance.drawArrow(pos1.x, pos1.y, pos2.x, pos2.y);
+        let pos1 = box.position;
+        let pos2 = this.workspace[lineTo].position;
+        if (lineFrom === current.id && pos) {
+          pos1 = pos;
+        }
+        if (lineTo === current.id && pos) {
+          pos2 = pos;
+        }
+
+        this.canvasInstance.drawArrow(pos1.x, pos1.y, pos2.x, pos2.y);
+      }
     }
   }
 }
