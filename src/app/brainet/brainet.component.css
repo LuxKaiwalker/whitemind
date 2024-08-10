@@ -26,18 +26,13 @@
   z-index: 0;
 }
 
-[box]
-{
+[box]{
   font-size: 18px;
   display: flex;
-  width: 130px;
-  height: 100px;
+  width: 160px;
+  height: 130px;
   border: solid 1px #ccc;
   color: rgba(0, 0, 0, 0.87);
-  cursor: move;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
   background: #fff;
   border-radius: 4px;
   position: absolute;
@@ -53,10 +48,23 @@
               0 3px 14px 2px rgba(0, 0, 0, 0.12);
 }
 
+[drag-area] {
+  width: 10px;
+  height: 10px;
+  top: 50px;
+  left: 0;
+  cursor: move;
+  display: inline-block;
+}
+
+p {
+  margin: 0;
+  padding: 10px;
+}
+
 input {
-  position: absolute;
   bottom: 10px;
-  left: 15px;
+  left: 5px;
   width: 40px;
   height: 30px;
   border: none;
@@ -68,9 +76,17 @@ input {
 
 button {
   font-size: 15px;
-  position: absolute;
   bottom: 0;
   width: 50px;
-  right: 15px;
+  left: 50px;
   bottom: 10px;
+}
+
+[arrow-handle] {
+  width: 20px;
+  height: 20px;
+  background: #333;
+  border: solid 1px #333;
+  border-radius: 50%;
+  cursor: pointer;
 }

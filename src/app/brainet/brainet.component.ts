@@ -64,7 +64,7 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   newPanelBox(typ: number)
   {
-    this.newBox(typ, {x: 20, y: typ*110 + 20});//60 = header area.
+    this.newBox(typ, {x: 5, y: typ*150 + 20});//60 = header area.
   }
 
 
@@ -74,7 +74,6 @@ export class BrainetComponent implements OnInit, OnChanges {
     if(box.in_panel)
     {
       this.newPanelBox(box.typ);
-      box.in_panel = false;
     }
     
     box.zIndex = ++this.zindex_count;
@@ -88,15 +87,27 @@ export class BrainetComponent implements OnInit, OnChanges {
   dragEnd($event: CdkDragEnd, box: Box) {
 
     box.position = $event.source.getFreeDragPosition();
-    
-    if(box.position.x < 170){//170 = constant for panel width
-      this.deleteBox(box);
-      this.updateCanvas(box);
+
+    if(box.position.x < 170){
+      if(!box.in_panel){
+        this.removeArrows(box);
+        this.deleteBox(box);
+        this.updateCanvas(box);
+      }
+      else{
+        box.position.x = 170;
+      }
     }
+
+    box.in_panel = false;
   }
 
 
   //arrow handling
+
+  drawConnectionArrow(){
+    console.log("hi");
+  }
 
   addArrow(from: Box, to: Box){
 
@@ -114,6 +125,17 @@ export class BrainetComponent implements OnInit, OnChanges {
     this.workspace[to.id].connections_in.push(from.id);
 
     this.updateCanvas(from);
+  }
+
+  removeArrows(to: Box){
+    for(const box of this.workspace){
+      if(box.connections_out.includes(to.id)){
+        box.connections_out.splice(box.connections_out.indexOf(to.id), 1);
+      }
+      if(box.connections_in.includes(to.id)){
+        box.connections_in.splice(box.connections_in.indexOf(to.id), 1);
+      }
+    }
   }
 
 
