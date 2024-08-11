@@ -1,4 +1,4 @@
-import { Box } from "../draggables/brainet.draggable";
+import { Box } from "../draggables/brainet.box";
 
 export class Canvas{
     ctx: any;
@@ -13,8 +13,8 @@ export class Canvas{
         this.ctx.lineTo(box2.position.x, box2.position.y);
         this.ctx.stroke();
 
-        box1.connectedTo.push(box2.id);
-        box2.connectedTo.push(box1.id);
+        box1.connections_out.push(box2.id);
+        box2.connections_in.push(box1.id);
 
         return [box1.id, box2.id, highest + 1]; // Replace 1 with the appropriate lineId value
     }

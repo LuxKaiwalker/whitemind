@@ -1,4 +1,8 @@
+
+import { Handle } from './brainet.handle';
+
 export class Box {
+
     typ: number;
     id: number;
     position: {x: number, y: number};
@@ -6,8 +10,15 @@ export class Box {
     message: string;
     in_panel: boolean = true;
     zIndex: number;
-    connectedFrom: number[] = [];//list of all box ids connected from
-    connectedTo: number[] = [];//list of all box ids connected to
+    
+    connections_out: number[] = [];//for html interactivity: pointing to a box
+    connections_in: number[] = [];//for html interactivity: pointing to a box
+    connections_special: number[] = [];//for html interactivity: pointing to a box
+    connections_config: number[] = [];//for html interactivity: pointing to a box
+
+
+    handles: Handle[] = [];
+
 
     pointTo: number = 0;//for html interactivity: pointing to a box
 
@@ -18,5 +29,10 @@ export class Box {
         this.dragged = false;
         this.message = 'ID: ' + this.id + ', type: ' + this.typ;
         this.zIndex = zIndex;
+
+
+        //handles init
+        this.handles.push(new Handle('output'));
+        this.handles.push(new Handle('input'));
     }
 }
