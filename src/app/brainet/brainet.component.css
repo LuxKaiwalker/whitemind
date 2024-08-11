@@ -48,15 +48,6 @@
               0 3px 14px 2px rgba(0, 0, 0, 0.12);
 }
 
-[drag-area] {
-  position: absolute;
-  width: 100px; /*ajust to box width*/
-  height: 100%;
-  top: 0;
-  left: 30px;
-
-  background-color: #eee;
-}
 
 p {
   position: absolute;
@@ -100,5 +91,4 @@ button {
 
   cursor: pointer;
 
-  background-color: #333;
 }

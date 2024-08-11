@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, ViewChild, ElementRef, HostListener } from '@angular/core';
+import { Component, OnInit, OnChanges, ViewChild, ElementRef } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { DragDropModule, CdkDragEnd, CdkDragMove, CdkDragStart } from '@angular/cdk/drag-drop';
 import { NgFor } from '@angular/common';
