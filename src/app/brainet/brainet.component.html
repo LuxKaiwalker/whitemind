@@ -1,3 +1,5 @@
+<div (mousemove)="MouseMove($event)"></div>
+
 
 <div class="ui"><!-- check cdk drop list group-->
   
@@ -5,7 +7,7 @@
 
     <div box *ngFor="let box of workspace" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEnd($event, box)" [cdkDragFreeDragPosition]="box.position" [ngStyle]="{'z-index': box.zIndex}">
 
-      <div arrow-handle *ngFor="let handle of box.handles" (click)="drawConnectionArrow()" [ngStyle]="{'left':handle.left + 'px', 'top': handle.top + 'px'}"></div>
+      <div arrow-handle *ngFor="let handle of box.handles" (click)="drawConnectionArrow(handle, box)" [ngStyle]="{'left':handle.left + 'px', 'top': handle.top + 'px'}"></div>
 
       <div drag-area cdkDragHandle></div>
 

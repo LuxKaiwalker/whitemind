@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnChanges, ViewChild, ElementRef, HostListener } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { DragDropModule, CdkDragEnd, CdkDragMove, CdkDragStart } from '@angular/cdk/drag-drop';
 import { NgFor } from '@angular/common';
@@ -9,6 +9,7 @@ import { HeaderComponent } from '../header/header.component';
 import { Canvas } from './canvas/brainet.canvas'
 
 import { Box } from './draggables/brainet.box';
+import { Handle } from './draggables/brainet.handle';
 
 @Component({
   selector: 'app-brainet',
@@ -29,7 +30,11 @@ export class BrainetComponent implements OnInit, OnChanges {
   box_count: number = 0;
   zindex_count: number = 10;
 
+  mousePos: {x: number, y: number} = {x: 0, y: 0};
+
   canvasInstance!: Canvas;
+
+  connectionArrow: {type:string, box?: Box} = {type: ""}//empty string means no draw arrow mode, box_id = -1 = no box currently selected
   
 
   ngOnInit(){
@@ -106,8 +111,25 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   //arrow handling
 
-  drawConnectionArrow(){
-    console.log("hi");
+  drawConnectionArrow(handle: Handle, box: Box){
+    if(this.connectionArrow.type === ""){//if empty, handle the arrow updates in updatecanvas
+      this.connectionArrow.type = handle.type;
+      this.connectionArrow.box = box;
+      return;
+    }
+    
+    if(this.connectionArrow.type === "output" && handle.type === "input"){
+      this.connectionArrow.type = "";
+
+      if(this.connectionArrow.box !== undefined){
+        this.addArrow(this.connectionArrow.box, box);
+      }
+    }
+    else{
+      this.connectionArrow.type = "";
+      this.connectionArrow.box = undefined;
+      console.log("the arrow cannot be drawn!");
+    }
   }
 
   addArrow(from: Box, to: Box){
@@ -141,9 +163,10 @@ export class BrainetComponent implements OnInit, OnChanges {
 
 
   //canvas handling
-  updateCanvas(current:Box, pos?: {x: number, y: number}){
+  updateCanvas(current?:Box, pos?: {x: number, y: number}){
     this.canvasInstance.clearCanvas();//clear all that have been drawn
 
+    //draw boxes
     for (const box of this.workspace) {
       const lineFrom = box.id;
 
@@ -151,15 +174,34 @@ export class BrainetComponent implements OnInit, OnChanges {
 
         let pos1 = box.position;
         let pos2 = this.workspace[lineTo].position;
-        if (lineFrom === current.id && pos) {
-          pos1 = pos;
-        }
-        if (lineTo === current.id && pos) {
-          pos2 = pos;
+        
+        if(current && pos){//include guard if we just want to draw box
+          if (lineFrom === current.id) {
+            pos1 = pos;
+          }
+          if (lineTo === current.id) {
+            pos2 = pos;
+          }
         }
 
         this.canvasInstance.drawArrow(pos1.x, pos1.y, pos2.x, pos2.y);
       }
+    }
+
+    //draw connection arrow
+    if(this.connectionArrow.type !== "" && this.connectionArrow.box){
+      console.log("drawing arrow");
+      this.canvasInstance.drawArrow(this.connectionArrow.box.position.x, this.connectionArrow.box.position.y, this.mousePos.x, this.mousePos.y);
+    }
+  }
+
+  //mouse handling
+  MouseMove(event: MouseEvent) {
+    this.mousePos.x = event.clientX;
+    this.mousePos.y = event.clientY;
+
+    if(this.connectionArrow.type !== "" && this.connectionArrow.box){//somehow ugly, needs fix
+      this.updateCanvas()
     }
   }
 }
