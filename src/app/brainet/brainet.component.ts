@@ -9,7 +9,6 @@ import { HeaderComponent } from '../header/header.component';
 import { Canvas } from './canvas/brainet.canvas'
 
 import { Box } from './draggables/brainet.box';
-import { Handle } from './draggables/brainet.handle';
 
 @Component({
   selector: 'app-brainet',
