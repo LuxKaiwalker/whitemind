@@ -1,4 +1,4 @@
-import { Box } from "../draggables/brainet.draggable";
+import { Box } from "../draggables/brainet.box";
 
 export class Canvas{
     ctx: any;

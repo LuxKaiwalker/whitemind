@@ -30,7 +30,7 @@
   font-size: 18px;
   display: flex;
   width: 160px;
-  height: 130px;
+  height: 100px;
   border: solid 1px #ccc;
   color: rgba(0, 0, 0, 0.87);
   background: #fff;
@@ -49,20 +49,26 @@
 }
 
 [drag-area] {
-  width: 10px;
-  height: 10px;
-  top: 50px;
-  left: 0;
-  cursor: move;
-  display: inline-block;
+  position: absolute;
+  width: 100px; /*ajust to box width*/
+  height: 100%;
+  top: 0;
+  left: 30px;
+
+  background-color: #eee;
 }
 
 p {
-  margin: 0;
+  position: absolute;
+  
+  left: 35px;
+  right: 35px;
+
   padding: 10px;
 }
 
 input {
+  position: absolute;
   bottom: 10px;
   left: 5px;
   width: 40px;
@@ -75,6 +81,7 @@ input {
 }
 
 button {
+  position: absolute;
   font-size: 15px;
   bottom: 0;
   width: 50px;
@@ -83,10 +90,15 @@ button {
 }
 
 [arrow-handle] {
+  position: absolute;
+  box-sizing: border-box;
+
   width: 20px;
   height: 20px;
-  background: #333;
-  border: solid 1px #333;
-  border-radius: 50%;
+  border: 1px solid #333;
+  border-radius: 5px;
+
   cursor: pointer;
+
+  background-color: #333;
 }

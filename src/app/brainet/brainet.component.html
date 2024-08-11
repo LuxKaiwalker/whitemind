@@ -4,14 +4,14 @@
   <div vertical-bar></div>
     <div box *ngFor="let box of workspace" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEnd($event, box)" [cdkDragFreeDragPosition]="box.position" [ngStyle]="{'z-index': box.zIndex}">
 
-      <div class = "drag-area" cdkDragHandle>hhh</div>
+      <div drag-area cdkDragHandle></div>
 
       <p>{{box.message}}</p>
       <label for="boxInput">
         <input type="number" [(ngModel)]="box.pointTo" (keydown.enter)="addArrow(box, workspace[box.pointTo])">
       </label>
       <button (click)="addArrow(box, workspace[box.pointTo])">point to box</button>
-      <div class = "arrow-handle" (mousedown)="drawConnectionArrow()">d</div>
+      <div arrow-handle (click)="drawConnectionArrow()" [ngStyle]="{'left': handle.left; 'top': handle.top;}"></div>
     </div>
 </div>
 
