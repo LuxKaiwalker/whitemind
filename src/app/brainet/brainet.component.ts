@@ -124,7 +124,7 @@ export class BrainetComponent implements OnInit, OnChanges {
     if(this.connectionArrow.type === "output" && handle.type === "input"){
       this.connectionArrow.type = "";
       if(this.connectionArrow.box !== undefined){
-        this.addArrow(this.connectionArrow.box, box);
+        this.addArrow(this.connectionArrow.box, box, "output", "input");
       }
     }
     else{
@@ -134,7 +134,7 @@ export class BrainetComponent implements OnInit, OnChanges {
     }
   }
 
-  addArrow(from: Box, to: Box){
+  addArrow(from: Box, to: Box, typeFrom: string, typeTo: string){
 
     if(from.connections_out.includes(to.id) || to.connections_in.includes(from.id)){//guard for multiple arrows
       return;
@@ -146,8 +146,13 @@ export class BrainetComponent implements OnInit, OnChanges {
       return;
     }
 
-    this.workspace[from.id].connections_out.push(to.id);
-    this.workspace[to.id].connections_in.push(from.id);
+    if(typeFrom === "output" && typeTo === "input"){//we have to enumerate all legit cases here
+      this.workspace[from.id].connections_out.push(to.id);
+      this.workspace[to.id].connections_in.push(from.id);
+    }
+    else{
+      throw new Error(`Invalid handle froms and tos, given ${typeFrom} and ${typeTo} so no new arrow is added`);
+    }
 
     this.updateCanvas(false, from);
   }
@@ -168,21 +173,29 @@ export class BrainetComponent implements OnInit, OnChanges {
   updateCanvas(drawMouseArrow: boolean = false, current?: Box, pos?: {x: number, y: number}){
     this.canvasInstance.clearCanvas();//clear all that have been drawn
 
-    //draw boxes
+    //draw in-out-lines
     for (const box of this.workspace) {
       const lineFrom = box.id;
 
       for(const lineTo of box.connections_out){
 
-        let pos1 = box.position;
-        let pos2 = this.workspace[lineTo].position;
+        let pos1 = {
+          x: box.position.x + box.handles[0].box_pos.x,
+          y: box.position.y + box.handles[0].box_pos.y
+        };
+        let pos2 = {
+          x: this.workspace[lineTo].position.x + this.workspace[lineTo].handles[1].box_pos.x,
+          y: this.workspace[lineTo].position.y + this.workspace[lineTo].handles[1].box_pos.y
+        };
         
         if(current && pos){//include guard if we just want to draw box
           if (lineFrom === current.id) {
-            pos1 = pos;
+            pos1.x = pos.x + box.handles[0].box_pos.x;
+            pos1.y = pos.y + box.handles[0].box_pos.y;
           }
           if (lineTo === current.id) {
-            pos2 = pos;
+            pos2.x = pos.x + this.workspace[lineTo].handles[1].box_pos.x;
+            pos2.y = pos.y + this.workspace[lineTo].handles[1].box_pos.y;
           }
         }
 
