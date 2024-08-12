@@ -30,7 +30,7 @@
   font-size: 18px;
   display: flex;
   width: 160px;
-  height: 100px;
+  height: 70px;
   border: solid 1px #ccc;
   color: rgba(0, 0, 0, 0.87);
   background: #fff;
@@ -54,6 +54,7 @@ p {
   
   left: 35px;
   right: 35px;
+
 
   padding: 10px;
 }

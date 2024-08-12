@@ -1,7 +1,4 @@
-<div (mousemove)="MouseMove($event)"></div>
-
-
-<div class="ui"><!-- check cdk drop list group-->
+<div class="ui" (mousemove)="MouseMove($event)"><!-- check cdk drop list group-->
   
   <div vertical-bar></div>
 
@@ -11,17 +8,9 @@
 
       <p>{{box.message}}</p>
 
-      <label for="boxInput">
-        <input type="number" [(ngModel)]="box.pointTo" (keydown.enter)="addArrow(box, workspace[box.pointTo])">
-      </label>
-
-      <button (click)="addArrow(box, workspace[box.pointTo])">
-        point to box
-      </button>
-
     </div>
 </div>
 
-<canvas #canvas class = "canvas">Canvas not properly loaded</canvas>
+<canvas #canvas class = "canvas" (mousemove)="MouseMove($event)">Canvas not properly loaded</canvas>
 
 
