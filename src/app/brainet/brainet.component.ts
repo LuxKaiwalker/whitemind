@@ -59,13 +59,42 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   // box handling
   newBox(typ: number, position: {x: number, y: number}) {
-    this.workspace.push(new Box(typ, this.box_count++, this.zindex_count, position));
+    this.workspace.push(new Box(typ, this.box_count++, this.workspace.length, this.zindex_count, position));
     this.workspace[this.workspace.length - 1].position = position;
     this.zindex_count++;
   }
 
   deleteBox(box: Box){
-    this.workspace.splice(this.workspace.indexOf(box), 1);
+
+    console.log("deleting box");
+
+    for(const b of this.workspace){
+      for(let c of b.connections_out){
+        if(c > box.id){
+          c--;
+        }
+      }
+      for(let c of b.connections_in){
+        if(c > box.id){
+          c--;
+        }
+      }
+    }
+
+    let indexcount = 0;
+    for(const b of this.workspace){
+      if(b.connections_out.includes(box.id)){
+        b.connections_out.splice(b.connections_out.indexOf(box.id), 1);
+      }
+      if(b.connections_in.includes(box.id)){
+        b.connections_in.splice(b.connections_in.indexOf(box.id), 1);
+      }
+
+      b.index = indexcount;
+      indexcount++;
+    }
+
+    this.workspace.splice(box.id, 1);
   }
 
   newPanelBox(typ: number)
@@ -96,7 +125,6 @@ export class BrainetComponent implements OnInit, OnChanges {
 
     if(box.position.x < 170){
       if(!box.in_panel){
-        this.removeArrows(box);
         this.deleteBox(box);
         this.updateCanvas(false, box);
       }
@@ -115,11 +143,9 @@ export class BrainetComponent implements OnInit, OnChanges {
     if(this.connectionArrow.type === ""){//if empty, handle the arrow updates in updatecanvas
       this.connectionArrow.type = handle.type;
       this.connectionArrow.box = box;
-      console.log("first arrow clicked!");
       return;
     }
     
-    console.log("second arrow clicked!");
     
     if(this.connectionArrow.type === "output" && handle.type === "input"){
       this.connectionArrow.type = "";
@@ -128,10 +154,14 @@ export class BrainetComponent implements OnInit, OnChanges {
       }
     }
     else{
-      this.connectionArrow.type = "";
-      this.connectionArrow.box = undefined;
-      console.log("the arrow cannot be drawn!");
+      this.abortConnectionArrow();
     }
+  }
+
+  abortConnectionArrow(){
+    this.connectionArrow.type = "";
+    this.connectionArrow.box = undefined;
+    this.updateCanvas(false);
   }
 
   addArrow(from: Box, to: Box, typeFrom: string, typeTo: string){
@@ -147,25 +177,14 @@ export class BrainetComponent implements OnInit, OnChanges {
     }
 
     if(typeFrom === "output" && typeTo === "input"){//we have to enumerate all legit cases here
-      this.workspace[from.id].connections_out.push(to.id);
-      this.workspace[to.id].connections_in.push(from.id);
+      this.workspace[from.index].connections_out.push(to.id);
+      this.workspace[to.index].connections_in.push(from.id);
     }
     else{
       throw new Error(`Invalid handle froms and tos, given ${typeFrom} and ${typeTo} so no new arrow is added`);
     }
 
     this.updateCanvas(false, from);
-  }
-
-  removeArrows(to: Box){
-    for(const box of this.workspace){
-      if(box.connections_out.includes(to.id)){
-        box.connections_out.splice(box.connections_out.indexOf(to.id), 1);
-      }
-      if(box.connections_in.includes(to.id)){
-        box.connections_in.splice(box.connections_in.indexOf(to.id), 1);
-      }
-    }
   }
 
 
@@ -205,7 +224,6 @@ export class BrainetComponent implements OnInit, OnChanges {
 
     //draw connection arrow
     if(drawMouseArrow){
-      console.log("drawing arrow");
       if (this.connectionArrow.box) {
 
         const posx = this.connectionArrow.box.position.x + this.connectionArrow.box.handles[0].box_pos.x;//here output is definetly at index 0. probably altering further alter
