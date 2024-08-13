@@ -74,7 +74,7 @@ export class BrainetComponent implements OnInit, OnChanges {
     console.log("deleting box");
 
     let indexcount = 0;
-    for(const [key, b] of this.workspace){
+    for(const [_, b] of this.workspace){
       if(b.connections_out.includes(box.id)){
         b.connections_out.splice(b.connections_out.indexOf(box.id), 1);
       }
@@ -95,6 +95,10 @@ export class BrainetComponent implements OnInit, OnChanges {
   //drag handling
 
   dragStart($event: CdkDragStart, box: Box){
+
+console.log("dragstart clicked!");
+console.log(box);
+
     if(box.in_panel)
     {
       this.newPanelBox(box.typ);
@@ -104,11 +108,18 @@ export class BrainetComponent implements OnInit, OnChanges {
   }
 
   dragMoved($event: CdkDragMove, box: Box) {
+
+    console.log("dragmove clicked!");
+    console.log(box);
+
     const pos = $event.source.getFreeDragPosition();
     this.updateCanvas(false, box, pos);
   }
 
   dragEnd($event: CdkDragEnd, box: Box) {
+
+    console.log("dragend clicked!");
+    console.log(box);
 
     box.position = $event.source.getFreeDragPosition();
 
@@ -238,6 +249,7 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   //mouse handling
   MouseMove(event: MouseEvent) {
+    
     this.mousePos.x = event.clientX;
     this.mousePos.y = event.clientY-60;//weird mouse problems again. fit to panel
 
