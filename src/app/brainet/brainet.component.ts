@@ -69,15 +69,15 @@ export class BrainetComponent implements OnInit, OnChanges {
     console.log("deleting box");
 
     for(const b of this.workspace){
-      for(let c of b.connections_out){
-        if(c > box.index){
-          c--;
-        }
+      for(let i = 0; i < b.connections_out.length; i++){
+      if(b.connections_out[i] > box.index){
+        b.connections_out[i]--;
       }
-      for(let c of b.connections_in){
-        if(c > box.index){
-          c--;
-        }
+      }
+      for(let i = 0; i < b.connections_in.length; i++){
+      if(b.connections_in[i] > box.index){
+        b.connections_in[i]--;
+      }
       }
     }
 
