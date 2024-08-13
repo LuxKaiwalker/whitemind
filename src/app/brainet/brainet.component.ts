@@ -70,31 +70,32 @@ export class BrainetComponent implements OnInit, OnChanges {
 
     for(const b of this.workspace){
       for(let c of b.connections_out){
-        if(c > box.id){
+        if(c > box.index){
           c--;
         }
       }
       for(let c of b.connections_in){
-        if(c > box.id){
+        if(c > box.index){
           c--;
         }
       }
     }
 
+
+    this.workspace.splice(box.index, 1);
+
     let indexcount = 0;
     for(const b of this.workspace){
-      if(b.connections_out.includes(box.id)){
-        b.connections_out.splice(b.connections_out.indexOf(box.id), 1);
+      if(b.connections_out.includes(box.index)){
+        b.connections_out.splice(b.connections_out.indexOf(box.index), 1);
       }
-      if(b.connections_in.includes(box.id)){
-        b.connections_in.splice(b.connections_in.indexOf(box.id), 1);
+      if(b.connections_in.includes(box.index)){
+        b.connections_in.splice(b.connections_in.indexOf(box.index), 1);
       }
 
       b.index = indexcount;
       indexcount++;
     }
-
-    this.workspace.splice(box.id, 1);
   }
 
   newPanelBox(typ: number)
@@ -177,8 +178,8 @@ export class BrainetComponent implements OnInit, OnChanges {
     }
 
     if(typeFrom === "output" && typeTo === "input"){//we have to enumerate all legit cases here
-      this.workspace[from.index].connections_out.push(to.id);
-      this.workspace[to.index].connections_in.push(from.id);
+      this.workspace[from.index].connections_out.push(to.index);
+      this.workspace[to.index].connections_in.push(from.index);
     }
     else{
       throw new Error(`Invalid handle froms and tos, given ${typeFrom} and ${typeTo} so no new arrow is added`);
@@ -190,11 +191,13 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   //canvas handling
   updateCanvas(drawMouseArrow: boolean = false, current?: Box, pos?: {x: number, y: number}){
+
+
     this.canvasInstance.clearCanvas();//clear all that have been drawn
 
     //draw in-out-lines
     for (const box of this.workspace) {
-      const lineFrom = box.id;
+      const lineFrom = box.index;
 
       for(const lineTo of box.connections_out){
 
@@ -208,11 +211,11 @@ export class BrainetComponent implements OnInit, OnChanges {
         };
         
         if(current && pos){//include guard if we just want to draw box
-          if (lineFrom === current.id) {
+          if (lineFrom === current.index) {
             pos1.x = pos.x + box.handles[0].box_pos.x;
             pos1.y = pos.y + box.handles[0].box_pos.y;
           }
-          if (lineTo === current.id) {
+          if (lineTo === current.index) {
             pos2.x = pos.x + this.workspace[lineTo].handles[1].box_pos.x;
             pos2.y = pos.y + this.workspace[lineTo].handles[1].box_pos.y;
           }

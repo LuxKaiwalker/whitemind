@@ -29,7 +29,7 @@ export class Box {
         this.index = index;
         this.position = {x: 0, y: 0};
         this.dragged = false;
-        this.message = 'ID: ' + this.id + ', type: ' + this.typ;
+        this.message = 'ID: ' + this.id + ' type: ' + this.typ;
         this.zIndex = zIndex;
 
 

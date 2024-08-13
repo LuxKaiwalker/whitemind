@@ -6,7 +6,7 @@
 
       <div arrow-handle *ngFor="let handle of box.handles" (click)="drawConnectionArrow(handle, box)" [ngStyle]="{'left':handle.left + 'px', 'top': handle.top + 'px', 'background-color':handle.color}"></div>
 
-      <p>{{box.message}}</p>
+      <p>{{box.message}} index: {{box.index}}</p>
 
     </div>
 </div>
