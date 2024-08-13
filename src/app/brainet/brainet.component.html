@@ -1,7 +1,4 @@
-<div (mousemove)="MouseMove($event)"></div>
-
-
-<div class="ui"><!-- check cdk drop list group-->
+<div class="ui" (mousemove)="MouseMove($event)"><!-- check cdk drop list group-->
   
   <div vertical-bar></div>
 
@@ -9,19 +6,11 @@
 
       <div arrow-handle *ngFor="let handle of box.handles" (click)="drawConnectionArrow(handle, box)" [ngStyle]="{'left':handle.left + 'px', 'top': handle.top + 'px', 'background-color':handle.color}"></div>
 
-      <p>{{box.message}}</p>
-
-      <label for="boxInput">
-        <input type="number" [(ngModel)]="box.pointTo" (keydown.enter)="addArrow(box, workspace[box.pointTo])">
-      </label>
-
-      <button (click)="addArrow(box, workspace[box.pointTo])">
-        point to box
-      </button>
+      <p>{{box.message}} index: {{box.index}}</p>
 
     </div>
 </div>
 
-<canvas #canvas class = "canvas">Canvas not properly loaded</canvas>
+<canvas #canvas class = "canvas" (mousemove)="MouseMove($event)" (click) = abortConnectionArrow()>Canvas not properly loaded</canvas>
 
 
