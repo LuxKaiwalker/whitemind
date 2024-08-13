@@ -36,6 +36,7 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   connectionArrow: {type:string, box?: Box} = {type: ""}//empty string means no draw arrow mode, box_id = -1 = no box currently selected
   
+  mapValues = Array.from(this.workspace.values());
 
   ngOnInit(){
       const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;

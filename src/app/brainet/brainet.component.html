@@ -2,11 +2,11 @@
   
   <div vertical-bar></div>
 
-    <div box *ngFor="let box of this.workspace.entries()" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box[1])" (cdkDragMoved)="dragMoved($event, box[1])" (cdkDragEnded)="dragEnd($event, box[1])" [cdkDragFreeDragPosition]="box[1].position" [ngStyle]="{'z-index': box[1].zIndex}">
+    <div box *ngFor="let box of mapValues" cdkDrag cdkDragBoundary=".ui" (cdkDragStarted)="dragStart($event, box)" (cdkDragMoved)="dragMoved($event, box)" (cdkDragEnded)="dragEnd($event, box)" [cdkDragFreeDragPosition]="box.position" [ngStyle]="{'z-index': box.zIndex}">
     
-      <div arrow-handle *ngFor="let handle of box[1].handles" (click)="drawConnectionArrow(handle, box[1])" [ngStyle]="{'left':handle.left + 'px', 'top': handle.top + 'px', 'background-color':handle.color}"></div>
+      <div arrow-handle *ngFor="let handle of box.handles" (click)="drawConnectionArrow(handle, box)" [ngStyle]="{'left':handle.left + 'px', 'top': handle.top + 'px', 'background-color':handle.color}"></div>
     
-      <p>{{box[1].message}} index: {{box[1].id}}</p>
+      <p>{{box.message}} index: {{box.id}}</p>
     
     </div>
 </div>
