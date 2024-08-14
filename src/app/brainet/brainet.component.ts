@@ -35,8 +35,6 @@ export class BrainetComponent implements OnInit, OnChanges {
   canvasInstance!: Canvas;
 
   connectionArrow: {type:string, box?: Box} = {type: ""}//empty string means no draw arrow mode, box_id = -1 = no box currently selected
-  
-  mapValues = Array.from(this.workspace.values());
 
   ngOnInit(){
       const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
@@ -61,9 +59,12 @@ export class BrainetComponent implements OnInit, OnChanges {
   // box handling
   newBox(typ: number, position: {x: number, y: number}) {
 
-    this.workspace.set(this.box_count++, new Box(typ, this.box_count, this.zindex_count, position));
+    this.workspace.set(this.box_count, new Box(typ, this.box_count, this.zindex_count, position));
+
+    this.box_count++;
 
     const lastBox = this.workspace.get(this.box_count - 1);
+
     if (lastBox) {
       lastBox.position = position;
     }
@@ -97,9 +98,6 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   dragStart($event: CdkDragStart, box: Box){
 
-console.log("dragstart clicked!");
-console.log(box);
-
     if(box.in_panel)
     {
       this.newPanelBox(box.typ);
@@ -110,17 +108,11 @@ console.log(box);
 
   dragMoved($event: CdkDragMove, box: Box) {
 
-    console.log("dragmove clicked!");
-    console.log(box);
-
     const pos = $event.source.getFreeDragPosition();
     this.updateCanvas(false, box, pos);
   }
 
   dragEnd($event: CdkDragEnd, box: Box) {
-
-    console.log("dragend clicked!");
-    console.log(box);
 
     box.position = $event.source.getFreeDragPosition();
 
@@ -146,7 +138,6 @@ console.log(box);
       this.connectionArrow.box = box;
       return;
     }
-    
     
     if(this.connectionArrow.type === "output" && handle.type === "input"){
       this.connectionArrow.type = "";
@@ -186,6 +177,8 @@ console.log(box);
       if (toBox) {
         toBox.connections_in.push(from.id);
       }
+
+      console.log(fromBox, toBox);
     }
     else{
       throw new Error(`Invalid handle froms and tos, given ${typeFrom} and ${typeTo} so no new arrow is added`);
@@ -213,6 +206,9 @@ console.log(box);
         };
 
         const workspace_lineto = this.workspace.get(lineTo);
+
+        console.log(workspace_lineto);
+
         if(workspace_lineto){
           let pos2 = {
             x: workspace_lineto.position.x + workspace_lineto.handles[1].box_pos.x,
@@ -230,6 +226,8 @@ console.log(box);
               pos2.y = pos.y + workspace_lineto.handles[1].box_pos.y;
             }
           }
+
+          console.log(pos1, pos2);
         
           this.canvasInstance.drawArrow(pos1.x, pos1.y, pos2.x, pos2.y);
         }
