@@ -25,7 +25,7 @@ export class BrainetComponent implements OnInit, OnChanges {
   myCanvas!: ElementRef;
 
   //list of all boxes on screen or available
-  workspace: Box[] = [];//dim 1: num of box.
+  workspace = new Map<number, Box>();//id  = number. probably we can even wipe out the id of the box.
 
   box_count: number = 0;
   zindex_count: number = 10;
@@ -35,7 +35,6 @@ export class BrainetComponent implements OnInit, OnChanges {
   canvasInstance!: Canvas;
 
   connectionArrow: {type:string, box?: Box} = {type: ""}//empty string means no draw arrow mode, box_id = -1 = no box currently selected
-  
 
   ngOnInit(){
       const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
@@ -59,8 +58,16 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   // box handling
   newBox(typ: number, position: {x: number, y: number}) {
-    this.workspace.push(new Box(typ, this.box_count++, this.workspace.length, this.zindex_count, position));
-    this.workspace[this.workspace.length - 1].position = position;
+
+    this.workspace.set(this.box_count, new Box(typ, this.box_count, this.zindex_count, position));
+
+    this.box_count++;
+
+    const lastBox = this.workspace.get(this.box_count - 1);
+
+    if (lastBox) {
+      lastBox.position = position;
+    }
     this.zindex_count++;
   }
 
@@ -68,33 +75,16 @@ export class BrainetComponent implements OnInit, OnChanges {
 
     console.log("deleting box");
 
-    for(const b of this.workspace){
-      for(let c of b.connections_out){
-        if(c > box.index){
-          c--;
-        }
-      }
-      for(let c of b.connections_in){
-        if(c > box.index){
-          c--;
-        }
-      }
-    }
-
-
-    this.workspace.splice(box.index, 1);
-
     let indexcount = 0;
-    for(const b of this.workspace){
-      if(b.connections_out.includes(box.index)){
-        b.connections_out.splice(b.connections_out.indexOf(box.index), 1);
+    for(const [_, b] of this.workspace){
+      if(b.connections_out.includes(box.id)){
+        b.connections_out.splice(b.connections_out.indexOf(box.id), 1);
       }
-      if(b.connections_in.includes(box.index)){
-        b.connections_in.splice(b.connections_in.indexOf(box.index), 1);
+      if(b.connections_in.includes(box.id)){
+        b.connections_in.splice(b.connections_in.indexOf(box.id), 1);
       }
 
-      b.index = indexcount;
-      indexcount++;
+      this.workspace.delete(box.id);
     }
   }
 
@@ -107,6 +97,7 @@ export class BrainetComponent implements OnInit, OnChanges {
   //drag handling
 
   dragStart($event: CdkDragStart, box: Box){
+
     if(box.in_panel)
     {
       this.newPanelBox(box.typ);
@@ -116,6 +107,7 @@ export class BrainetComponent implements OnInit, OnChanges {
   }
 
   dragMoved($event: CdkDragMove, box: Box) {
+
     const pos = $event.source.getFreeDragPosition();
     this.updateCanvas(false, box, pos);
   }
@@ -147,7 +139,6 @@ export class BrainetComponent implements OnInit, OnChanges {
       return;
     }
     
-    
     if(this.connectionArrow.type === "output" && handle.type === "input"){
       this.connectionArrow.type = "";
       if(this.connectionArrow.box !== undefined){
@@ -178,8 +169,16 @@ export class BrainetComponent implements OnInit, OnChanges {
     }
 
     if(typeFrom === "output" && typeTo === "input"){//we have to enumerate all legit cases here
-      this.workspace[from.index].connections_out.push(to.index);
-      this.workspace[to.index].connections_in.push(from.index);
+      const fromBox = this.workspace.get(from.id);
+      if (fromBox) {
+        fromBox.connections_out.push(to.id);
+      }
+      const toBox = this.workspace.get(to.id);
+      if (toBox) {
+        toBox.connections_in.push(from.id);
+      }
+
+      console.log(fromBox, toBox);
     }
     else{
       throw new Error(`Invalid handle froms and tos, given ${typeFrom} and ${typeTo} so no new arrow is added`);
@@ -196,8 +195,8 @@ export class BrainetComponent implements OnInit, OnChanges {
     this.canvasInstance.clearCanvas();//clear all that have been drawn
 
     //draw in-out-lines
-    for (const box of this.workspace) {
-      const lineFrom = box.index;
+    for (const [key, box] of this.workspace) {
+      const lineFrom = box.id;
 
       for(const lineTo of box.connections_out){
 
@@ -205,23 +204,33 @@ export class BrainetComponent implements OnInit, OnChanges {
           x: box.position.x + box.handles[0].box_pos.x,
           y: box.position.y + box.handles[0].box_pos.y
         };
-        let pos2 = {
-          x: this.workspace[lineTo].position.x + this.workspace[lineTo].handles[1].box_pos.x,
-          y: this.workspace[lineTo].position.y + this.workspace[lineTo].handles[1].box_pos.y
-        };
-        
-        if(current && pos){//include guard if we just want to draw box
-          if (lineFrom === current.index) {
-            pos1.x = pos.x + box.handles[0].box_pos.x;
-            pos1.y = pos.y + box.handles[0].box_pos.y;
-          }
-          if (lineTo === current.index) {
-            pos2.x = pos.x + this.workspace[lineTo].handles[1].box_pos.x;
-            pos2.y = pos.y + this.workspace[lineTo].handles[1].box_pos.y;
-          }
-        }
 
-        this.canvasInstance.drawArrow(pos1.x, pos1.y, pos2.x, pos2.y);
+        const workspace_lineto = this.workspace.get(lineTo);
+
+        console.log(workspace_lineto);
+
+        if(workspace_lineto){
+          let pos2 = {
+            x: workspace_lineto.position.x + workspace_lineto.handles[1].box_pos.x,
+            y: workspace_lineto.position.y + workspace_lineto.handles[1].box_pos.y
+          };
+        
+        
+          if(current && pos){//include guard if we just want to draw box
+            if (lineFrom === current.id) {
+              pos1.x = pos.x + box.handles[0].box_pos.x;
+              pos1.y = pos.y + box.handles[0].box_pos.y;
+            }
+            if (lineTo === current.id && workspace_lineto) {
+              pos2.x = pos.x + workspace_lineto.handles[1].box_pos.x;
+              pos2.y = pos.y + workspace_lineto.handles[1].box_pos.y;
+            }
+          }
+
+          console.log(pos1, pos2);
+        
+          this.canvasInstance.drawArrow(pos1.x, pos1.y, pos2.x, pos2.y);
+        }
       }
     }
 
@@ -239,6 +248,7 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   //mouse handling
   MouseMove(event: MouseEvent) {
+    
     this.mousePos.x = event.clientX;
     this.mousePos.y = event.clientY-60;//weird mouse problems again. fit to panel
 

@@ -5,7 +5,6 @@ export class Box {
 
     typ: number;
     id: number;
-    index: number;
     position: {x: number, y: number};
     dragged: boolean;
     message: string;
@@ -23,11 +22,10 @@ export class Box {
 
     pointTo: number = 0;//for html interactivity: pointing to a box
 
-    constructor(typ: number, id: number, index: number, zIndex: number, position: {x: number, y: number} = {x: 100, y: 100}){
+    constructor(typ: number, id: number, zIndex: number, position: {x: number, y: number}){
         this.typ = typ;
         this.id = id;
-        this.index = index;
-        this.position = {x: 0, y: 0};
+        this.position = {x: position.x, y: position.y};
         this.dragged = false;
         this.message = 'ID: ' + this.id + ' type: ' + this.typ;
         this.zIndex = zIndex;
