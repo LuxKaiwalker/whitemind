@@ -26,10 +26,10 @@ export class Canvas{
     drawArrow(startX: number, startY: number, endX: number, endY: number) {
 
         // Control points for the cubic bezier curve (can be adjusted for the desired curve shape)
-        const controlX1 = startX + Math.abs((endX - startX) / 2);
-        const controlY1 = startY;  // Adjust these values to change the curve
-        const controlX2 = endX - Math.abs((endX - startX) / 2);
-        const controlY2 = endY;  // Adjust these values to change the curve
+        const controlX1 = startX + Math.abs((endX - startX)/2);
+        const controlY1 = startY + Math.abs((endY - startY)/2);  // Adjust these values to change the curve
+        const controlX2 = endX - Math.abs((endX - startX)/2);
+        const controlY2 = endY - Math.abs((endY-startY)/2);  // Adjust these values to change the curve
     
         // Draw the cubic bezier curve
         this.ctx.beginPath();
