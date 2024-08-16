@@ -11,16 +11,6 @@ body {
     text-align: center;
 }
 
-#home h1 {
-    font-size: 3em;
-    margin-bottom: 20px;
-}
-
-#home p {
-    font-size: 1.5em;
-    margin-bottom: 20px;
-}
-
 .btn {
     background-color: #333;
     color: #fff;
