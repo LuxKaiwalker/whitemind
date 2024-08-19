@@ -1,11 +1,4 @@
-#home {
-    background: url('/assets/pictures/home_background.jpg') no-repeat center center/cover;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-}
+
 
 .service {
     margin-bottom: 20px;
