@@ -60,10 +60,6 @@
     font-size: 12px;
 }
 
-.mdown body {
-    line-height: 1.85;
-}
-
 .mdown p,
 .mdown .splendor-p {
     font-size: 1rem;

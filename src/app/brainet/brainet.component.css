@@ -1,39 +1,21 @@
 
 .ui {
   font-family: Arial, sans-serif;
-  font-size: 14px;
-  color: #333;
-  background-color: transparent;
-  position: absolute;
-  top: 60px;
   height:calc(100% - 60px);
-  width: 100%;
 }
 
 [vertical-bar] {
   width: 170px;
-  height: 100%;
-  position: absolute;
-  left: 0;
-  background: #aaaaaa;
 }
 
 .canvas {
-  position: absolute;
-  width: 100%;
   height: calc(100% - 60px);
-  top: 60px;
-  z-index: 0;
 }
 
 [box]{
   font-size: 18px;
-  display: flex;
   width: 160px;
   height: 70px;
-  border: solid 1px #ccc;
-  color: rgba(0, 0, 0, 0.87);
-  background: #fff;
   border-radius: 4px;
   position: absolute;
   transition: box-shadow 200ms cubic-bezier(0, 0, 0.2, 1);

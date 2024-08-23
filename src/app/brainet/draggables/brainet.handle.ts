@@ -11,22 +11,22 @@ export class Handle {
         this.type = typ.toString();
         if(this.type == "output"){//declares new handle
             this.left = 135;
-            this.color = "red";
+            this.color = "#BB4430";//persian red
             this.box_pos.x = 160;
         }
         else if(this.type == "input"){
             this.left = 5;
-            this.color = "blue";
+            this.color = "#008080";//teal
             this.box_pos.x = 0;
         }
         else if(this.type == "special"){
             this.left = 0;
-            this.color = "green";
+            this.color = "#BAD29F";//Celadon
             this.box_pos.x = 0;
         }
         else if(this.type == "config"){
             this.left = 0;
-            this.color = "yellow";
+            this.color = "FF9914";//princeton orange
             this.box_pos.x = 0;
         }
         else{
