@@ -10,6 +10,7 @@ module.exports = {
         accent_dark: "#004040",
 
         light_gray: "#f4f4f4",
+        gray: "#d9d9d9",
         dark: "#333333",
       },
       backgroundImage: {
