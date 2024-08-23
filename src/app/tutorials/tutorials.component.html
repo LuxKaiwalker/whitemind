@@ -3,6 +3,8 @@
   <p class="text-center">Learn how to use Whitemind with these tutorials.</p>
 </div>
 
-<div class="mx-auto relative top-8" style="width: 80%">
-  <markdown class="mdown" [src]="'/assets/markdown/tutorials.md'" (load)="onLoad($event)"></markdown>
+<div class="mx-auto relative top-8 bg-light_gray dark:bg-dark_gray" style="width: 80%">
+  <div class = "markdown-body">
+    <markdown class="mdown" [src]="'/assets/markdown/tutorials.md'" (load)="onLoad($event)"></markdown>
+  </div>
 </div>
