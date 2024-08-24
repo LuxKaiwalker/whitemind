@@ -33,6 +33,6 @@ export class Handle {
             throw new Error(`Invalid handle type, given ${this.type}`);
         }
         this.top = 10;
-        this.box_pos.y = this.top;
+        this.box_pos.y = this.top + 10;
     }
 }

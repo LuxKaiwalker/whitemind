@@ -7,22 +7,6 @@ export class Canvas{
         this.ctx = ctx;
     }
 
-    drawLine(box1: Box, box2: Box, highest: number): [arrowFrom: number, arrowTo: number, arrowId: number]{
-        this.ctx.beginPath();
-        this.ctx.moveTo(box1.position.x, box1.position.y);
-        this.ctx.lineTo(box2.position.x, box2.position.y);
-        this.ctx.stroke();
-
-        box1.connections_out.push(box2.id);
-        box2.connections_in.push(box1.id);
-
-        return [box1.id, box2.id, highest + 1]; // Replace 1 with the appropriate lineId value
-    }
-
-    deleteLine(){//to do
-
-    }
-
     drawArrow(startX: number, startY: number, endX: number, endY: number) {
 
         // Control points for the cubic bezier curve (can be adjusted for the desired curve shape)
@@ -40,6 +24,31 @@ export class Canvas{
         // Calculate arrowhead angle based on the tangent to the curve at the end point
         const angle = Math.atan2(endY - controlY2, endX - controlX2);
         
+        // Draw arrowhead
+        const arrowLength = 10;
+        const arrowWidth = 5;
+        this.ctx.beginPath();
+        this.ctx.moveTo(endX, endY);
+        this.ctx.lineTo(
+            endX - arrowLength * Math.cos(angle - Math.PI / 6),
+            endY - arrowLength * Math.sin(angle - Math.PI / 6)
+        );
+        this.ctx.moveTo(endX, endY);
+        this.ctx.lineTo(
+            endX - arrowLength * Math.cos(angle + Math.PI / 6),
+            endY - arrowLength * Math.sin(angle + Math.PI / 6)
+        );
+        this.ctx.stroke();
+    }
+
+    drawLine(startX: number, startY: number, endX: number, endY: number){
+        this.ctx.beginPath();
+        this.ctx.moveTo(startX, startY);
+        this.ctx.lineTo(endX, endY);
+        this.ctx.stroke();
+        // Calculate arrowhead angle based on the tangent to the line at the end point
+        const angle = Math.atan2(endY - startY, endX - startX);
+
         // Draw arrowhead
         const arrowLength = 10;
         const arrowWidth = 5;
