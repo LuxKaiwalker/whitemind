@@ -1,8 +1,16 @@
-<div panel>
-  <h1 class="text-4xl font-bold text-center bg-teal">Tutorials</h1>
-  <p class="text-center">Learn how to use Whitemind with these tutorials.</p>
+<div class="absolute w-1/5 bg-gray-200 dark:bg-gray-800 p-4 bg-accent text-dark dark:text-white h-full items-center" style="">
+
+  <img src='assets/neurologism.ico' class = "self-center" routerLink="/">
+
+  <ul>
+    <li><a class = "text-dark dark:text-white text-xl" href="#">Tutorial 1</a></li>
+    <li><a class = "text-dark dark:text-white text-xl" href="#">Tutorial 2</a></li>
+    <li><a class = "text-dark dark:text-white text-xl" href="#">Tutorial 3</a></li>
+  </ul>
 </div>
 
-<div class="mx-auto relative top-8" style="width: 80%">
-  <markdown class="mdown" [src]="'/assets/markdown/tutorials.md'" (load)="onLoad($event)"></markdown>
+<div class="absolute right-0 bg-light_gray dark:bg-dark_gray overflow-scroll h-full" style="left: 20%">
+  <app-tutorial-md></app-tutorial-md>
 </div>
+
+<router-outlet></router-outlet>

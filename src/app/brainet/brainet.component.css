@@ -4,6 +4,10 @@
   height:calc(100% - 60px);
 }
 
+[bg] {
+  height: calc(100vh - 60px);
+}
+
 [vertical-bar] {
   width: 170px;
 }

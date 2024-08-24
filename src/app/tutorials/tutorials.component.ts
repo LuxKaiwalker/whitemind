@@ -1,18 +1,21 @@
-import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
+
+import { TutorialMdComponent } from '../tutorial-md/tutorial-md.component';
+
+import { HeaderComponent } from '../header/header.component';
+import { FooterComponent } from '../footer/footer.component';
  
-import { MarkdownModule } from 'ngx-markdown';
 
 @Component({
   selector: 'app-tutorials',
   standalone: true,
-  imports: [RouterOutlet, MarkdownModule],
-  providers: [{ provide: HttpClient }],//dunno how it works
+  imports: [RouterLink, RouterOutlet, TutorialMdComponent, HeaderComponent, FooterComponent],
   templateUrl: './tutorials.component.html',
   styleUrl: './tutorials.component.css'
 })
 export class TutorialsComponent {
+assets: any;
   onLoad(event: any) {
     console.log(event);
   }

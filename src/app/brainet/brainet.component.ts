@@ -229,7 +229,7 @@ export class BrainetComponent implements OnInit, OnChanges {
 
           console.log(pos1, pos2);
         
-          this.canvasInstance.drawArrow(pos1.x, pos1.y, pos2.x, pos2.y);
+          this.canvasInstance.drawLine(pos1.x, pos1.y, pos2.x, pos2.y);
         }
       }
     }
@@ -241,7 +241,7 @@ export class BrainetComponent implements OnInit, OnChanges {
         const posx = this.connectionArrow.box.position.x + this.connectionArrow.box.handles[0].box_pos.x;//here output is definetly at index 0. probably altering further alter
         const posy = this.connectionArrow.box.position.y + this.connectionArrow.box.handles[0].box_pos.y;
 
-        this.canvasInstance.drawArrow(posx, posy, this.mousePos.x, this.mousePos.y);
+        this.canvasInstance.drawLine(posx, posy, this.mousePos.x, this.mousePos.y);
       }
     }
   }
