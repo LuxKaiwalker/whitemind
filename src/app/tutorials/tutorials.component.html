@@ -1,4 +1,7 @@
-<div class="absolute w-1/6 bg-gray-200 dark:bg-gray-800 p-4 bg-accent text-dark dark:text-white" style="height: calc(100% - 60px)">
+<div class="absolute w-1/5 bg-gray-200 dark:bg-gray-800 p-4 bg-accent text-dark dark:text-white h-full items-center" style="">
+
+  <img src='assets/neurologism.ico' class = "self-center" routerLink="/">
+
   <ul>
     <li><a class = "text-dark dark:text-white text-xl" href="#">Tutorial 1</a></li>
     <li><a class = "text-dark dark:text-white text-xl" href="#">Tutorial 2</a></li>
@@ -6,6 +9,8 @@
   </ul>
 </div>
 
-<div class="absolute right-0 bg-light_gray dark:bg-dark_gray overflow-scroll" style="left: 16.6666666%; height: calc(100% - 60px)">
+<div class="absolute right-0 bg-light_gray dark:bg-dark_gray overflow-scroll h-full" style="left: 20%">
   <app-tutorial-md></app-tutorial-md>
 </div>
+
+<router-outlet></router-outlet>
