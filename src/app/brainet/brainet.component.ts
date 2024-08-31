@@ -132,9 +132,13 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   drawConnectionArrow(handle: Handle, box: Box){
     if(this.connectionArrow.type === ""){//if empty, handle the arrow updates in updatecanvas
-      this.connectionArrow.type = handle.type;
-      this.connectionArrow.box = box;
-      return;
+
+      if(handle.type === "output"){
+        this.connectionArrow.type = handle.type;
+
+        this.connectionArrow.box = box;
+        return;
+      }
     }
     
     if(this.connectionArrow.type === "output" && handle.type === "input"){
@@ -301,6 +305,9 @@ export class BrainetComponent implements OnInit, OnChanges {
       if(isInBox(box)){//drag started!
 
         if(!isOnHandle(box)){
+
+          this.abortConnectionArrow();
+
           this.dragStart(box);//initiate drag start
 
           this.dragging = box.id;
@@ -312,6 +319,7 @@ export class BrainetComponent implements OnInit, OnChanges {
           if(handleType){
             let index = box.handles.findIndex((handle) => handle.type === handleType);
             this.drawConnectionArrow(box.handles[index], box);
+            return;
           }
         }
       }
@@ -344,7 +352,9 @@ export class BrainetComponent implements OnInit, OnChanges {
     }
   }
 
-  onScroll(event: Event){
-    console.log(event);//we want to enable zoom using scrolling later!
+  onScroll(event: WheelEvent){
+    if(event.deltaY > 0){
+      this.;
+    }
   }
 }
