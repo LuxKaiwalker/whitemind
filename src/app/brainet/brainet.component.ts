@@ -30,11 +30,16 @@ export class BrainetComponent implements OnInit, OnChanges {
   box_count: number = 0;
   zindex_count: number = 10;
 
-  mousePos: {x: number, y: number} = {x: 0, y: 0};
-
   canvasInstance!: Canvas;
 
-  connectionArrow: {type:string, box?: Box} = {type: ""}//empty string means no draw arrow mode, box_id = -1 = no box currently selected
+  connectionArrow: {type:string, box?: Box, toPos:{x:number, y:number}} = {type: "", toPos: {x:0, y:0}}//empty string means no draw arrow mode, box_id = -1 = no box currently selected
+
+
+  //dragdrop variables
+  dragging: number = -1;
+  startx:number = 0;
+  starty:number = 0;
+
 
   ngOnInit(){
       const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
@@ -42,6 +47,7 @@ export class BrainetComponent implements OnInit, OnChanges {
 
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight - 60;//60 = header area.
+      console.log(canvas.width, canvas.height);
 
 
       this.canvasInstance = new Canvas(ctx);
@@ -96,7 +102,7 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   //drag handling
 
-  dragStart($event: CdkDragStart, box: Box){
+  dragStart(box: Box){
 
     if(box.in_panel)
     {
@@ -106,20 +112,12 @@ export class BrainetComponent implements OnInit, OnChanges {
     box.zIndex = ++this.zindex_count;
   }
 
-  dragMoved($event: CdkDragMove, box: Box) {
-
-    const pos = $event.source.getFreeDragPosition();
-    this.updateCanvas(false, box, pos);
-  }
-
-  dragEnd($event: CdkDragEnd, box: Box) {
-
-    box.position = $event.source.getFreeDragPosition();
+  dragEnd(box: Box) {
 
     if(box.position.x < 170){
       if(!box.in_panel){
         this.deleteBox(box);
-        this.updateCanvas(false, box);
+        this.updateCanvas(box);
       }
       else{
         box.position.x = 170;
@@ -153,7 +151,7 @@ export class BrainetComponent implements OnInit, OnChanges {
   abortConnectionArrow(){
     this.connectionArrow.type = "";
     this.connectionArrow.box = undefined;
-    this.updateCanvas(false);
+    this.updateCanvas();
   }
 
   addArrow(from: Box, to: Box, typeFrom: string, typeTo: string){
@@ -184,15 +182,22 @@ export class BrainetComponent implements OnInit, OnChanges {
       throw new Error(`Invalid handle froms and tos, given ${typeFrom} and ${typeTo} so no new arrow is added`);
     }
 
-    this.updateCanvas(false, from);
+    this.updateCanvas(from);
   }
 
 
   //canvas handling
-  updateCanvas(drawMouseArrow: boolean = false, current?: Box, pos?: {x: number, y: number}){
-
+  updateCanvas(current?: Box, pos?: {x: number, y: number}){
 
     this.canvasInstance.clearCanvas();//clear all that have been drawn
+
+    this.canvasInstance.drawBar();
+
+    //draw boxes
+    for(const [key, box] of this.workspace){
+      this.canvasInstance.drawBox(box);
+      this.canvasInstance.drawHandles(box);
+    }
 
     //draw in-out-lines
     for (const [key, box] of this.workspace) {
@@ -235,25 +240,111 @@ export class BrainetComponent implements OnInit, OnChanges {
     }
 
     //draw connection arrow
-    if(drawMouseArrow){
+    if(this.connectionArrow.type !== ""){
       if (this.connectionArrow.box) {
 
         const posx = this.connectionArrow.box.position.x + this.connectionArrow.box.handles[0].box_pos.x;//here output is definetly at index 0. probably altering further alter
         const posy = this.connectionArrow.box.position.y + this.connectionArrow.box.handles[0].box_pos.y;
 
-        this.canvasInstance.drawLine(posx, posy, this.mousePos.x, this.mousePos.y);
+        this.canvasInstance.drawLine(posx, posy, this.connectionArrow.toPos.x, this.connectionArrow.toPos.y);
       }
     }
   }
 
-  //mouse handling
-  MouseMove(event: MouseEvent) {
+  //dragdrop implemenrtation
+  mouseMove(event: MouseEvent) {
     
-    this.mousePos.x = event.clientX;
-    this.mousePos.y = event.clientY-60;//weird mouse problems again. fit to panel
+    if(this.dragging !== -1){
+      console.log("dragging");
+      let moveX = event.clientX - this.startx;
+      let moveY = event.clientY - 60 - this.starty;//60 = header area.
+      this.startx = event.clientX;
+      this.starty = event.clientY - 60;//60 = header area.
+
+      let box = this.workspace.get(this.dragging);
+      if (box) {
+        box.position.x += moveX;
+        box.position.y += moveY;
+      }
+    }
 
     if(this.connectionArrow.type !== ""){
-      this.updateCanvas(true);
+      this.connectionArrow.toPos = {x: event.clientX, y: event.clientY - 60};//60 = header area.
     }
+
+    this.updateCanvas();
+  }
+
+  onMouseDown(event: MouseEvent){
+    this.startx = event.clientX;
+    this.starty = event.clientY-60;
+
+    let isInBox = (box: Box) => {
+      return box.position.x < this.startx && this.startx < box.position.x + box.width && box.position.y < this.starty && this.starty < box.position.y + box.height;
+    }
+
+    let isOnHandle = (box:Box) => {
+      for(const handle of box.handles){
+        let x = box.position.x + handle.left;
+        let y = box.position.y + handle.top;
+        let width = 20;//handle dimensions, probybly to change
+        let height = 20;
+
+        if(x < this.startx && this.startx < x + width && y < this.starty && this.starty < y + height){
+          return handle.type;
+        }
+      }
+      return false;
+    }
+    
+    for(let box of this.workspace.values()){
+      if(isInBox(box)){//drag started!
+
+        if(!isOnHandle(box)){
+          this.dragStart(box);//initiate drag start
+
+          this.dragging = box.id;
+          console.log(this.dragging);
+          return;
+        }
+        else{
+          let handleType = isOnHandle(box);
+          if(handleType){
+            let index = box.handles.findIndex((handle) => handle.type === handleType);
+            this.drawConnectionArrow(box.handles[index], box);
+          }
+        }
+      }
+    }
+  }
+
+  onMouseUp(event: MouseEvent){
+    if(this.dragging === -1){
+      return;
+    }
+    else{
+      let box = this.workspace.get(this.dragging);
+      if (box) {
+        this.dragEnd(box);
+      }
+      this.dragging = -1;
+    }
+  }
+
+  onMouseOut(event: MouseEvent){
+    if(this.dragging === -1){
+      return;
+    }
+    else{
+      let box = this.workspace.get(this.dragging);
+      if (box) {
+        this.dragEnd(box);
+      }
+      this.dragging = -1;
+    }
+  }
+
+  onScroll(event: Event){
+    console.log(event);//we want to enable zoom using scrolling later!
   }
 }

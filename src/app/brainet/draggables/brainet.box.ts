@@ -10,6 +10,9 @@ export class Box {
     message: string;
     in_panel: boolean = true;
     zIndex: number;
+    color: string = 'white';
+    height: number = 70;
+    width: number = 160;
     
     connections_out: number[] = [];//for html interactivity: pointing to a box
     connections_in: number[] = [];//for html interactivity: pointing to a box
@@ -29,6 +32,18 @@ export class Box {
         this.dragged = false;
         this.message = 'ID: ' + this.id + ' type: ' + this.typ;
         this.zIndex = zIndex;
+
+        switch(this.typ){
+            case 0: this.color = "#008080";//input
+            break;
+            case 1: this.color = "#FF6347";//output
+            break;
+            case 2: this.color = "#FFD700";//special
+            break;
+            case 3: this.color = "#FFA07A";//config
+            break;
+            default: this.color = "#fff";
+        }
 
 
         //handles init
