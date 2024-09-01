@@ -292,19 +292,24 @@ export class BrainetComponent implements OnInit, OnChanges {
     
     if(this.dragging !== -1){
 
-      let clx = event.clientX - this.viewportTransform.x;
-      let cly = event.clientY - this.viewportTransform.y;//60 = header area.
+      let clx = (event.clientX - this.viewportTransform.x)/this.viewportTransform.scale;
+      let cly = (event.clientY - this.viewportTransform.y)/this.viewportTransform.scale;//60 = header area.
+
+      let headermargin = 60/this.viewportTransform.scale;//60 = header area.
 
       if(this.paneldrag === 1){
-          clx = event.clientX;
-          cly = event.clientY;
+        clx = event.clientX;
+        cly = event.clientY;
+
+        headermargin = 60;
       }
 
       console.log("dragging");
       let moveX = clx - this.startx;
-      let moveY = cly - 60 - this.starty;//60 = header area.
+      let moveY = cly - headermargin - this.starty;//60 = header area.
       this.startx = clx;
-      this.starty = cly - 60;//60 = header area.
+      this.starty = cly - headermargin;//60 = header area.
+
 
       let box = this.workspace.get(this.dragging);
       if (box) {
@@ -314,9 +319,9 @@ export class BrainetComponent implements OnInit, OnChanges {
     }
 
     if(this.connectionArrow.type !== ""){
-      const clx = event.clientX - this.viewportTransform.x;
-      const cly = event.clientY - this.viewportTransform.y;//60 = header area.
-      this.connectionArrow.toPos = {x: clx, y: cly - 60};//60 = header area.
+      const clx = (event.clientX - this.viewportTransform.x)/this.viewportTransform.scale;
+      const cly = (event.clientY - this.viewportTransform.y)/this.viewportTransform.scale;//60 = header area.
+      this.connectionArrow.toPos = {x: clx, y: cly - 60/this.viewportTransform.scale};//60 = header area.
     }
 
     if(this.panning){
@@ -340,8 +345,8 @@ export class BrainetComponent implements OnInit, OnChanges {
     this.transx = event.clientX;
     this.transy = event.clientY-60;
 
-    this.startx = event.clientX - this.viewportTransform.x;
-    this.starty = event.clientY - 60 - this.viewportTransform.y;//60 = header area.
+    this.startx = (event.clientX - this.viewportTransform.x)/this.viewportTransform.scale;
+    this.starty = (event.clientY - 60 - this.viewportTransform.y)/this.viewportTransform.scale;//60 = header area.
 
     if(event.clientX<170){
       this.paneldrag = 1;
@@ -411,8 +416,8 @@ export class BrainetComponent implements OnInit, OnChanges {
         let box = this.workspace.get(this.dragging);
         if (box) {
           if(this.paneldrag === 1){
-            box.position.x -= this.viewportTransform.x;
-            box.position.y -= this.viewportTransform.y;
+            box.position.x = (box.position.x-this.viewportTransform.x)/this.viewportTransform.scale;
+            box.position.y = (box.position.y-this.viewportTransform.y)/this.viewportTransform.scale;
           }
           this.dragEnd(box);
         }
@@ -423,6 +428,8 @@ export class BrainetComponent implements OnInit, OnChanges {
     else if(event.button == 2){//right button clicked
       this.panning = false;
     }
+
+    this.updateCanvas();
   }
 
   onMouseOut(event: MouseEvent){
@@ -434,7 +441,6 @@ export class BrainetComponent implements OnInit, OnChanges {
     console.log("scrolling");
     console.log(event.deltaY);
 
-    const oldScale = this.viewportTransform.scale;
     const oldX = this.viewportTransform.x;
     const oldY = this.viewportTransform.y;
 
