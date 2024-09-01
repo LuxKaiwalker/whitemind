@@ -1,6 +1,6 @@
 import { Component, OnInit, OnChanges, ViewChild, ElementRef } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { DragDropModule, CdkDragEnd, CdkDragMove, CdkDragStart } from '@angular/cdk/drag-drop';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { NgFor } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -37,6 +37,7 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   //dragdrop variables
   dragging: number = -1;
+  panning: boolean = false;
   startx:number = 0;
   starty:number = 0;
 
@@ -46,7 +47,7 @@ export class BrainetComponent implements OnInit, OnChanges {
       const ctx = this.myCanvas.nativeElement.getContext('2d');
 
       canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight - 60;//60 = header area.
+      canvas.height = (window.innerHeight - 60);//60 = header area.
       console.log(canvas.width, canvas.height);
 
 
@@ -276,85 +277,105 @@ export class BrainetComponent implements OnInit, OnChanges {
       this.connectionArrow.toPos = {x: event.clientX, y: event.clientY - 60};//60 = header area.
     }
 
+    if(this.panning){
+      console.log("panning");
+      this.canvasInstance.ctx.translate(event.movementX, event.movementY);
+    }
+
     this.updateCanvas();
   }
 
   onMouseDown(event: MouseEvent){
+
     this.startx = event.clientX;
     this.starty = event.clientY-60;
 
-    let isInBox = (box: Box) => {
-      return box.position.x < this.startx && this.startx < box.position.x + box.width && box.position.y < this.starty && this.starty < box.position.y + box.height;
-    }
-
-    let isOnHandle = (box:Box) => {
-      for(const handle of box.handles){
-        let x = box.position.x + handle.left;
-        let y = box.position.y + handle.top;
-        let width = 20;//handle dimensions, probybly to change
-        let height = 20;
-
-        if(x < this.startx && this.startx < x + width && y < this.starty && this.starty < y + height){
-          return handle.type;
-        }
+    if(event.button == 0){//left button clicked
+      let isInBox = (box: Box) => {
+        return box.position.x < this.startx && this.startx < box.position.x + box.width && box.position.y < this.starty && this.starty < box.position.y + box.height;
       }
-      return false;
-    }
-    
-    for(let box of this.workspace.values()){
-      if(isInBox(box)){//drag started!
 
-        if(!isOnHandle(box)){
+      let isOnHandle = (box:Box) => {
+        for(const handle of box.handles){
+          let x = box.position.x + handle.left;
+          let y = box.position.y + handle.top;
+          let width = 20;//handle dimensions, probybly to change
+          let height = 20;
 
-          this.abortConnectionArrow();
-
-          this.dragStart(box);//initiate drag start
-
-          this.dragging = box.id;
-          console.log(this.dragging);
-          return;
+          if(x < this.startx && this.startx < x + width && y < this.starty && this.starty < y + height){
+            return handle.type;
+          }
         }
-        else{
-          let handleType = isOnHandle(box);
-          if(handleType){
-            let index = box.handles.findIndex((handle) => handle.type === handleType);
-            this.drawConnectionArrow(box.handles[index], box);
+        return false;
+      }
+      
+      for(let box of this.workspace.values()){
+        if(isInBox(box)){//drag started!
+
+          if(!isOnHandle(box)){
+
+            this.abortConnectionArrow();
+
+            this.dragStart(box);//initiate drag start
+
+            this.dragging = box.id;
+            console.log(this.dragging);
             return;
+          }
+          else{
+            let handleType = isOnHandle(box);
+            if(handleType){
+              let index = box.handles.findIndex((handle) => handle.type === handleType);
+              this.drawConnectionArrow(box.handles[index], box);
+              return;
+            }
           }
         }
       }
     }
+    else if(event.button == 2){//right button clicked
+      //we want to enable panning here
+      console.log("panning");
+      this.panning = true;
+    }
+    
   }
 
   onMouseUp(event: MouseEvent){
-    if(this.dragging === -1){
-      return;
-    }
-    else{
-      let box = this.workspace.get(this.dragging);
-      if (box) {
-        this.dragEnd(box);
+
+    if(event.button == 0){//left button clicked
+      if(this.dragging === -1){
+        return;
       }
-      this.dragging = -1;
+      else{
+        let box = this.workspace.get(this.dragging);
+        if (box) {
+          this.dragEnd(box);
+        }
+        this.dragging = -1;
+      }
+    }
+    else if(event.button == 2){//right button clicked
+      this.panning = false;
     }
   }
 
   onMouseOut(event: MouseEvent){
-    if(this.dragging === -1){
-      return;
-    }
-    else{
-      let box = this.workspace.get(this.dragging);
-      if (box) {
-        this.dragEnd(box);
-      }
-      this.dragging = -1;
-    }
+    this.onMouseUp(event);
   }
 
   onScroll(event: WheelEvent){
     if(event.deltaY > 0){
-      this.;
+      this.canvasInstance.ctx.scale(0.9, 0.9);
     }
+    else{
+      this.canvasInstance.ctx.scale(1.1, 1.1);
+      this.updateCanvas();
+    }
+    this.updateCanvas();
+  }
+
+  onContextMenu(event: MouseEvent){
+    event.preventDefault();
   }
 }
