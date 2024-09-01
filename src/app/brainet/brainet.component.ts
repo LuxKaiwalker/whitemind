@@ -430,13 +430,28 @@ export class BrainetComponent implements OnInit, OnChanges {
   }
 
   onScroll(event: WheelEvent){
-    if(event.deltaY > 0){
-      this.canvasInstance.ctx.scale(0.9, 0.9);
-    }
-    else{
-      this.canvasInstance.ctx.scale(1.1, 1.1);
-      this.updateCanvas();
-    }
+
+    console.log("scrolling");
+    console.log(event.deltaY);
+
+    const oldScale = this.viewportTransform.scale;
+    const oldX = this.viewportTransform.x;
+    const oldY = this.viewportTransform.y;
+
+    const localX = event.clientX;
+    const localY = event.clientY;
+
+    const previousScale = this.viewportTransform.scale;
+
+    const newScale = this.viewportTransform.scale += event.deltaY * -0.00025;
+
+    const newX = localX - (localX - oldX) * (newScale / previousScale);
+    const newY = localY - (localY - oldY) * (newScale / previousScale);
+
+    this.viewportTransform.x = newX;
+    this.viewportTransform.y = newY;
+    this.viewportTransform.scale = newScale;
+
     this.updateCanvas();
   }
 

@@ -8,10 +8,10 @@ export class Canvas{
     }
 
     drawBar(transformx: number, transformy: number, scale: number){
-        const x = -1*transformx; // x-coordinate of the bar
-        const y = -1*transformy; // y-coordinate of the bar
-        const width = 170; // width of the bar
-        const height = this.ctx.canvas.height*scale; // height of the bar
+        const x = -1*transformx/scale; // x-coordinate of the bar
+        const y = -1*transformy/scale; // y-coordinate of the bar
+        const width = 170/scale; // width of the bar
+        const height = this.ctx.canvas.height/scale; // height of the bar
 
         // Draw the bar
         this.ctx.fillStyle = "#666";
@@ -78,8 +78,8 @@ export class Canvas{
     }
 
     drawBox(box: Box, transformx: number, transformy: number, scale: number){
-        let width = box.width;
-        let height = box.height;
+        let width = box.width*scale;
+        let height = box.height*scale;
         let x = box.position.x; // Centered on the canvas
         let y = box.position.y; // Centered on the canvas
         const borderRadius = 4;
