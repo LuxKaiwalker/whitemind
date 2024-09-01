@@ -48,6 +48,8 @@ export class BrainetComponent implements OnInit, OnChanges {
     y: 0,
     scale: 1
   }
+  transx: number = 0;
+  transy: number = 0;
 
   ngOnInit(){
       const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
@@ -288,11 +290,15 @@ export class BrainetComponent implements OnInit, OnChanges {
   mouseMove(event: MouseEvent) {
     
     if(this.dragging !== -1){
+
+      const clx = event.clientX - this.viewportTransform.x;
+      const cly = event.clientY - this.viewportTransform.y;//60 = header area.
+
       console.log("dragging");
-      let moveX = event.clientX - this.startx;
-      let moveY = event.clientY - 60 - this.starty;//60 = header area.
-      this.startx = event.clientX;
-      this.starty = event.clientY - 60;//60 = header area.
+      let moveX = clx - this.startx;
+      let moveY = cly - 60 - this.starty;//60 = header area.
+      this.startx = clx;
+      this.starty = cly - 60;//60 = header area.
 
       let box = this.workspace.get(this.dragging);
       if (box) {
@@ -302,7 +308,9 @@ export class BrainetComponent implements OnInit, OnChanges {
     }
 
     if(this.connectionArrow.type !== ""){
-      this.connectionArrow.toPos = {x: event.clientX, y: event.clientY - 60};//60 = header area.
+      const clx = event.clientX - this.viewportTransform.x;
+      const cly = event.clientY - this.viewportTransform.y;//60 = header area.
+      this.connectionArrow.toPos = {x: clx, y: cly - 60};//60 = header area.
     }
 
     if(this.panning){
@@ -311,11 +319,11 @@ export class BrainetComponent implements OnInit, OnChanges {
       const localX = event.clientX;
       const localY = event.clientY - 60;//60 = header area.
 
-      this.viewportTransform.x += localX - this.startx;
-      this.viewportTransform.y += localY - this.starty;
+      this.viewportTransform.x += localX - this.transx;
+      this.viewportTransform.y += localY - this.transy;
 
-      this.startx = localX;
-      this.starty = localY;
+      this.transx = localX;
+      this.transy = localY;
     }
 
     this.updateCanvas();
@@ -323,8 +331,11 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   onMouseDown(event: MouseEvent){
 
-    this.startx = event.clientX;
-    this.starty = event.clientY-60;
+    this.transx = event.clientX;
+    this.transy = event.clientY-60;
+
+    this.startx = event.clientX - this.viewportTransform.x;
+    this.starty = event.clientY - 60 - this.viewportTransform.y;//60 = header area.
 
     if(event.button == 0){//left button clicked
       let isInBox = (box: Box) => {
