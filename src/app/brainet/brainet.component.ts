@@ -40,6 +40,7 @@ export class BrainetComponent implements OnInit, OnChanges {
   panning: boolean = false;
   startx:number = 0;
   starty:number = 0;
+  paneldrag: number = -1;
 
 
   //viewport variables
@@ -291,8 +292,13 @@ export class BrainetComponent implements OnInit, OnChanges {
     
     if(this.dragging !== -1){
 
-      const clx = event.clientX - this.viewportTransform.x;
-      const cly = event.clientY - this.viewportTransform.y;//60 = header area.
+      let clx = event.clientX - this.viewportTransform.x;
+      let cly = event.clientY - this.viewportTransform.y;//60 = header area.
+
+      if(this.paneldrag === 1){
+          clx = event.clientX;
+          cly = event.clientY;
+      }
 
       console.log("dragging");
       let moveX = clx - this.startx;
@@ -337,7 +343,14 @@ export class BrainetComponent implements OnInit, OnChanges {
     this.startx = event.clientX - this.viewportTransform.x;
     this.starty = event.clientY - 60 - this.viewportTransform.y;//60 = header area.
 
+    if(event.clientX<170){
+      this.paneldrag = 1;
+      this.startx = event.clientX;
+      this.starty = event.clientY - 60;//60 = header area.
+    }
+
     if(event.button == 0){//left button clicked
+
       let isInBox = (box: Box) => {
         return box.position.x < this.startx && this.startx < box.position.x + box.width && box.position.y < this.starty && this.starty < box.position.y + box.height;
       }
@@ -397,9 +410,14 @@ export class BrainetComponent implements OnInit, OnChanges {
       else{
         let box = this.workspace.get(this.dragging);
         if (box) {
+          if(this.paneldrag === 1){
+            box.position.x -= this.viewportTransform.x;
+            box.position.y -= this.viewportTransform.y;
+          }
           this.dragEnd(box);
         }
         this.dragging = -1;
+        this.paneldrag = -1;
       }
     }
     else if(event.button == 2){//right button clicked
