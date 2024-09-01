@@ -42,6 +42,13 @@ export class BrainetComponent implements OnInit, OnChanges {
   starty:number = 0;
 
 
+  //viewport variables
+  viewportTransform = {
+    x: 0,
+    y: 0,
+    scale: 1
+  }
+
   ngOnInit(){
       const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
       const ctx = this.myCanvas.nativeElement.getContext('2d');
@@ -115,6 +122,7 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   dragEnd(box: Box) {
 
+    /*
     if(box.position.x < 170){
       if(!box.in_panel){
         this.deleteBox(box);
@@ -124,6 +132,7 @@ export class BrainetComponent implements OnInit, OnChanges {
         box.position.x = 170;
       }
     }
+    */
 
     box.in_panel = false;
   }
@@ -194,15 +203,13 @@ export class BrainetComponent implements OnInit, OnChanges {
   //canvas handling
   updateCanvas(current?: Box, pos?: {x: number, y: number}){
 
+    //render viewport transformation
+
+    this.canvasInstance.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.canvasInstance.clearCanvas();
+    this.canvasInstance.ctx.setTransform(this.viewportTransform.scale, 0, 0, this.viewportTransform.scale, this.viewportTransform.x, this.viewportTransform.y);
+
     this.canvasInstance.clearCanvas();//clear all that have been drawn
-
-    this.canvasInstance.drawBar();
-
-    //draw boxes
-    for(const [key, box] of this.workspace){
-      this.canvasInstance.drawBox(box);
-      this.canvasInstance.drawHandles(box);
-    }
 
     //draw in-out-lines
     for (const [key, box] of this.workspace) {
@@ -244,6 +251,15 @@ export class BrainetComponent implements OnInit, OnChanges {
       }
     }
 
+    //draw boxes
+    for(const [key, box] of this.workspace){
+      if(box.in_panel){
+        continue;
+      }
+      this.canvasInstance.drawBox(box, this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
+      this.canvasInstance.drawHandles(box, this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
+    }
+
     //draw connection arrow
     if(this.connectionArrow.type !== ""){
       if (this.connectionArrow.box) {
@@ -253,6 +269,18 @@ export class BrainetComponent implements OnInit, OnChanges {
 
         this.canvasInstance.drawLine(posx, posy, this.connectionArrow.toPos.x, this.connectionArrow.toPos.y);
       }
+    }
+
+    //draw bar
+    this.canvasInstance.drawBar(this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
+
+    //draw boxes in panel
+    for(const [key, box] of this.workspace){
+      if(!box.in_panel){
+        continue;
+      }
+      this.canvasInstance.drawBox(box, this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
+      this.canvasInstance.drawHandles(box, this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
     }
   }
 
@@ -279,7 +307,15 @@ export class BrainetComponent implements OnInit, OnChanges {
 
     if(this.panning){
       console.log("panning");
-      this.canvasInstance.ctx.translate(event.movementX, event.movementY);
+
+      const localX = event.clientX;
+      const localY = event.clientY - 60;//60 = header area.
+
+      this.viewportTransform.x += localX - this.startx;
+      this.viewportTransform.y += localY - this.starty;
+
+      this.startx = localX;
+      this.starty = localY;
     }
 
     this.updateCanvas();

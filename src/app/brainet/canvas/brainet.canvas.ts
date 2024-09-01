@@ -7,11 +7,11 @@ export class Canvas{
         this.ctx = ctx;
     }
 
-    drawBar() {
-        const x = 0; // x-coordinate of the bar
-        const y = 0; // y-coordinate of the bar
+    drawBar(transformx: number, transformy: number, scale: number){
+        const x = -1*transformx; // x-coordinate of the bar
+        const y = -1*transformy; // y-coordinate of the bar
         const width = 170; // width of the bar
-        const height = this.ctx.canvas.height; // height of the bar
+        const height = this.ctx.canvas.height*scale; // height of the bar
 
         // Draw the bar
         this.ctx.fillStyle = "#666";
@@ -77,13 +77,21 @@ export class Canvas{
         this.ctx.stroke();
     }
 
-    drawBox(box: Box) {
-        const width = box.width;
-        const height = box.height;
-        const x = box.position.x; // Centered on the canvas
-        const y = box.position.y; // Centered on the canvas
+    drawBox(box: Box, transformx: number, transformy: number, scale: number){
+        let width = box.width;
+        let height = box.height;
+        let x = box.position.x; // Centered on the canvas
+        let y = box.position.y; // Centered on the canvas
         const borderRadius = 4;
         const color = box.color;
+
+        if(box.in_panel){
+            x -= transformx;
+            y -= transformy;
+
+            width *= scale;
+            height *= scale;
+        }
         
         // Draw the box with rounded corners
         this.ctx.beginPath();
@@ -124,13 +132,23 @@ export class Canvas{
         this.ctx.shadowColor = "transparent";
     }
 
-    drawHandles(box: Box) {
+    drawHandles(box: Box, transformx: number, transformy: number, scale: number){
 
         for (const handle of box.handles) {
 
-            const x = box.position.x + handle.left;
-            const y = box.position.y + handle.top;
+            let x = box.position.x + handle.left;
+            let y = box.position.y + handle.top;
+            let height = handle.height;
+            let width = handle.width;
             const color = handle.color;
+
+            if(box.in_panel){
+                x -= transformx;
+                y -= transformy;
+    
+                width *= scale;
+                height *= scale;
+            }
 
             // Draw rounded box
             this.ctx.fillStyle = color;

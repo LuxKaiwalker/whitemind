@@ -2,6 +2,8 @@ export class Handle {
     type: string;
     left: number;
     top: number;
+    height: number = 20;
+    width: number = 20;
 
     box_pos: {x: number, y: number} = {x: 0, y: 0};//the relative position to the box where the arrow should spawn
 
