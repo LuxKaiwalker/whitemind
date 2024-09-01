@@ -1,6 +1,6 @@
 import { Component, OnInit, OnChanges, ViewChild, ElementRef } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { DragDropModule, CdkDragEnd, CdkDragMove, CdkDragStart } from '@angular/cdk/drag-drop';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { NgFor } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -30,18 +30,35 @@ export class BrainetComponent implements OnInit, OnChanges {
   box_count: number = 0;
   zindex_count: number = 10;
 
-  mousePos: {x: number, y: number} = {x: 0, y: 0};
-
   canvasInstance!: Canvas;
 
-  connectionArrow: {type:string, box?: Box} = {type: ""}//empty string means no draw arrow mode, box_id = -1 = no box currently selected
+  connectionArrow: {type:string, box?: Box, toPos:{x:number, y:number}} = {type: "", toPos: {x:0, y:0}}//empty string means no draw arrow mode, box_id = -1 = no box currently selected
+
+
+  //dragdrop variables
+  dragging: number = -1;
+  panning: boolean = false;
+  startx:number = 0;
+  starty:number = 0;
+  paneldrag: number = -1;
+
+
+  //viewport variables
+  viewportTransform = {
+    x: 0,
+    y: 0,
+    scale: 1
+  }
+  transx: number = 0;
+  transy: number = 0;
 
   ngOnInit(){
       const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
       const ctx = this.myCanvas.nativeElement.getContext('2d');
 
       canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight - 60;//60 = header area.
+      canvas.height = (window.innerHeight - 60);//60 = header area.
+      console.log(canvas.width, canvas.height);
 
 
       this.canvasInstance = new Canvas(ctx);
@@ -96,7 +113,7 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   //drag handling
 
-  dragStart($event: CdkDragStart, box: Box){
+  dragStart(box: Box){
 
     if(box.in_panel)
     {
@@ -106,25 +123,19 @@ export class BrainetComponent implements OnInit, OnChanges {
     box.zIndex = ++this.zindex_count;
   }
 
-  dragMoved($event: CdkDragMove, box: Box) {
+  dragEnd(box: Box) {
 
-    const pos = $event.source.getFreeDragPosition();
-    this.updateCanvas(false, box, pos);
-  }
-
-  dragEnd($event: CdkDragEnd, box: Box) {
-
-    box.position = $event.source.getFreeDragPosition();
-
+    /*
     if(box.position.x < 170){
       if(!box.in_panel){
         this.deleteBox(box);
-        this.updateCanvas(false, box);
+        this.updateCanvas(box);
       }
       else{
         box.position.x = 170;
       }
     }
+    */
 
     box.in_panel = false;
   }
@@ -134,9 +145,13 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   drawConnectionArrow(handle: Handle, box: Box){
     if(this.connectionArrow.type === ""){//if empty, handle the arrow updates in updatecanvas
-      this.connectionArrow.type = handle.type;
-      this.connectionArrow.box = box;
-      return;
+
+      if(handle.type === "output"){
+        this.connectionArrow.type = handle.type;
+
+        this.connectionArrow.box = box;
+        return;
+      }
     }
     
     if(this.connectionArrow.type === "output" && handle.type === "input"){
@@ -153,7 +168,7 @@ export class BrainetComponent implements OnInit, OnChanges {
   abortConnectionArrow(){
     this.connectionArrow.type = "";
     this.connectionArrow.box = undefined;
-    this.updateCanvas(false);
+    this.updateCanvas();
   }
 
   addArrow(from: Box, to: Box, typeFrom: string, typeTo: string){
@@ -184,13 +199,18 @@ export class BrainetComponent implements OnInit, OnChanges {
       throw new Error(`Invalid handle froms and tos, given ${typeFrom} and ${typeTo} so no new arrow is added`);
     }
 
-    this.updateCanvas(false, from);
+    this.updateCanvas(from);
   }
 
 
   //canvas handling
-  updateCanvas(drawMouseArrow: boolean = false, current?: Box, pos?: {x: number, y: number}){
+  updateCanvas(current?: Box, pos?: {x: number, y: number}){
 
+    //render viewport transformation
+
+    this.canvasInstance.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.canvasInstance.clearCanvas();
+    this.canvasInstance.ctx.setTransform(this.viewportTransform.scale, 0, 0, this.viewportTransform.scale, this.viewportTransform.x, this.viewportTransform.y);
 
     this.canvasInstance.clearCanvas();//clear all that have been drawn
 
@@ -234,26 +254,214 @@ export class BrainetComponent implements OnInit, OnChanges {
       }
     }
 
+    //draw boxes
+    for(const [key, box] of this.workspace){
+      if(box.in_panel){
+        continue;
+      }
+      this.canvasInstance.drawBox(box, this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
+      this.canvasInstance.drawHandles(box, this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
+    }
+
     //draw connection arrow
-    if(drawMouseArrow){
+    if(this.connectionArrow.type !== ""){
       if (this.connectionArrow.box) {
 
         const posx = this.connectionArrow.box.position.x + this.connectionArrow.box.handles[0].box_pos.x;//here output is definetly at index 0. probably altering further alter
         const posy = this.connectionArrow.box.position.y + this.connectionArrow.box.handles[0].box_pos.y;
 
-        this.canvasInstance.drawLine(posx, posy, this.mousePos.x, this.mousePos.y);
+        this.canvasInstance.drawLine(posx, posy, this.connectionArrow.toPos.x, this.connectionArrow.toPos.y);
       }
+    }
+
+    //draw bar
+    this.canvasInstance.drawBar(this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
+
+    //draw boxes in panel
+    for(const [key, box] of this.workspace){
+      if(!box.in_panel){
+        continue;
+      }
+      this.canvasInstance.drawBox(box, this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
+      this.canvasInstance.drawHandles(box, this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
     }
   }
 
-  //mouse handling
-  MouseMove(event: MouseEvent) {
+  //dragdrop implemenrtation
+  mouseMove(event: MouseEvent) {
     
-    this.mousePos.x = event.clientX;
-    this.mousePos.y = event.clientY-60;//weird mouse problems again. fit to panel
+    if(this.dragging !== -1){
+
+      let clx = (event.clientX - this.viewportTransform.x)/this.viewportTransform.scale;
+      let cly = (event.clientY - this.viewportTransform.y)/this.viewportTransform.scale;//60 = header area.
+
+      let headermargin = 60/this.viewportTransform.scale;//60 = header area.
+
+      if(this.paneldrag === 1){
+        clx = event.clientX;
+        cly = event.clientY;
+
+        headermargin = 60;
+      }
+
+      console.log("dragging");
+      let moveX = clx - this.startx;
+      let moveY = cly - headermargin - this.starty;//60 = header area.
+      this.startx = clx;
+      this.starty = cly - headermargin;//60 = header area.
+
+
+      let box = this.workspace.get(this.dragging);
+      if (box) {
+        box.position.x += moveX;
+        box.position.y += moveY;
+      }
+    }
 
     if(this.connectionArrow.type !== ""){
-      this.updateCanvas(true);
+      const clx = (event.clientX - this.viewportTransform.x)/this.viewportTransform.scale;
+      const cly = (event.clientY - this.viewportTransform.y)/this.viewportTransform.scale;//60 = header area.
+      this.connectionArrow.toPos = {x: clx, y: cly - 60/this.viewportTransform.scale};//60 = header area.
     }
+
+    if(this.panning){
+      console.log("panning");
+
+      const localX = event.clientX;
+      const localY = event.clientY - 60;//60 = header area.
+
+      this.viewportTransform.x += localX - this.transx;
+      this.viewportTransform.y += localY - this.transy;
+
+      this.transx = localX;
+      this.transy = localY;
+    }
+
+    this.updateCanvas();
+  }
+
+  onMouseDown(event: MouseEvent){
+
+    this.transx = event.clientX;
+    this.transy = event.clientY-60;
+
+    this.startx = (event.clientX - this.viewportTransform.x)/this.viewportTransform.scale;
+    this.starty = (event.clientY - 60 - this.viewportTransform.y)/this.viewportTransform.scale;//60 = header area.
+
+    if(event.clientX<170){
+      this.paneldrag = 1;
+      this.startx = event.clientX;
+      this.starty = event.clientY - 60;//60 = header area.
+    }
+
+    if(event.button == 0){//left button clicked
+
+      let isInBox = (box: Box) => {
+        return box.position.x < this.startx && this.startx < box.position.x + box.width && box.position.y < this.starty && this.starty < box.position.y + box.height;
+      }
+
+      let isOnHandle = (box:Box) => {
+        for(const handle of box.handles){
+          let x = box.position.x + handle.left;
+          let y = box.position.y + handle.top;
+          let width = 20;//handle dimensions, probybly to change
+          let height = 20;
+
+          if(x < this.startx && this.startx < x + width && y < this.starty && this.starty < y + height){
+            return handle.type;
+          }
+        }
+        return false;
+      }
+      
+      for(let box of this.workspace.values()){
+        if(isInBox(box)){//drag started!
+
+          if(!isOnHandle(box)){
+
+            this.abortConnectionArrow();
+
+            this.dragStart(box);//initiate drag start
+
+            this.dragging = box.id;
+            console.log(this.dragging);
+            return;
+          }
+          else{
+            let handleType = isOnHandle(box);
+            if(handleType){
+              let index = box.handles.findIndex((handle) => handle.type === handleType);
+              this.drawConnectionArrow(box.handles[index], box);
+              return;
+            }
+          }
+        }
+      }
+    }
+    else if(event.button == 2){//right button clicked
+      //we want to enable panning here
+      console.log("panning");
+      this.panning = true;
+    }
+    
+  }
+
+  onMouseUp(event: MouseEvent){
+
+    if(event.button == 0){//left button clicked
+      if(this.dragging === -1){
+        return;
+      }
+      else{
+        let box = this.workspace.get(this.dragging);
+        if (box) {
+          if(this.paneldrag === 1){
+            box.position.x = (box.position.x-this.viewportTransform.x)/this.viewportTransform.scale;
+            box.position.y = (box.position.y-this.viewportTransform.y)/this.viewportTransform.scale;
+          }
+          this.dragEnd(box);
+        }
+        this.dragging = -1;
+        this.paneldrag = -1;
+      }
+    }
+    else if(event.button == 2){//right button clicked
+      this.panning = false;
+    }
+
+    this.updateCanvas();
+  }
+
+  onMouseOut(event: MouseEvent){
+    this.onMouseUp(event);
+  }
+
+  onScroll(event: WheelEvent){
+
+    console.log("scrolling");
+    console.log(event.deltaY);
+
+    const oldX = this.viewportTransform.x;
+    const oldY = this.viewportTransform.y;
+
+    const localX = event.clientX;
+    const localY = event.clientY;
+
+    const previousScale = this.viewportTransform.scale;
+
+    const newScale = this.viewportTransform.scale += event.deltaY * -0.00025;
+
+    const newX = localX - (localX - oldX) * (newScale / previousScale);
+    const newY = localY - (localY - oldY) * (newScale / previousScale);
+
+    this.viewportTransform.x = newX;
+    this.viewportTransform.y = newY;
+    this.viewportTransform.scale = newScale;
+
+    this.updateCanvas();
+  }
+
+  onContextMenu(event: MouseEvent){
+    event.preventDefault();
   }
 }
