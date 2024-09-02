@@ -13,28 +13,31 @@ export class Handle {
         this.type = typ.toString();
         if(this.type == "output"){//declares new handle
             this.left = 135;
+            this.top = 10;
             this.color = "#BB4430";//persian red
             this.box_pos.x = 160;
         }
         else if(this.type == "input"){
             this.left = 5;
+            this.top = 10;
             this.color = "#008080";//teal
             this.box_pos.x = 0;
         }
         else if(this.type == "special"){
-            this.left = 0;
-            this.color = "#BAD29F";//Celadon
+            this.left = 135;
+            this.top = 35;
+            this.color = "#bad29f";//Celadon
             this.box_pos.x = 0;
         }
         else if(this.type == "config"){
-            this.left = 0;
-            this.color = "FF9914";//princeton orange
+            this.left = 5;
+            this.top = 35;
+            this.color = "#ff9914";//princeton orange
             this.box_pos.x = 0;
         }
         else{
             throw new Error(`Invalid handle type, given ${this.type}`);
         }
-        this.top = 10;
         this.box_pos.y = this.top + 10;
     }
 }
