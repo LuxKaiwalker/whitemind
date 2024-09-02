@@ -144,6 +144,12 @@ export class BrainetComponent implements OnInit, OnChanges {
   //arrow handling
 
   drawConnectionArrow(handle: Handle, box: Box){
+
+    //connection arrow guard for panel boxes
+    if(box.in_panel){
+      return;
+    }
+
     if(this.connectionArrow.type === ""){//if empty, handle the arrow updates in updatecanvas
 
       if(handle.type === "output"){
@@ -389,14 +395,22 @@ export class BrainetComponent implements OnInit, OnChanges {
           }
           else{
             let handleType = isOnHandle(box);
-            if(handleType){
+            if(handleType == "output" || handleType == "input"){
               let index = box.handles.findIndex((handle) => handle.type === handleType);
               this.drawConnectionArrow(box.handles[index], box);
+              return;
+            }
+            else if(handleType == "config"){
+              this.deleteBox(box);
+              this.updateCanvas();
               return;
             }
           }
         }
       }
+      //if nothing clicked:
+      this.abortConnectionArrow();
+      this.panning = true; //enable pannign for other mouse movements
     }
     else if(event.button == 2){//right button clicked
       //we want to enable panning here
@@ -410,6 +424,7 @@ export class BrainetComponent implements OnInit, OnChanges {
 
     if(event.button == 0){//left button clicked
       if(this.dragging === -1){
+        this.panning = false;//abort pannign!
         return;
       }
       else{
@@ -449,7 +464,15 @@ export class BrainetComponent implements OnInit, OnChanges {
 
     const previousScale = this.viewportTransform.scale;
 
-    const newScale = this.viewportTransform.scale += event.deltaY * -0.00025;
+    const newScale = this.viewportTransform.scale += event.deltaY * -0.00050;
+
+    console.log("new scale:");
+    console.log(newScale);
+
+    if(newScale < 0.1 || newScale > 10){//prevent bugs
+      this.viewportTransform.scale = previousScale;
+      return;
+    }
 
     const newX = localX - (localX - oldX) * (newScale / previousScale);
     const newY = localY - (localY - oldY) * (newScale / previousScale);

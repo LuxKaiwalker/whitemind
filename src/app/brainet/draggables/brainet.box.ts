@@ -49,5 +49,6 @@ export class Box {
         //handles init
         this.handles.push(new Handle('output'));
         this.handles.push(new Handle('input'));
+        this.handles.push(new Handle('config'));
     }
 }
