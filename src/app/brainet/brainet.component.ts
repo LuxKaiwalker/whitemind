@@ -316,7 +316,6 @@ export class BrainetComponent implements OnInit, OnChanges {
       this.startx = clx;
       this.starty = cly - headermargin;//60 = header area.
 
-
       let box = this.workspace.get(this.dragging);
       if (box) {
         box.position.x += moveX;
@@ -412,10 +411,8 @@ export class BrainetComponent implements OnInit, OnChanges {
       this.abortConnectionArrow();
       this.panning = true; //enable pannign for other mouse movements
     }
-    else if(event.button == 2){//right button clicked
-      //we want to enable panning here
-      console.log("panning");
-      this.panning = true;
+    else if(event.button == 2){
+      return;//nothing
     }
     
   }
@@ -440,8 +437,8 @@ export class BrainetComponent implements OnInit, OnChanges {
         this.paneldrag = -1;
       }
     }
-    else if(event.button == 2){//right button clicked
-      this.panning = false;
+    else if(event.button == 2){
+      return;//nothing
     }
 
     this.updateCanvas();
@@ -485,6 +482,6 @@ export class BrainetComponent implements OnInit, OnChanges {
   }
 
   onContextMenu(event: MouseEvent){
-    event.preventDefault();
+    return;
   }
 }
