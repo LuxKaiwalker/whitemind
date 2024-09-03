@@ -525,4 +525,8 @@ export class BrainetComponent implements OnInit, OnChanges {
     }
   }
 
+  onContextContext(event: MouseEvent){
+    event.preventDefault();
+  }
+
 }
