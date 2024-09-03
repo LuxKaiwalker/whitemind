@@ -6,17 +6,74 @@
 <canvas #canvas class = "canvas absolute w-full z-0 bg-transparent" (mousemove)="mouseMove($event)" (mousedown) = "onMouseDown($event)" (mouseup)="onMouseUp($event)" (mouseout)="onMouseOut($event)" (wheel)="onScroll($event)" (contextmenu)="onContextMenu($event, true)">Canvas not properly loaded</canvas>
 
 <mat-menu #menu="matMenu">
-    <button mat-menu-item (click)="onMenuButton($event, 1)">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci perferendis voluptatem repudiandae, quae natus quia, doloribus doloremque quos, laboriosam atque tempora. Quisquam, quod. Necessitatibus, quia. Quisquam, quod. Necessitatibus, quia.</button>
+    <button mat-menu-item >Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci perferendis voluptatem repudiandae, quae natus quia, doloribus doloremque quos, laboriosam atque tempora. Quisquam, quod. Necessitatibus, quia. Quisquam, quod. Necessitatibus, quia.</button>
 </mat-menu>
 
 
 <div bg class="z-0 w-screen bg-light_gray dark:bg-gray"></div>
 
 <div #contextmenu class="z-50 bg-accent dark:bg-accent_dark text-dark dark:text-white fixed h-44 w-44">
-    <a>
-        <button class="bg-black" (click)="onMenuButton($event, 1)">Lorem ipsum</button>    
-    </a>
+    <div class="flex flex-col justify-center items-center h-full w-full">
+        <button mat-menu-item (click)="onContextMenu($event, false)">Add Node</button>
+        <button mat-menu-item (click)="onContextMenu($event, false)">Add Edge</button>
+        <button mat-menu-item (click)="onContextMenu($event, false)">Add Group</button>
+    </div>
 </div>
+
+
+<div #contextMenu class="wrapper">
+    <div #shareMenu class="content">
+      <ul class="menu">
+        <li class="item">
+          <i class="uil uil-eye"></i>
+          <span>Preview</span>
+        </li>
+        <li class="item share">
+          <div>
+            <i class="uil uil-share"></i>
+            <span>Share</span>
+          </div>
+          <i class="uil uil-angle-right"></i>
+          <ul class="share-menu">
+            <li class="item">
+              <i class="uil uil-twitter-alt"></i>
+              <span>Twitter</span>
+            </li>
+            <li class="item">
+              <i class="uil uil-instagram"></i>
+              <span>Instagram</span>
+            </li>
+            <li class="item">
+              <i class="uil uil-dribbble"></i>
+              <span>Dribble</span>
+            </li>
+            <li class="item">
+              <i class="uil uil-telegram-alt"></i>
+              <span>Telegram</span>
+            </li>
+          </ul>
+        </li>
+        <li class="item">
+          <i class="uil uil-link-alt"></i>
+          <span>Get Link</span>
+        </li>
+        <li class="item">
+          <i class="uil uil-edit"></i>
+          <span>Rename</span>
+        </li>
+        <li class="item">
+          <i class="uil uil-trash-alt"></i>
+          <span>Delete</span>
+        </li>
+      </ul>
+      <div class="setting">
+        <li class="item">
+          <i class="uil uil-setting"></i>
+          <span>Settings</span>
+        </li>
+      </div>
+    </div>
+  </div>
 
 
 

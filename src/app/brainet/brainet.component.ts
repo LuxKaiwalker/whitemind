@@ -24,6 +24,12 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   @ViewChild('canvas', { static: true }) myCanvas!: ElementRef;
 
+  // Access the context menu element
+  @ViewChild('contextMenu') contextMenu!: ElementRef<HTMLDivElement>;
+
+  // Access the share menu element inside the context menu
+  @ViewChild('shareMenu') shareMenu!: ElementRef<HTMLDivElement>;
+
   @ViewChild('contextmenu', { read: ElementRef, static: true }) contextmenu!: ElementRef;
 
 
@@ -341,6 +347,9 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   onMouseDown(event: MouseEvent){
 
+    let contextMenu = this.contextMenu.nativeElement;
+    contextMenu.style.visibility = "hidden";
+
     this.moved = false;
 
     this.transx = event.clientX;
@@ -486,21 +495,29 @@ export class BrainetComponent implements OnInit, OnChanges {
     else{
       event.preventDefault();
 
-      const contextmenuElement = this.contextmenu.nativeElement;
+      let contextMenu = this.contextMenu.nativeElement;
+      let shareMenu = this.shareMenu.nativeElement;
 
-      contextmenuElement.style.left = `${event.clientX}px`;
-      contextmenuElement.style.top = `${event.clientY}px`;
-      contextmenuElement.style.display = 'block';
+      let x = event.offsetX, y = event.offsetY,
+      winWidth = window.innerWidth,
+      winHeight = window.innerHeight,
+      cmWidth = contextMenu.offsetWidth,
+      cmHeight = contextMenu.offsetHeight;
+      if(x > (winWidth - cmWidth - shareMenu.offsetWidth)) {
+          shareMenu.style.left = "-200px";
+      } else {
+          shareMenu.style.left = "";
+          shareMenu.style.right = "-200px";
+      }
+      x = x > winWidth - cmWidth ? winWidth - cmWidth - 5 : x;
+      y = y > winHeight - cmHeight ? winHeight - cmHeight - 5 : y;
+      
+      contextMenu.style.left = `${x}px`;
+      contextMenu.style.top = `${y}px`;
+      contextMenu.style.visibility = "visible";
       
       return;
     }
   }
 
-  onMenuButton(event: MouseEvent, num: number){
-    const div = document.getElementById('contextmenu');
-    if(div){
-      div.style.display = 'hidden';
-    }
-    return;
-  }
 }
