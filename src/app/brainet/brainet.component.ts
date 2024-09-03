@@ -52,6 +52,8 @@ export class BrainetComponent implements OnInit, OnChanges {
   transx: number = 0;
   transy: number = 0;
 
+  moved:boolean = false;
+
   ngOnInit(){
       const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
       const ctx = this.myCanvas.nativeElement.getContext('2d');
@@ -335,6 +337,8 @@ export class BrainetComponent implements OnInit, OnChanges {
       const localX = event.clientX;
       const localY = event.clientY - 60;//60 = header area.
 
+      this.moved = true;
+
       this.viewportTransform.x += localX - this.transx;
       this.viewportTransform.y += localY - this.transy;
 
@@ -346,6 +350,8 @@ export class BrainetComponent implements OnInit, OnChanges {
   }
 
   onMouseDown(event: MouseEvent){
+
+    this.moved = false;
 
     this.transx = event.clientX;
     this.transy = event.clientY-60;
@@ -412,6 +418,8 @@ export class BrainetComponent implements OnInit, OnChanges {
       this.panning = true; //enable pannign for other mouse movements
     }
     else if(event.button == 2){
+
+      this.panning = true;
       return;//nothing
     }
     
@@ -438,7 +446,13 @@ export class BrainetComponent implements OnInit, OnChanges {
       }
     }
     else if(event.button == 2){
-      return;//nothing
+      if(this.dragging === -1){
+        this.panning = false;//abort pannign!
+      }
+
+      if(!this.moved){
+        this.onContextMenu(event, false);
+      }
     }
 
     this.updateCanvas();
@@ -481,7 +495,15 @@ export class BrainetComponent implements OnInit, OnChanges {
     this.updateCanvas();
   }
 
-  onContextMenu(event: MouseEvent){
-    return;
+  onContextMenu(event: MouseEvent, moved:boolean){
+
+    if(moved){
+      event.preventDefault();
+    }
+    else{
+      console.log("showing context menu!");
+      this.canvasInstance.showContextMenu(event);
+      return;
+    }
   }
 }
