@@ -1,11 +1,69 @@
 <app-header></app-header>
 
-
 <div class="ui w-full absolute bg-transparent text-dark dark:text-white" (mousemove)="mouseMove($event)"><!-- check cdk drop list group-->
 </div>
 
 <canvas #canvas class = "canvas absolute w-full z-0 bg-transparent" (mousemove)="mouseMove($event)" (mousedown) = "onMouseDown($event)" (mouseup)="onMouseUp($event)" (mouseout)="onMouseOut($event)" (wheel)="onScroll($event)" (contextmenu)="onContextMenu($event, true)">Canvas not properly loaded</canvas>
 
-<div bg class="z-0 w-screen bg-light_gray dark:bg-gray"></div>
+<mat-menu #menu="matMenu">
+    <button mat-menu-item >Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci perferendis voluptatem repudiandae, quae natus quia, doloribus doloremque quos, laboriosam atque tempora. Quisquam, quod. Necessitatibus, quia. Quisquam, quod. Necessitatibus, quia.</button>
+</mat-menu>
+
+
+
+<div #contextMenu class="wrapper">
+    <div #shareMenu class="content">
+      <ul class="menu">
+        <li class="item">
+          <i class="uil uil-eye"></i>
+          <span>Action 1</span>
+        </li>
+        <li class="item share">
+          <div>
+            <i class="uil uil-share"></i>
+            <span>Action 2</span>
+          </div>
+          <i class="uil uil-angle-right"></i>
+          <ul class="share-menu">
+            <li class="item">
+              <i class="uil uil-twitter-alt"></i>
+              <span>Action 3</span>
+            </li>
+            <li class="item">
+              <i class="uil uil-instagram"></i>
+              <span>Action 4</span>
+            </li>
+            <li class="item">
+              <i class="uil uil-dribbble"></i>
+              <span>Action 5</span>
+            </li>
+            <li class="item">
+              <i class="uil uil-telegram-alt"></i>
+              <span>Action 6</span>
+            </li>
+          </ul>
+        </li>
+        <li class="item">
+          <i class="uil uil-link-alt"></i>
+          <span>Action 7</span>
+        </li>
+        <li class="item">
+          <i class="uil uil-edit"></i>
+          <span>Action 8</span>
+        </li>
+        <li class="item">
+          <i class="uil uil-trash-alt"></i>
+          <span>Action 9</span>
+        </li>
+      </ul>
+      <div class="setting">
+        <li class="item">
+          <i class="uil uil-setting"></i>
+          <span>Settings</span>
+        </li>
+      </div>
+    </div>
+  </div>
+
 
 

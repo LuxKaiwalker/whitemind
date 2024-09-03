@@ -153,7 +153,6 @@ export class Canvas{
                 width = width/scale;
                 height = height/scale;
 
-                console.log(width, handle.width, scale);
                 cornerRadius = 5/scale;
             }
 

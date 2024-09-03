@@ -1,9 +1,10 @@
 import { Component, OnInit, OnChanges, ViewChild, ElementRef } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { DragDropModule } from '@angular/cdk/drag-drop';
 import { NgFor } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
+import { OverlayModule } from '@angular/cdk/overlay';
 
 import { HeaderComponent } from '../header/header.component';
 import { Canvas } from './canvas/brainet.canvas'
@@ -14,15 +15,23 @@ import { Handle } from './draggables/brainet.handle';
 @Component({
   selector: 'app-brainet',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, DragDropModule, NgFor, CommonModule, FormsModule],
+  imports: [RouterOutlet, HeaderComponent, NgFor, CommonModule, FormsModule, MatMenuModule, OverlayModule],
   templateUrl: './brainet.component.html',
   styleUrl: './brainet.component.css'
 })
 
 export class BrainetComponent implements OnInit, OnChanges {
 
-  @ViewChild('canvas', { static: true })
-  myCanvas!: ElementRef;
+  @ViewChild('canvas', { static: true }) myCanvas!: ElementRef;
+
+  // Access the context menu element
+  @ViewChild('contextMenu') contextMenu!: ElementRef<HTMLDivElement>;
+
+  // Access the share menu element inside the context menu
+  @ViewChild('shareMenu') shareMenu!: ElementRef<HTMLDivElement>;
+
+  @ViewChild('contextmenu', { read: ElementRef, static: true }) contextmenu!: ElementRef;
+
 
   //list of all boxes on screen or available
   workspace = new Map<number, Box>();//id  = number. probably we can even wipe out the id of the box.
@@ -60,15 +69,12 @@ export class BrainetComponent implements OnInit, OnChanges {
 
       canvas.width = window.innerWidth;
       canvas.height = (window.innerHeight - 60);//60 = header area.
-      console.log(canvas.width, canvas.height);
-
 
       this.canvasInstance = new Canvas(ctx);
 
       this.newPanelBox(0);
       this.newPanelBox(1);
       this.newPanelBox(2);
-      console.log(this.workspace);
   }
 
   ngOnChanges(){
@@ -91,8 +97,6 @@ export class BrainetComponent implements OnInit, OnChanges {
   }
 
   deleteBox(box: Box){
-
-    console.log("deleting box");
 
     let indexcount = 0;
     for(const [_, b] of this.workspace){
@@ -200,8 +204,6 @@ export class BrainetComponent implements OnInit, OnChanges {
       if (toBox) {
         toBox.connections_in.push(from.id);
       }
-
-      console.log(fromBox, toBox);
     }
     else{
       throw new Error(`Invalid handle froms and tos, given ${typeFrom} and ${typeTo} so no new arrow is added`);
@@ -235,8 +237,6 @@ export class BrainetComponent implements OnInit, OnChanges {
 
         const workspace_lineto = this.workspace.get(lineTo);
 
-        console.log(workspace_lineto);
-
         if(workspace_lineto){
           let pos2 = {
             x: workspace_lineto.position.x + workspace_lineto.handles[1].box_pos.x,
@@ -254,8 +254,6 @@ export class BrainetComponent implements OnInit, OnChanges {
               pos2.y = pos.y + workspace_lineto.handles[1].box_pos.y;
             }
           }
-
-          console.log(pos1, pos2);
         
           this.canvasInstance.drawLine(pos1.x, pos1.y, pos2.x, pos2.y);
         }
@@ -312,7 +310,6 @@ export class BrainetComponent implements OnInit, OnChanges {
         headermargin = 60;
       }
 
-      console.log("dragging");
       let moveX = clx - this.startx;
       let moveY = cly - headermargin - this.starty;//60 = header area.
       this.startx = clx;
@@ -332,7 +329,6 @@ export class BrainetComponent implements OnInit, OnChanges {
     }
 
     if(this.panning){
-      console.log("panning");
 
       const localX = event.clientX;
       const localY = event.clientY - 60;//60 = header area.
@@ -350,6 +346,9 @@ export class BrainetComponent implements OnInit, OnChanges {
   }
 
   onMouseDown(event: MouseEvent){
+
+    let contextMenu = this.contextMenu.nativeElement;
+    contextMenu.style.visibility = "hidden";
 
     this.moved = false;
 
@@ -379,6 +378,9 @@ export class BrainetComponent implements OnInit, OnChanges {
           let height = 20;
 
           if(x < this.startx && this.startx < x + width && y < this.starty && this.starty < y + height){
+            if(box.in_panel && !this.paneldrag){
+              return;
+            }
             return handle.type;
           }
         }
@@ -395,7 +397,6 @@ export class BrainetComponent implements OnInit, OnChanges {
             this.dragStart(box);//initiate drag start
 
             this.dragging = box.id;
-            console.log(this.dragging);
             return;
           }
           else{
@@ -406,7 +407,9 @@ export class BrainetComponent implements OnInit, OnChanges {
               return;
             }
             else if(handleType == "config"){
-              this.deleteBox(box);
+              if(!box.in_panel){
+                this.deleteBox(box);
+              }
               this.updateCanvas();
               return;
             }
@@ -464,9 +467,6 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   onScroll(event: WheelEvent){
 
-    console.log("scrolling");
-    console.log(event.deltaY);
-
     const oldX = this.viewportTransform.x;
     const oldY = this.viewportTransform.y;
 
@@ -476,9 +476,6 @@ export class BrainetComponent implements OnInit, OnChanges {
     const previousScale = this.viewportTransform.scale;
 
     const newScale = this.viewportTransform.scale += event.deltaY * -0.00050;
-
-    console.log("new scale:");
-    console.log(newScale);
 
     if(newScale < 0.1 || newScale > 10){//prevent bugs
       this.viewportTransform.scale = previousScale;
@@ -501,9 +498,31 @@ export class BrainetComponent implements OnInit, OnChanges {
       event.preventDefault();
     }
     else{
-      console.log("showing context menu!");
-      this.canvasInstance.showContextMenu(event);
+      event.preventDefault();
+
+      let contextMenu = this.contextMenu.nativeElement;
+      let shareMenu = this.shareMenu.nativeElement;
+
+      let x = event.offsetX, y = event.offsetY,
+      winWidth = window.innerWidth,
+      winHeight = window.innerHeight,
+      cmWidth = contextMenu.offsetWidth,
+      cmHeight = contextMenu.offsetHeight;
+      if(x > (winWidth - cmWidth - shareMenu.offsetWidth)) {
+          shareMenu.style.left = "-200px";
+      } else {
+          shareMenu.style.left = "";
+          shareMenu.style.right = "-200px";
+      }
+      x = x > winWidth - cmWidth ? winWidth - cmWidth - 5 : x;
+      y = y > winHeight - cmHeight ? winHeight - cmHeight - 5 : y;
+      
+      contextMenu.style.left = `${x}px`;
+      contextMenu.style.top = `${y}px`;
+      contextMenu.style.visibility = "visible";
+      
       return;
     }
   }
+
 }
