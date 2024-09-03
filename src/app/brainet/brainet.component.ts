@@ -1,9 +1,10 @@
 import { Component, OnInit, OnChanges, ViewChild, ElementRef } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { DragDropModule } from '@angular/cdk/drag-drop';
 import { NgFor } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
+import { OverlayModule } from '@angular/cdk/overlay';
 
 import { HeaderComponent } from '../header/header.component';
 import { Canvas } from './canvas/brainet.canvas'
@@ -14,15 +15,17 @@ import { Handle } from './draggables/brainet.handle';
 @Component({
   selector: 'app-brainet',
   standalone: true,
-  imports: [RouterOutlet, HeaderComponent, DragDropModule, NgFor, CommonModule, FormsModule],
+  imports: [RouterOutlet, HeaderComponent, NgFor, CommonModule, FormsModule, MatMenuModule, OverlayModule],
   templateUrl: './brainet.component.html',
   styleUrl: './brainet.component.css'
 })
 
 export class BrainetComponent implements OnInit, OnChanges {
 
-  @ViewChild('canvas', { static: true })
-  myCanvas!: ElementRef;
+  @ViewChild('canvas', { static: true }) myCanvas!: ElementRef;
+
+  @ViewChild('contextmenu', { read: ElementRef, static: true }) contextmenu!: ElementRef;
+
 
   //list of all boxes on screen or available
   workspace = new Map<number, Box>();//id  = number. probably we can even wipe out the id of the box.
@@ -481,9 +484,23 @@ export class BrainetComponent implements OnInit, OnChanges {
       event.preventDefault();
     }
     else{
-      console.log("showing context menu!");
-      this.canvasInstance.showContextMenu(event);
+      event.preventDefault();
+
+      const contextmenuElement = this.contextmenu.nativeElement;
+
+      contextmenuElement.style.left = `${event.clientX}px`;
+      contextmenuElement.style.top = `${event.clientY}px`;
+      contextmenuElement.style.display = 'block';
+      
       return;
     }
+  }
+
+  onMenuButton(event: MouseEvent, num: number){
+    const div = document.getElementById('contextmenu');
+    if(div){
+      div.style.display = 'hidden';
+    }
+    return;
   }
 }

@@ -79,3 +79,18 @@ button {
   cursor: pointer;
 
 }
+
+
+
+
+
+
+
+::ng-deep .mat-menu-panel {
+  background-color: #333; /* Background color of the menu */
+  color: #fff; /* Text color */
+  border-radius: 8px; /* Rounded corners */
+  min-width: fit-content; /* Minimum width */
+  min-height: fit-content; /* Minimum height */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Drop shadow */
+}
