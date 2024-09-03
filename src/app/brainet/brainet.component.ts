@@ -60,15 +60,12 @@ export class BrainetComponent implements OnInit, OnChanges {
 
       canvas.width = window.innerWidth;
       canvas.height = (window.innerHeight - 60);//60 = header area.
-      console.log(canvas.width, canvas.height);
-
 
       this.canvasInstance = new Canvas(ctx);
 
       this.newPanelBox(0);
       this.newPanelBox(1);
       this.newPanelBox(2);
-      console.log(this.workspace);
   }
 
   ngOnChanges(){
@@ -91,8 +88,6 @@ export class BrainetComponent implements OnInit, OnChanges {
   }
 
   deleteBox(box: Box){
-
-    console.log("deleting box");
 
     let indexcount = 0;
     for(const [_, b] of this.workspace){
@@ -200,8 +195,6 @@ export class BrainetComponent implements OnInit, OnChanges {
       if (toBox) {
         toBox.connections_in.push(from.id);
       }
-
-      console.log(fromBox, toBox);
     }
     else{
       throw new Error(`Invalid handle froms and tos, given ${typeFrom} and ${typeTo} so no new arrow is added`);
@@ -235,8 +228,6 @@ export class BrainetComponent implements OnInit, OnChanges {
 
         const workspace_lineto = this.workspace.get(lineTo);
 
-        console.log(workspace_lineto);
-
         if(workspace_lineto){
           let pos2 = {
             x: workspace_lineto.position.x + workspace_lineto.handles[1].box_pos.x,
@@ -254,8 +245,6 @@ export class BrainetComponent implements OnInit, OnChanges {
               pos2.y = pos.y + workspace_lineto.handles[1].box_pos.y;
             }
           }
-
-          console.log(pos1, pos2);
         
           this.canvasInstance.drawLine(pos1.x, pos1.y, pos2.x, pos2.y);
         }
@@ -312,7 +301,6 @@ export class BrainetComponent implements OnInit, OnChanges {
         headermargin = 60;
       }
 
-      console.log("dragging");
       let moveX = clx - this.startx;
       let moveY = cly - headermargin - this.starty;//60 = header area.
       this.startx = clx;
@@ -332,7 +320,6 @@ export class BrainetComponent implements OnInit, OnChanges {
     }
 
     if(this.panning){
-      console.log("panning");
 
       const localX = event.clientX;
       const localY = event.clientY - 60;//60 = header area.
@@ -395,7 +382,6 @@ export class BrainetComponent implements OnInit, OnChanges {
             this.dragStart(box);//initiate drag start
 
             this.dragging = box.id;
-            console.log(this.dragging);
             return;
           }
           else{
@@ -464,9 +450,6 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   onScroll(event: WheelEvent){
 
-    console.log("scrolling");
-    console.log(event.deltaY);
-
     const oldX = this.viewportTransform.x;
     const oldY = this.viewportTransform.y;
 
@@ -476,9 +459,6 @@ export class BrainetComponent implements OnInit, OnChanges {
     const previousScale = this.viewportTransform.scale;
 
     const newScale = this.viewportTransform.scale += event.deltaY * -0.00050;
-
-    console.log("new scale:");
-    console.log(newScale);
 
     if(newScale < 0.1 || newScale > 10){//prevent bugs
       this.viewportTransform.scale = previousScale;
