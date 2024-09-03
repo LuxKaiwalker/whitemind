@@ -378,6 +378,9 @@ export class BrainetComponent implements OnInit, OnChanges {
           let height = 20;
 
           if(x < this.startx && this.startx < x + width && y < this.starty && this.starty < y + height){
+            if(box.in_panel && !this.paneldrag){
+              return;
+            }
             return handle.type;
           }
         }
@@ -404,7 +407,9 @@ export class BrainetComponent implements OnInit, OnChanges {
               return;
             }
             else if(handleType == "config"){
-              this.deleteBox(box);
+              if(!box.in_panel){
+                this.deleteBox(box);
+              }
               this.updateCanvas();
               return;
             }

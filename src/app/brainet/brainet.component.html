@@ -10,60 +10,50 @@
 </mat-menu>
 
 
-<div bg class="z-0 w-screen bg-light_gray dark:bg-gray"></div>
-
-<div #contextmenu class="z-50 bg-accent dark:bg-accent_dark text-dark dark:text-white fixed h-44 w-44">
-    <div class="flex flex-col justify-center items-center h-full w-full">
-        <button mat-menu-item (click)="onContextMenu($event, false)">Add Node</button>
-        <button mat-menu-item (click)="onContextMenu($event, false)">Add Edge</button>
-        <button mat-menu-item (click)="onContextMenu($event, false)">Add Group</button>
-    </div>
-</div>
-
 
 <div #contextMenu class="wrapper">
     <div #shareMenu class="content">
       <ul class="menu">
         <li class="item">
           <i class="uil uil-eye"></i>
-          <span>Preview</span>
+          <span>Action 1</span>
         </li>
         <li class="item share">
           <div>
             <i class="uil uil-share"></i>
-            <span>Share</span>
+            <span>Action 2</span>
           </div>
           <i class="uil uil-angle-right"></i>
           <ul class="share-menu">
             <li class="item">
               <i class="uil uil-twitter-alt"></i>
-              <span>Twitter</span>
+              <span>Action 3</span>
             </li>
             <li class="item">
               <i class="uil uil-instagram"></i>
-              <span>Instagram</span>
+              <span>Action 4</span>
             </li>
             <li class="item">
               <i class="uil uil-dribbble"></i>
-              <span>Dribble</span>
+              <span>Action 5</span>
             </li>
             <li class="item">
               <i class="uil uil-telegram-alt"></i>
-              <span>Telegram</span>
+              <span>Action 6</span>
             </li>
           </ul>
         </li>
         <li class="item">
           <i class="uil uil-link-alt"></i>
-          <span>Get Link</span>
+          <span>Action 7</span>
         </li>
         <li class="item">
           <i class="uil uil-edit"></i>
-          <span>Rename</span>
+          <span>Action 8</span>
         </li>
         <li class="item">
           <i class="uil uil-trash-alt"></i>
-          <span>Delete</span>
+          <span>Action 9</span>
         </li>
       </ul>
       <div class="setting">
