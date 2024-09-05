@@ -367,7 +367,10 @@ export class BrainetComponent implements OnInit, OnChanges {
     if(event.button == 0){//left button clicked
 
       let isInBox = (box: Box) => {
-        return box.position.x < this.startx && this.startx < box.position.x + box.width && box.position.y < this.starty && this.starty < box.position.y + box.height;
+
+        let on_box:boolean = box.position.x < this.startx && this.startx < box.position.x + box.width && box.position.y < this.starty && this.starty < box.position.y + box.height;
+
+        return on_box;
       }
 
       let isOnHandle = (box:Box) => {
@@ -378,9 +381,6 @@ export class BrainetComponent implements OnInit, OnChanges {
           let height = 20;
 
           if(x < this.startx && this.startx < x + width && y < this.starty && this.starty < y + height){
-            if(box.in_panel && !this.paneldrag){
-              return;
-            }
             return handle.type;
           }
         }
@@ -391,6 +391,11 @@ export class BrainetComponent implements OnInit, OnChanges {
         if(isInBox(box)){//drag started!
 
           if(!isOnHandle(box)){
+
+            if(this.paneldrag === -1 && box.in_panel){
+              //edge case: dragging from box position but box is not in panel
+              return;
+            }
 
             this.abortConnectionArrow();
 
@@ -439,7 +444,7 @@ export class BrainetComponent implements OnInit, OnChanges {
         let box = this.workspace.get(this.dragging);
         if (box) {
           if(this.paneldrag === 1){
-            box.position.x = (box.position.x-this.viewportTransform.x)/this.viewportTransform.scale;
+            box.position.x = (box.position.x-this.viewportTransform.x)/this.viewportTransform.scale;//TODO modify here to center boxes on drop
             box.position.y = (box.position.y-this.viewportTransform.y)/this.viewportTransform.scale;
           }
           this.dragEnd(box);
