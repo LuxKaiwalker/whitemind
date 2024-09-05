@@ -118,8 +118,8 @@ export class Canvas{
             x = (x-transformx)/scale;
             y = (y-transformy)/scale;
 
-            width = box.width_in_panel;
-            height = box.height_in_panel;
+            width = box.width_in_panel/scale;
+            height = box.height_in_panel/scale;
 
             borderRadius = 4/scale;
 
