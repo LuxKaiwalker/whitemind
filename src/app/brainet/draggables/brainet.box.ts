@@ -40,9 +40,9 @@ export class Box {
             break;
             case 1: this.message = 'Output';
             break;
-            case 2: this.message = 'Special';
+            case 2: this.message = 'Processing';
             break;
-            case 3: this.message = 'Config';
+            case 3: this.message = 'Special';
             break;
             default: this.message = 'Unknown';
         }
@@ -52,9 +52,9 @@ export class Box {
             break;
             case 1: this.color = "#FF6347";//output
             break;
-            case 2: this.color = "#FFD700";//special
+            case 2: this.color = "#FFD700";//processing
             break;
-            case 3: this.color = "#FFA07A";//config
+            case 3: this.color = "#FFA07A";//special
             break;
             default: this.color = "#fff";
         }
