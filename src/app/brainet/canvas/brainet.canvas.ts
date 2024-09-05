@@ -8,15 +8,44 @@ export class Canvas{
     }
 
     drawBar(transformx: number, transformy: number, scale: number){
-        const x = -1*transformx/scale; // x-coordinate of the bar
-        const y = -1*transformy/scale; // y-coordinate of the bar
-        const width = 170/scale; // width of the bar
-        const height = this.ctx.canvas.height/scale; // height of the bar
-
-        // Draw the bar
+        const x = (10-transformx) / scale; // x-coordinate of the bar
+        const y = (10-transformy) / scale; // y-coordinate of the bar
+        const width = 115 / scale; // width of the bar
+        const height = (this.ctx.canvas.height-20) / scale; // height of the bar
+        const radius = 5/scale; // Radius for rounded corners
+    
+        // Set shadow properties for a floating effect
+        this.ctx.shadowOffsetX = 5;
+        this.ctx.shadowOffsetY = 5;
+        this.ctx.shadowBlur = 15;
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.3)'; // Light shadow for floating effect
+    
+        // Create a path for the rounded rectangle
+        this.ctx.beginPath();
+        this.ctx.moveTo(x + radius, y);
+        this.ctx.lineTo(x + width - radius, y);
+        this.ctx.arcTo(x + width, y, x + width, y + radius, radius);
+        this.ctx.lineTo(x + width, y + height - radius);
+        this.ctx.arcTo(x + width, y + height, x + width - radius, y + height, radius);
+        this.ctx.lineTo(x + radius, y + height);
+        this.ctx.arcTo(x, y + height, x, y + height - radius, radius);
+        this.ctx.lineTo(x, y + radius);
+        this.ctx.arcTo(x, y, x + radius, y, radius);
+        
+        // Fill the bar with color
         this.ctx.fillStyle = "#666";
-        this.ctx.fillRect(x, y, width, height);
-    }
+        this.ctx.fill();
+        
+        // Add a border with rounded corners
+        this.ctx.lineWidth = 1 / scale;
+        this.ctx.strokeStyle = "#444"; // Border color
+        this.ctx.stroke();
+    
+        // Reset shadow settings after drawing
+        this.ctx.shadowOffsetX = 0;
+        this.ctx.shadowOffsetY = 0;
+        this.ctx.shadowBlur = 0;
+    }    
 
     drawArrow(startX: number, startY: number, endX: number, endY: number) {
 
@@ -62,7 +91,6 @@ export class Canvas{
 
         // Draw arrowhead
         const arrowLength = 10;
-        const arrowWidth = 5;
         this.ctx.beginPath();
         this.ctx.moveTo(endX, endY);
         this.ctx.lineTo(
@@ -83,17 +111,19 @@ export class Canvas{
         let x = box.position.x; // Centered on the canvas
         let y = box.position.y; // Centered on the canvas
         let fontsize = 16;
-        const borderRadius = 4;
+        let borderRadius = 4;
         const color = box.color;
 
         if(box.in_panel){
             x = (x-transformx)/scale;
             y = (y-transformy)/scale;
 
-            width = box.width/scale;
-            height = box.height/scale;
+            width = box.width_in_panel;
+            height = box.height_in_panel;
 
-            fontsize = 16/scale;
+            borderRadius = 4/scale;
+
+            fontsize = 14/scale;
         }
         
         // Draw the box with rounded corners
@@ -114,7 +144,7 @@ export class Canvas{
         this.ctx.fill();
       
         // Add a border
-        this.ctx.lineWidth = 1;
+        this.ctx.lineWidth = 1/scale;
         this.ctx.strokeStyle = "#333";
         this.ctx.stroke();
       
@@ -136,6 +166,10 @@ export class Canvas{
     }
 
     drawHandles(box: Box, transformx: number, transformy: number, scale: number){
+
+        if(box.in_panel){
+            return;
+        }
 
         for (const handle of box.handles) {
 

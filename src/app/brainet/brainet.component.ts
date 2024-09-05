@@ -113,7 +113,7 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   newPanelBox(typ: number)
   {
-    this.newBox(typ, {x: 5, y: typ*150 + 20});//60 = header area.
+    this.newBox(typ, {x: 10 + 15/2, y: typ*100 + 30});//bit messy, needs imporvement
   }
 
 
