@@ -412,8 +412,11 @@ export class BrainetComponent implements OnInit, OnChanges {
               return;
             }
             else if(handleType == "config"){
-              if(!box.in_panel){
+              if(!box.in_panel && this.connectionArrow.type === ""){
                 this.deleteBox(box);
+              }
+              else{
+                this.abortConnectionArrow();
               }
               this.updateCanvas();
               return;
