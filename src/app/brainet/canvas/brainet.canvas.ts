@@ -201,6 +201,11 @@ export class Canvas{
             this.ctx.closePath();
             this.ctx.fill();
 
+            //draw borders
+            this.ctx.lineWidth = 1/scale;
+            this.ctx.strokeStyle = "#333";
+            this.ctx.stroke();
+
             if(box.in_panel){
                 // Draw arrow inside the box
                 this.ctx.fillStyle = 'white'; // Arrow color (white)
