@@ -1,6 +1,6 @@
 <app-header></app-header>
 
-<div class="ui w-full absolute bg-transparent text-dark dark:text-white" (mousemove)="mouseMove($event)"><!-- check cdk drop list group-->
+<div class="ui w-full absolute  bg-light_gray dark:bg-gray text-dark dark:text-white" (mousemove)="mouseMove($event)"><!-- check cdk drop list group-->
 </div>
 
 <canvas #canvas class = "canvas absolute w-full z-0 bg-transparent" (mousemove)="mouseMove($event)" (mousedown) = "onMouseDown($event)" (mouseup)="onMouseUp($event)" (mouseout)="onMouseOut($event)" (wheel)="onScroll($event)" (contextmenu)="onContextMenu($event, true)">Canvas not properly loaded</canvas>
@@ -11,7 +11,7 @@
 
 
 
-<div #contextMenu class="wrapper">
+<div #contextMenu class="wrapper" (contextmenu)="onContextContext($event)">
     <div #shareMenu class="content">
       <ul class="menu">
         <li class="item">

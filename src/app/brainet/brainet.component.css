@@ -1,4 +1,8 @@
 
+/* Import Google Font - Poppins */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+
 .ui {
   font-family: Arial, sans-serif;
   height:calc(100% - 60px);
@@ -83,8 +87,6 @@ button {
 
 
 
-/* Import Google Font - Poppins */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 *{
   margin: 0;
   padding: 0;

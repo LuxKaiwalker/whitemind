@@ -6,6 +6,8 @@ import { FormsModule } from '@angular/forms';
 import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { OverlayModule } from '@angular/cdk/overlay';
 
+import { HttpClient } from '@angular/common/http';
+
 import { HeaderComponent } from '../header/header.component';
 import { Canvas } from './canvas/brainet.canvas'
 
@@ -31,6 +33,13 @@ export class BrainetComponent implements OnInit, OnChanges {
   @ViewChild('shareMenu') shareMenu!: ElementRef<HTMLDivElement>;
 
   @ViewChild('contextmenu', { read: ElementRef, static: true }) contextmenu!: ElementRef;
+
+
+constructor(private http: HttpClient) {}
+
+
+  //api request setup
+  readonly ROOT_URL = 'https://backmind.icinoxis.net:3000';
 
 
   //list of all boxes on screen or available
@@ -75,9 +84,18 @@ export class BrainetComponent implements OnInit, OnChanges {
       this.newPanelBox(0);
       this.newPanelBox(1);
       this.newPanelBox(2);
+
+      this.get();
   }
 
   ngOnChanges(){
+  }
+
+  //api request handling
+  get(){
+    let url = `${this.ROOT_URL}/`;
+    let data = this.http.get(url);
+    console.log(data);
   }
 
 
@@ -113,7 +131,7 @@ export class BrainetComponent implements OnInit, OnChanges {
 
   newPanelBox(typ: number)
   {
-    this.newBox(typ, {x: 5, y: typ*150 + 20});//60 = header area.
+    this.newBox(typ, {x: 10 + 15/2, y: typ*100 + 30});//bit messy, needs imporvement
   }
 
 
@@ -367,7 +385,10 @@ export class BrainetComponent implements OnInit, OnChanges {
     if(event.button == 0){//left button clicked
 
       let isInBox = (box: Box) => {
-        return box.position.x < this.startx && this.startx < box.position.x + box.width && box.position.y < this.starty && this.starty < box.position.y + box.height;
+
+        let on_box:boolean = box.position.x < this.startx && this.startx < box.position.x + box.width && box.position.y < this.starty && this.starty < box.position.y + box.height;
+
+        return on_box;
       }
 
       let isOnHandle = (box:Box) => {
@@ -378,9 +399,6 @@ export class BrainetComponent implements OnInit, OnChanges {
           let height = 20;
 
           if(x < this.startx && this.startx < x + width && y < this.starty && this.starty < y + height){
-            if(box.in_panel && !this.paneldrag){
-              return;
-            }
             return handle.type;
           }
         }
@@ -391,6 +409,11 @@ export class BrainetComponent implements OnInit, OnChanges {
         if(isInBox(box)){//drag started!
 
           if(!isOnHandle(box)){
+
+            if(this.paneldrag === -1 && box.in_panel){
+              //edge case: dragging from box position but box is not in panel
+              return;
+            }
 
             this.abortConnectionArrow();
 
@@ -407,8 +430,11 @@ export class BrainetComponent implements OnInit, OnChanges {
               return;
             }
             else if(handleType == "config"){
-              if(!box.in_panel){
+              if(!box.in_panel && this.connectionArrow.type === ""){
                 this.deleteBox(box);
+              }
+              else{
+                this.abortConnectionArrow();
               }
               this.updateCanvas();
               return;
@@ -439,7 +465,7 @@ export class BrainetComponent implements OnInit, OnChanges {
         let box = this.workspace.get(this.dragging);
         if (box) {
           if(this.paneldrag === 1){
-            box.position.x = (box.position.x-this.viewportTransform.x)/this.viewportTransform.scale;
+            box.position.x = (box.position.x-this.viewportTransform.x)/this.viewportTransform.scale;//TODO modify here to center boxes on drop
             box.position.y = (box.position.y-this.viewportTransform.y)/this.viewportTransform.scale;
           }
           this.dragEnd(box);
@@ -523,6 +549,10 @@ export class BrainetComponent implements OnInit, OnChanges {
       
       return;
     }
+  }
+
+  onContextContext(event: MouseEvent){
+    event.preventDefault();
   }
 
 }
