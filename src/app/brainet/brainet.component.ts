@@ -6,6 +6,8 @@ import { FormsModule } from '@angular/forms';
 import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { OverlayModule } from '@angular/cdk/overlay';
 
+import { HttpClient } from '@angular/common/http';
+
 import { HeaderComponent } from '../header/header.component';
 import { Canvas } from './canvas/brainet.canvas'
 
@@ -31,6 +33,13 @@ export class BrainetComponent implements OnInit, OnChanges {
   @ViewChild('shareMenu') shareMenu!: ElementRef<HTMLDivElement>;
 
   @ViewChild('contextmenu', { read: ElementRef, static: true }) contextmenu!: ElementRef;
+
+
+constructor(private http: HttpClient) {}
+
+
+  //api request setup
+  readonly ROOT_URL = 'https://backmind.icinoxis.net:3000';
 
 
   //list of all boxes on screen or available
@@ -75,9 +84,18 @@ export class BrainetComponent implements OnInit, OnChanges {
       this.newPanelBox(0);
       this.newPanelBox(1);
       this.newPanelBox(2);
+
+      this.get();
   }
 
   ngOnChanges(){
+  }
+
+  //api request handling
+  get(){
+    let url = `${this.ROOT_URL}/`;
+    let data = this.http.get(url);
+    console.log(data);
   }
 
 

@@ -1,9 +1,12 @@
 import { Routes } from '@angular/router';
+
 import { HomeComponent } from './home/home.component';
 import { BrainetComponent } from './brainet/brainet.component';
 import { TutorialsComponent } from './tutorials/tutorials.component';
 import { AboutComponent } from './about/about.component';
 import { ContactComponent } from './contact/contact.component';
+import { LoginComponent } from './login/login.component';
+import { RegisterComponent } from './register/register.component';
 
 
 
@@ -33,5 +36,15 @@ export const routes: Routes = [
         path: 'contact',
         title: 'Contact',
         component: ContactComponent,
+    },
+    {
+        path: 'register',
+        title: 'Register',
+        component: RegisterComponent,
+    },
+    {
+        path: 'login',
+        title: 'Login',
+        component: LoginComponent,
     },
 ];
