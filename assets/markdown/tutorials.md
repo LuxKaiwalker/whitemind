@@ -1,0 +1,45 @@
+# Tutorials
+
+this is the begin of the tutorials page. here, we will teach you the Art of deep learning 🎨
+
+this text is written in Markdown!
+
+Lorem ipsum odor amet, consectetuer adipiscing elit. Senectus molestie proin iaculis phasellus, curae phasellus molestie duis sit. Erat inceptos vehicula facilisi taciti, porta cubilia convallis primis volutpat. Inceptos habitasse inceptos ut finibus est platea proin litora nisl. Tristique dis eget sociosqu rutrum a rutrum auctor viverra erat. Praesent nisl enim nascetur sagittis sociosqu. Adictum lectus sapien congue, conubia eu vel. Justo dui ut felis mollis ultricies. Semper cubilia nulla posuere semper vehicula vivamus nullam.
+
+Finibus venenatis hac etiam dictum metus pulvinar? Nullam donec mattis mollis interdum urna mauris, magnis cursus. Metus ad porta at sociosqu vitae auctor. Purus in nisl lectus euismod aliquam tellus interdum. Tristique per senectus eu habitant, suscipit purus. Platea nullam dui scelerisque nisi sapien, montes blandit. Nostra metus metus cras habitasse mollis primis class volutpat molestie.
+
+Nunc varius pharetra tellus sem habitant lobortis nullam auctor. Scelerisque interdum tristique nascetur suspendisse laoreet phasellus nec. Phasellus nam volutpat ex parturient senectus. Nascetur diam venenatis quam gravida fames. In auctor nibh imperdiet nec viverra leo nulla lorem taciti. Habitasse elementum magna aptent convallis; consectetur eros vivamus ullamcorper. Semper sit nisi netus ultrices integer tristique venenatis class. Iaculis sociosqu nec sed tempor vitae turpis pretium neque. Ultricies tempor maecenas ornare orci aenean consectetur. Integer posuere cras feugiat taciti pulvinar; nunc dapibus.
+
+Habitasse porttitor ridiculus eleifend gravida molestie commodo laoreet. Tempus semper volutpat tortor tempus at risus; mauris luctus dictum. Rutrum ultricies velit potenti sem vestibulum vivamus, consequat eget purus. Facilisis leo scelerisque diam odio at nam blandit. Nullam in duis augue habitasse sodales fermentum primis. Nullam per dolor sagittis ut ex porta, nam in nascetur. Leo nisi facilisis magna orci malesuada natoque pretium posuere. Nec mollis torquent himenaeos parturient amet massa ut. Ante ornare et nec lacus imperdiet litora hendrerit ridiculus.
+
+Imperdiet massa tellus, porta aliquet feugiat senectus. Varius eros erat lorem posuere suspendisse. Finibus ultrices penatibus penatibus posuere tristique efficitur maximus; conubia enim. Donec augue sagittis cursus cubilia cras tempus metus. Malesuada tincidunt magnis vehicula nisl posuere conubia, curabitur eget. Finibus in quam ornare suspendisse bibendum tortor venenatis ut. Molestie turpis suspendisse ultricies malesuada dignissim.
+
+Neque sociosqu parturient dignissim pharetra ad adipiscing vulputate. Magnis ex convallis velit leo vitae. Netus tortor habitant faucibus rhoncus pretium mi velit. Parturient nulla dictum quisque facilisis a class sociosqu gravida. Sem nullam mus dapibus auctor blandit aliquet. Tristique leo gravida dis, sed per sed.
+
+Eget consectetur magna fames, ornare purus litora. Sagittis magna sem lacus netus mollis lectus et. Potenti lectus quis integer nam vel himenaeos. Condimentum iaculis per nisi netus tincidunt penatibus semper. Malesuada egestas porttitor id hac velit aliquam faucibus nec. Ac a condimentum lorem litora sodales arcu lacinia netus conubia. Cursus nascetur torquent hendrerit lacinia interdum vestibulum pretium.
+
+Fusce integer mollis litora ante mattis adipiscing egestas sodales. Sem maecenas justo vestibulum tincidunt dolor. Auctor vehicula justo at sed enim eu tincidunt. Nam odio eros vitae urna commodo suscipit gravida. Iaculis ipsum blandit integer nascetur magna; malesuada interdum. Pretium luctus rutrum morbi suscipit montes laoreet magna. Quam augue laoreet senectus rhoncus posuere tempus nisl.
+
+Maecenas finibus ad lacinia nostra facilisis, primis duis urna. Platea scelerisque netus sodales ridiculus primis sodales. Mollis porttitor ac ad massa aliquet; mi torquent convallis posuere. Finibus donec nam et justo ullamcorper porta integer. Placerat magnis fames donec; posuere habitant penatibus cras commodo. Suscipit elit malesuada class sem inceptos blandit cubilia. Libero suscipit nisi leo rutrum velit euismod. Ut ad dignissim enim, quam aenean facilisis enim?
+
+Ridiculus amet inceptos semper nostra orci velit integer. Quisque mus neque cras tortor sagittis ex bibendum risus. Vivamus tempus tellus netus vestibulum proin. Dictum consequat rhoncus; nibh erat fermentum suspendisse. Mi varius fames semper fames malesuada senectus netus placerat dis. Augue hendrerit dolor quis imperdiet nascetur vulputate inceptos ipsum. Suscipit felis lacinia turpis eu ullamcorper. Placerat platea platea congue leo metus. Amus feugiat morbi mauris sem eget sapien.
+
+Gravida orci habitant augue conubia habitasse feugiat. Semper purus sollicitudin urna; netus ullamcorper nisl dolor mus. Pulvinar nulla quisque tellus cubilia nascetur tempor efficitur diam. Aliquam euismod litora leo integer convallis dictum efficitur commodo sapien. Ut ac habitant urna mus torquent mi ridiculus parturient. Potenti dis semper facilisis; mattis elementum tempus. Egestas turpis pretium netus consequat velit finibus mi adipiscing. In platea erat ullamcorper ipsum nulla.
+
+Ornare augue diam eros lectus consequat pulvinar arcu. Euismod commodo metus diam etiam id potenti cursus. Dis tortor a consequat; habitant maximus cursus. Ante accumsan sociosqu aptent arcu consectetur aptent, est accumsan nisi. Cubilia hac magnis dictumst leo ut eleifend finibus. Nostra potenti semper massa; non magna felis rhoncus semper. Sit magnis mattis velit porttitor senectus; sit adipiscing. Justo potenti placerat quis volutpat, luctus felis elementum.
+
+Ullamcorper pulvinar justo inceptos placerat ridiculus et enim. Sagittis elementum felis luctus, curae pellentesque nam. Eros quam massa convallis mus gravida orci; nisl mauris nec. Atempor phasellus proin hac ipsum nulla placerat congue. Netus vivamus phasellus egestas maecenas; senectus hac aliquet. Auctor eros sodales fermentum, nec finibus platea velit. Hac pretium praesent orci taciti facilisi curabitur.
+
+In nullam et gravida nullam vestibulum fringilla. Litora ridiculus proin risus tellus consectetur quis. Dis porta quam euismod venenatis varius vehicula justo. Tempor vulputate mi lacinia nisi lobortis faucibus auctor. Elit turpis commodo molestie ex non iaculis venenatis id per. Auctor libero suspendisse urna posuere vulputate.
+
+Etiam quisque primis; ullamcorper placerat magna magnis. Elementum nisl netus urna cras fringilla magna cras hac mi. Mi nisi purus blandit curabitur tortor platea et. Ut ultrices imperdiet morbi turpis aliquam nisl hac lorem. Feugiat vitae hac sem per elit blandit egestas volutpat. Consequat aptent adipiscing suscipit sem suscipit id nibh.
+
+Vehicula parturient luctus dignissim eget per habitant enim. Magnis curabitur inceptos odio et suscipit morbi lacus. Class mus porta arcu ultrices porttitor curae. Euismod vulputate et aenean imperdiet rutrum. Tortor quis sollicitudin penatibus aptent maecenas sagittis ut. Ornare mi tortor risus tortor hac? Hac habitasse nec urna arcu eros dictum maximus. Lectus mauris sapien enim magnis suscipit tellus felis sagittis enim.
+
+Rhoncus integer nisi ante phasellus integer. Lectus curae montes facilisis aliquam ornare condimentum vitae sapien. Vehicula pulvinar eros molestie a mi quis suscipit faucibus. Nullam feugiat finibus molestie suscipit proin leo mattis. Dui sapien libero malesuada amet, malesuada magna. Mus laoreet habitant etiam adipiscing luctus porta eleifend. Arcu dis rhoncus pharetra lacus placerat luctus lacus lectus.
+
+Vel platea donec nisl semper nec fringilla aenean. Venenatis ultricies nisi inceptos, gravida potenti eros. Auctor malesuada suspendisse non consequat neque rutrum. Penatibus lectus odio ligula habitasse ipsum taciti vestibulum natoque. Eleifend habitasse gravida maximus viverra dolor cras neque accumsan. Velit urna curabitur magnis vehicula litora interdum sapien maximus? Risus bibendum ante sapien commodo curae. Adipiscing fermentum varius in inceptos diam feugiat porttitor adipiscing?
+
+Pretium suspendisse a elit dis orci. Cras hendrerit nullam euismod cursus aptent efficitur. Tempor eleifend donec etiam; curae dolor volutpat curae. Curae nostra a adipiscing habitant, semper taciti integer. Luctus in aenean fermentum magna cursus placerat? Orci nullam eleifend consectetur nec torquent. Ornare aliquet morbi ridiculus primis in ultrices erat torquent tortor. Viverra nam senectus nunc nibh porttitor turpis suscipit netus.
+
+Ligula hendrerit finibus congue pulvinar gravida sociosqu diam elementum. Mi ligula sociosqu ridiculus augue augue volutpat, vehicula justo ultricies? Imperdiet per vivamus adipiscing elementum fermentum vel. Nunc viverra phasellus ante quis mi enim adipiscing luctus. Penatibus potenti ante sollicitudin litora risus class. Nisi maecenas curae ultrices fames ac interdum fusce libero. Praesent egestas et lacus pellentesque libero.
