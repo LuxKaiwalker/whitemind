@@ -1,4 +1,5 @@
 import { Box } from "../draggables/brainet.box";
+import { Handle } from "../draggables/brainet.handle"; 
 
 export class Canvas{
     ctx: any;
@@ -83,27 +84,41 @@ export class Canvas{
 
     drawLine(startX: number, startY: number, endX: number, endY: number){
         this.ctx.beginPath();
+        this.ctx.lineWidth = 3;
+
+        const midX = (startX + endX) / 2;
+
         this.ctx.moveTo(startX, startY);
+        this.ctx.lineTo(midX, startY);
+
+        this.ctx.lineTo(midX, endY);
+
         this.ctx.lineTo(endX, endY);
         this.ctx.stroke();
-        // Calculate arrowhead angle based on the tangent to the line at the end point
-        const angle = Math.atan2(endY - startY, endX - startX);
 
-        // Draw arrowhead
-        const arrowLength = 10;
+        this.drawArrowhead(midX, (startY + endY) / 2, endX - midX, endY - startY);
+    }
+    
+    drawArrowhead(x:number, y:number, dx:number, dy:number) {
+        let angle =  Math.PI/2;
+        if(dy  <= 0){
+            angle = -angle;
+        }
+        const length = 10; // Arrowhead size
+    
         this.ctx.beginPath();
-        this.ctx.moveTo(endX, endY);
+        this.ctx.moveTo(x, y);
         this.ctx.lineTo(
-            endX - arrowLength * Math.cos(angle - Math.PI / 6),
-            endY - arrowLength * Math.sin(angle - Math.PI / 6)
+            x - length * Math.cos(angle - Math.PI / 6),
+            y - length * Math.sin(angle - Math.PI / 6)
         );
-        this.ctx.moveTo(endX, endY);
+        this.ctx.moveTo(x, y);
         this.ctx.lineTo(
-            endX - arrowLength * Math.cos(angle + Math.PI / 6),
-            endY - arrowLength * Math.sin(angle + Math.PI / 6)
+            x - length * Math.cos(angle + Math.PI / 6),
+            y - length * Math.sin(angle + Math.PI / 6)
         );
         this.ctx.stroke();
-    }
+    }   
 
     drawBox(box: Box, transformx: number, transformy: number, scale: number){
         let width = box.width;
@@ -173,14 +188,52 @@ export class Canvas{
 
         for (const handle of box.handles) {
 
+            let handletype: number = 0; //0 = nil, 1 = left, 2 = right, 3 = top
+
+
             let x = box.position.x + handle.left;
             let y = box.position.y + handle.top;
             let height = handle.height;
             let width = handle.width;
-            const color = handle.color;
-            let cornerRadius = 5;
+            let color = handle.color;
+            let cornerRadius = 10;
 
-            if(box.in_panel){
+            const connected = handle.connected;//custom handler needed later
+
+            if(!connected){
+                color = "#aaa"; 
+            }
+
+
+            switch (handle.type){
+                case "output":
+                    handletype = 2;
+                break;
+                
+                case "input":
+                    handletype = 1;
+                break;
+
+                case "config":
+                    handletype = 1;
+                break;
+
+                default: handletype = 0;
+            }
+
+            if(handletype === 1){//left 
+                if(!connected){
+                    x -= 1;
+                }
+            }
+            else if (handletype === 2){//right
+                if(!connected){
+                    x += 1;
+                }
+            }
+            else 
+
+            if(box.in_panel){//transformation handle
                 x = (x-transformx)/scale;
                 y = (y-transformy)/scale;
     
@@ -190,43 +243,71 @@ export class Canvas{
                 cornerRadius = 5/scale;
             }
 
-            // Draw rounded box
+            // Draw handle
             this.ctx.fillStyle = color;
+            this.ctx.strokeStyle = "#333";
+            this.ctx.lineWidth = 1/scale;
             this.ctx.beginPath();
-            this.ctx.moveTo(x + cornerRadius, y);                 // Top left corner
-            this.ctx.arcTo(x + width, y, x + width, y + height, cornerRadius); // Top-right corner
-            this.ctx.arcTo(x + width, y + height, x, y + height, cornerRadius); // Bottom-right corner
-            this.ctx.arcTo(x, y + height, x, y, cornerRadius);           // Bottom-left corner
-            this.ctx.arcTo(x, y, x + width, y, cornerRadius);           // Top-left corner
+
+            if(handletype === 1){//left 
+                this.ctx.moveTo(x , y);                               // Top left corner
+                this.ctx.arcTo(x + width, y, x + width, y + height, cornerRadius);  // Top-right corner
+                this.ctx.arcTo(x + width, y + height, x, y + height, cornerRadius); // Bottom-right corner
+                this.ctx.lineTo(x, y + height);
+            }
+            else if(handletype === 2){//right
+                this.ctx.moveTo(x + width , y);                               // Top left corner
+                this.ctx.arcTo(x, y, x, y + height, cornerRadius);  // Top-right corner
+                this.ctx.arcTo(x, y + height, x + width, y + height, cornerRadius); // Bottom-right corner
+                this.ctx.lineTo(x + width, y + height);
+            }
+
+            if(!connected){//if empty!
+                this.ctx.stroke();
+            }
             this.ctx.closePath();
             this.ctx.fill();
-
-            //draw borders
-            this.ctx.lineWidth = 1/scale;
-            this.ctx.strokeStyle = "#333";
-            this.ctx.stroke();
-
-            if(box.in_panel){
+            if(connected){
+                this.ctx.stroke();
                 // Draw arrow inside the box
                 this.ctx.fillStyle = 'white'; // Arrow color (white)
                 this.ctx.beginPath();
-                this.ctx.moveTo(x + 7/scale, y + 6/scale);  // Arrow start (left)
-                this.ctx.lineTo(x + 13/scale, y + 10/scale); // Arrow tip (center right)
-                this.ctx.lineTo(x + 7/scale, y + 14/scale); // Arrow end (bottom left)
+                this.ctx.moveTo(x + handle.width/4, y + handle.height/4);  // Arrow start (left)
+                this.ctx.lineTo(x + handle.width/2, y + handle.height/2); // Arrow tip (center right)
+                this.ctx.lineTo(x + handle.width/4, y + (3/4)*handle.height); // Arrow end (bottom left)
                 this.ctx.closePath();
                 this.ctx.fill();
             }
-            else{
-                // Draw arrow inside the box
-            this.ctx.fillStyle = 'white'; // Arrow color (white)
-            this.ctx.beginPath();
-            this.ctx.moveTo(x + 7, y + 6);  // Arrow start (left)
-            this.ctx.lineTo(x + 13, y + 10); // Arrow tip (center right)
-            this.ctx.lineTo(x + 7, y + 14); // Arrow end (bottom left)
-            this.ctx.closePath();
-            this.ctx.fill();
-            }
         }
+    }
+
+    drawInputHandle(x: number, y: number, handle: Handle, scale: number){
+        let height = handle.height;
+        let width = handle.width;
+        let color = handle.color;
+        let cornerRadius = 10;
+
+        this.ctx.fillStyle = color;
+        this.ctx.strokeStyle = "#333";
+        this.ctx.lineWidth = 1/scale;
+        this.ctx.beginPath();
+
+        this.ctx.moveTo(x , y);                               // Top left corner
+        this.ctx.arcTo(x + width, y, x + width, y + height, cornerRadius);  // Top-right corner
+        this.ctx.arcTo(x + width, y + height, x, y + height, cornerRadius); // Bottom-right corner
+        this.ctx.lineTo(x, y + height);
+
+        this.ctx.closePath();
+        this.ctx.fill();
+        this.ctx.stroke();
+        // Draw arrow inside the box
+        this.ctx.fillStyle = 'white'; // Arrow color (white)
+        this.ctx.beginPath();
+        this.ctx.moveTo(x + handle.width/4, y + handle.height/4);  // Arrow start (left)
+        this.ctx.lineTo(x + handle.width/2, y + handle.height/2); // Arrow tip (center right)
+        this.ctx.lineTo(x + handle.width/4, y + (3/4)*handle.height); // Arrow end (bottom left)
+        this.ctx.closePath();
+        this.ctx.fill();
     }
 
     showContextMenu(event: MouseEvent){//TODO

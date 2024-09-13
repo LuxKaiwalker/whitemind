@@ -72,6 +72,9 @@ constructor(private http: HttpClient) {}
 
   moved:boolean = false;
 
+  //handle variable
+  inputHandle:Handle = new Handle("input");
+
   ngOnInit(){
       const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
       const ctx = this.myCanvas.nativeElement.getContext('2d');
@@ -282,6 +285,12 @@ constructor(private http: HttpClient) {}
       if(box.in_panel){
         continue;
       }
+      if(box.connections_in.length === 0){//input handle is meant here.
+        box.handles[1].connected = false;
+      }
+      else {
+        box.handles[1].connected = true;
+      }
       this.canvasInstance.drawBox(box, this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
       this.canvasInstance.drawHandles(box, this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
     }
@@ -293,7 +302,10 @@ constructor(private http: HttpClient) {}
         const posx = this.connectionArrow.box.position.x + this.connectionArrow.box.handles[0].box_pos.x;//here output is definetly at index 0. probably altering further alter
         const posy = this.connectionArrow.box.position.y + this.connectionArrow.box.handles[0].box_pos.y;
 
+        console.log("carrow drawing");
+
         this.canvasInstance.drawLine(posx, posy, this.connectionArrow.toPos.x, this.connectionArrow.toPos.y);
+        this.canvasInstance.drawInputHandle(this.connectionArrow.toPos.x - this.inputHandle.height/2, this.connectionArrow.toPos.y - this.inputHandle.height/2, this.inputHandle, this.viewportTransform.scale);
       }
     }
 
@@ -394,8 +406,8 @@ constructor(private http: HttpClient) {}
         for(const handle of box.handles){
           let x = box.position.x + handle.left;
           let y = box.position.y + handle.top;
-          let width = 20;//handle dimensions, probybly to change
-          let height = 20;
+          let width = handle.width;//handle dimensions, probybly to change
+          let height = handle.height;
 
           if(x < this.startx && this.startx < x + width && y < this.starty && this.starty < y + height){
             return handle.type;
