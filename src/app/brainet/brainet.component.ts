@@ -39,7 +39,7 @@ constructor(private http: HttpClient) {}
 
 
   //api request setup
-  readonly ROOT_URL = 'https://backmind.icinoxis.net:3000';
+  readonly ROOT_URL = 'https://backmind.icinoxis.net';
 
 
   //list of all boxes on screen or available
@@ -94,8 +94,7 @@ constructor(private http: HttpClient) {}
   //api request handling
   get(){
     let url = `${this.ROOT_URL}/`;
-    let data = this.http.get(url);
-    console.log(data);
+    this.http.get(url).subscribe((response: any) => {console.log('Response:', response);});
   }
 
 
