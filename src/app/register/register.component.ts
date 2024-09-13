@@ -5,40 +5,81 @@ import { FooterComponent } from '../footer/footer.component';
 import { HeaderComponent } from '../header/header.component';
 
 import { HttpClient } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ RouterOutlet, FooterComponent, HeaderComponent ],
+  imports: [ RouterOutlet, FooterComponent, HeaderComponent, FormsModule ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
 })
 export class RegisterComponent {
 
-  readonly ROOT_URL = 'http://localhost:3000';
+
+  constructor(private router: Router, private http: HttpClient) { }
+
+  //api request setup
+  readonly ROOT_URL = 'https://backmind.icinoxis.net';
 
   username: string = "";
   password: string = "";
   confirmPassword: string = "";
 
-  constructor(private router: Router, private http: HttpClient) { }
-
   register() {
     this.router.navigate(['/login']);
   }
 
-  onSubmit(username: string, password: string, confirmPassword: string) {
+  onSubmit(event: any, username: string, password: string, confirmPassword: string) {
+    event.preventDefault();
+
     if (password !== confirmPassword) {
       alert("Passwords do not match.");
     } else {
-      this.http.post(this.ROOT_URL + '/register', {
-        username: username,
-        password: password
-      }).subscribe((data) => {
-        console.log(data);
+      const data = JSON.stringify({//switch to parse
+        user: {
+          email: `${username}`,
+          brainet_tag: `${username}${password}`,
+          plain_password: `${password}`
+        }
+      });
+
+      console.log('Data:', data);
+
+      const istakent = JSON.stringify({//switch to parse
+        user: {
+          email: `${username}`,
+          brainet_tag: `${username}${password}`
+        }
+      });
+      const istaken = JSON.parse(istakent);
+
+      this.http.post(`${this.ROOT_URL}/api/user/is-taken`, istaken).subscribe({
+        next: (response: any) => {
+          console.log('User is taken:', response);
+        },
+        error: (error: any) => {
+          console.error('Error checking if user is taken:', error);
+        },
+        complete: () => {
+          // Handle any cleanup or finalization logic here
+        }
+      });
+
+      const send = JSON.stringify(data);
+
+      this.http.post(`${this.ROOT_URL}/api/auth/register`, send).subscribe({
+        next: (response: any) => {
+          console.log('User registered:', response);
+        },
+        error: (error: any) => {
+          console.error('Error registering user:', error);
+        },
+        complete: () => {
+          // Handle any cleanup or finalization logic here
+        }
       });
     }
-    
   }
-
-}
+  
+  }

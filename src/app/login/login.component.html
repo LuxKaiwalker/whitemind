@@ -4,7 +4,7 @@
     <div class="mx-auto text-dark dark:text-white bg-light_gray dark:bg-dark_gray p-7 z-10 w-1/3">
         <div class="login-form">
             <h1 class="text-5xl font-bold mb-4">Login</h1>
-            <form (submit)="onSubmit()">
+            <form (submit)="onSubmit($event)">
                 <div class="mb-4 text-3xl">
                     <label for="username" class="block text-gray-700">Username</label>
                     <input type="text" id="username" name="username" class="form-input mt-1 block w-full bg-light_gray dark:bg-dark" required>
