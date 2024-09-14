@@ -50,6 +50,9 @@ export class RegisterComponent {
 
       console.log('Data:', data);
 
+
+      // @note: http requeast to fix
+      /*
       const istakent = JSON.stringify({//switch to parse
         user: {
           email: `${username}`,
@@ -83,7 +86,7 @@ export class RegisterComponent {
           // Handle any cleanup or finalization logic here
         }
       });
-
+*/
 
       this.token = "d9f8vz10qe8r3h1q";//this is a placeholder token
     }

@@ -37,7 +37,7 @@ export class LoginComponent {
 
   token:string = "";
 
-  //api request handling
+  //api request handling (experiment)
   get(){
     let url = `${this.ROOT_URL}/`;
     this.http.get(url).subscribe((response: any) => {console.log('Response:', response);});
@@ -47,6 +47,8 @@ export class LoginComponent {
 
   onSubmit(event: any) {
     event.preventDefault();
+
+    //@note : http request to fix
     this.get();
 
     this.token = "0a98vzfwhio3ruqjn";//this is a placeholder token

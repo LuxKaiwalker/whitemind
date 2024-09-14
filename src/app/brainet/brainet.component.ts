@@ -95,13 +95,31 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
       this.token = this.tokenService.getToken();//get user token
 
+      console.log("token for the api: ");
+      console.log(this.token);
+
 
       //manage api calls etc. etc.
 
       this.get();
+
+      this.loadBoxes();
   }
 
   ngOnChanges(){
+  }
+
+  //file handling
+
+  onSave(event:MouseEvent){
+    event.preventDefault();
+      
+    let data = {
+      "operations": [],
+      "general-information1": "This is a test file"
+    }
+
+    //push data to the data object
   }
 
   //api request handling
@@ -110,6 +128,104 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     this.http.get(url).subscribe((response: any) => {console.log('Response:', response);});
   }
 
+  loadBoxes(){
+    this.get();//get the box data
+
+    //parse the data
+
+    let exapmledata =
+      {
+        "operations": [
+          {
+            "type": "add",
+            "modules": [
+              {
+                "type": "dense",
+                "parameters": [
+                  {
+                    "type": "relu",
+                    "param0": 0.01
+                  },
+                  {
+                    "value": 200
+                  },
+                  {
+                      "value": "module1"
+                  }
+                ]
+              },
+              {
+                "type": "input",
+                "parameters": [
+                  {
+                    "value": 100
+                  },
+                  {
+                    "value": "module2"
+                  }
+                ]
+              },
+              {
+                "type": "output",
+                "parameters": [
+                  {
+                    "type": "softmax"
+                  },
+                  {
+                    "value": 10
+                  },
+                  {
+                    "type": "error_rate"
+                  },
+                  {
+                    "value": "module3"
+                  }
+                ]
+              }
+            ],
+            "connections": [
+              {
+                "from": "module2",
+                "to": "module1"
+              },
+              {
+                "from": "module1",
+                "to": "module3"
+              }
+            ]
+          },
+      
+          {
+            "type": "train",
+            "parameters": [
+              {
+                "value": 10
+              },
+              {
+                "value": 32
+              },
+              {
+                "type": "adam",
+                "param0": 0.01
+              },
+              {
+                "value": 10
+              }
+      
+            ]
+          },
+      
+          {
+              "type": "predict",
+              "parameters": [
+              ]
+          }
+        ],
+        "general-information1": "This is a test file"
+      }
+
+
+  }
 
   // box handling
   newBox(typ: number, position: {x: number, y: number}) {
