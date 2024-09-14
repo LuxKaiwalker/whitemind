@@ -3,7 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { NgFor } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
+import { MatMenuModule } from '@angular/material/menu';
 import { OverlayModule } from '@angular/cdk/overlay';
 
 import { HttpClient } from '@angular/common/http';
@@ -13,6 +13,7 @@ import { Canvas } from './canvas/brainet.canvas'
 
 import { Box } from './draggables/brainet.box';
 import { Handle } from './draggables/brainet.handle';
+import { TokenService } from '../token.service';
 
 @Component({
   selector: 'app-brainet',
@@ -35,11 +36,15 @@ export class BrainetComponent implements OnInit, OnChanges {
   @ViewChild('contextmenu', { read: ElementRef, static: true }) contextmenu!: ElementRef;
 
 
-constructor(private http: HttpClient) {}
+constructor(private http: HttpClient, private tokenService: TokenService) {}
 
 
   //api request setup
   readonly ROOT_URL = 'https://backmind.icinoxis.net';
+
+  //login data
+
+  token:string = "";
 
 
   //list of all boxes on screen or available
@@ -87,6 +92,11 @@ constructor(private http: HttpClient) {}
       this.newPanelBox(0);
       this.newPanelBox(1);
       this.newPanelBox(2);
+
+      this.token = this.tokenService.getToken();//get user token
+
+
+      //manage api calls etc. etc.
 
       this.get();
   }

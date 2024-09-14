@@ -12,4 +12,8 @@ import { FooterComponent } from './footer/footer.component';
 })
 export class AppComponent {
   title = 'whitemind';
+
+  token: string = "";
+
+  
 }
