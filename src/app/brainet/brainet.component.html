@@ -3,7 +3,11 @@
 
 <div class="ui w-full absolute  bg-light_gray dark:bg-gray text-dark dark:text-white" (mousemove)="mouseMove($event)"><!-- check cdk drop list group-->
 
-  <div class = "absolute w-40 h-14 z-40 bg-accent rounded-xl text-4xl text-center content-center items-center hover:bg-accent_dark" style = "left: 16.5px; top: 90%;"(click)="onSave($event)">
+  <div class = "absolute w-40 h-14 z-40 bg-accent rounded-xl text-2xl text-center content-center items-center hover:bg-accent_dark" style = "left: 16.5px; top: 80%;"(click)="onConfigTrain($event)">
+    ConfigTraining
+  </div>
+  
+  <div class = "absolute w-40 h-14 z-40 bg-accent rounded-xl text-2xl text-center content-center items-center hover:bg-accent_dark" style = "left: 16.5px; top: 90%;"(click)="onSave($event)">
     Save!
   </div>
 
@@ -15,21 +19,44 @@
 
 
 <!-- dense layer context menu -->
-<div id="contextMenu" class="fixed bg-white rounded-lg shadow-lg z-50 w-96 p-6 space-y-4">
+<div #denseLayerForm id="contextMenu" class="fixed bg-white rounded-lg shadow-lg z-50 w-96 p-6 space-y-4" style="visibility: hidden;">
   <h3 class="text-center text-lg font-semibold mb-4">Configuration for Dense Layer</h3>
-  <form id="configForm" class="space-y-4">
+  <form id="configForm" class="space-y-4" (submit)="updateDenseLayer($event);">
       <div>
-          <label for="configInput" class="block text-sm font-medium text-gray-700">Enter Value:</label>
-          <input type="text" id="configInput" name="configInput" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Type something..." required>
+          <label for="configInput" class="block text-sm font-medium text-gray-700">Enter Neuron Count:</label>
+          <input type="text" id="configInput" name="configInput" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="CURRENT_NEURON_COUNT" required>
       </div>
 
       <div class="relative">
-        <label for="configDropdown" class="block text-sm font-medium text-gray-700">Select Option:</label>
+        <label for="configDropdown" class="block text-sm font-medium text-gray-700">Select Activation Function:</label>
         <select id="configDropdown" name="configDropdown" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
           <option value="option1">Option 1</option>
           <option value="option2">Option 2</option>
           <option value="option3">Option 3</option>
         </select>
+      </div>
+
+      <div>
+        <button type="submit" class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Save</button>
+      </div>
+  </form>
+</div>
+
+<!-- loss module context menu -->
+<div #lossModuleForm id="contextMenu" class="fixed bg-white rounded-lg shadow-lg z-50 w-96 p-6 space-y-4" style="visibility: hidden;">
+  <h3 class="text-center text-lg font-semibold mb-4">Configuration for Loss Module</h3>
+  <form id="configForm" class="space-y-4" (submit)="updateLossModule($event)">
+      <div class="relative">
+        <label for="configDropdown" class="block text-sm font-medium text-gray-700">Select Loss Function:</label>
+        <select id="configDropdown" name="configDropdown" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <option value="option1">Option 1</option>
+          <option value="option2">Option 2</option>
+          <option value="option3">Option 3</option>
+        </select>
+      </div>
+
+      <div>
+        <button type="submit" class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Save</button>
       </div>
   </form>
 </div>

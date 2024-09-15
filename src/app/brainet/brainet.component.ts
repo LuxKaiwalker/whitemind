@@ -33,6 +33,9 @@ export class BrainetComponent implements OnInit, OnChanges {
   // Access the share menu element inside the context menu
   @ViewChild('shareMenu') shareMenu!: ElementRef<HTMLDivElement>;
 
+  @ViewChild('denseLayerForm') denseLayerForm!: ElementRef<HTMLDivElement>;
+  @ViewChild('lossModuleForm') lossModuleForm!: ElementRef<HTMLDivElement>;
+
   @ViewChild('contextmenu', { read: ElementRef, static: true }) contextmenu!: ElementRef;
 
 
@@ -49,6 +52,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
   //list of all boxes on screen or available
   workspace = new Map<number, Box>();//id  = number. probably we can even wipe out the id of the box.
+  workspace_params = new Map<number, any>();//id  = number. probably we can even wipe out the id of the box.
 
   box_count: number = 0;
   zindex_count: number = 10;
@@ -126,6 +130,12 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     //push data to the data object
   }
 
+  onConfigTrain(event: MouseEvent){
+    event.preventDefault();
+    console.log("config train");
+
+  }
+
   //api request handling
   get(){
     let url = `${this.ROOT_URL}/`;
@@ -137,97 +147,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
     //parse the data
 
-    let exapmledata =
-      {
-        "operations": [
-          {
-            "type": "add",
-            "modules": [
-              {
-                "type": "dense",
-                "parameters": [
-                  {
-                    "type": "relu",
-                    "param0": 0.01
-                  },
-                  {
-                    "value": 200
-                  },
-                  {
-                      "value": "module1"
-                  }
-                ]
-              },
-              {
-                "type": "input",
-                "parameters": [
-                  {
-                    "value": 100
-                  },
-                  {
-                    "value": "module2"
-                  }
-                ]
-              },
-              {
-                "type": "output",
-                "parameters": [
-                  {
-                    "type": "softmax"
-                  },
-                  {
-                    "value": 10
-                  },
-                  {
-                    "type": "error_rate"
-                  },
-                  {
-                    "value": "module3"
-                  }
-                ]
-              }
-            ],
-            "connections": [
-              {
-                "from": "module2",
-                "to": "module1"
-              },
-              {
-                "from": "module1",
-                "to": "module3"
-              }
-            ]
-          },
-      
-          {
-            "type": "train",
-            "parameters": [
-              {
-                "value": 10
-              },
-              {
-                "value": 32
-              },
-              {
-                "type": "adam",
-                "param0": 0.01
-              },
-              {
-                "value": 10
-              }
-      
-            ]
-          },
-      
-          {
-              "type": "predict",
-              "parameters": [
-              ]
-          }
-        ],
-        "general-information1": "This is a test file"
-      }
-
+    let exapmledata = {"operations":[{"type":"add","modules":[{"type":"dense","parameters":[{"type":"relu","param0":0.01},{"value":200},{"value":"module1"}]},{"type":"input","parameters":[{"value":100},{"value":"module2"}]},{"type":"output","parameters":[{"type":"softmax"},{"value":10},{"type":"error_rate"},{"value":"module3"}]}],"connections":[{"from":"module2","to":"module1"},{"from":"module1","to":"module3"}]},{"type":"train","parameters":[{"value":10},{"value":32},{"type":"adam","param0":0.01},{"value":10}]},{"type":"predict","parameters":[]}],"general-information1":"This is a test file"};//example data
 
   }
 
@@ -244,6 +164,49 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
       lastBox.position = position;
     }
     this.zindex_count++;
+
+    switch(typ){
+    
+      //TODO:case 0
+      case 1:
+        this.workspace_params.set(this.box_count, {
+          type: "dense",
+          parameters: [
+            {
+              type: "relu",
+              value: 0.01
+            },
+            {
+              value: 100
+            },
+            {
+              value: `module${this.box_count}`
+            }
+          ]
+        });
+        break;
+      case 2:
+        this.workspace_params.set(this.box_count, {
+          type: "loss",
+          parameters: [
+            {
+              type: "object",
+              value: "error_rate"
+            },
+            {
+              type: "parameter",
+              value: `module${this.box_count}`
+            }
+          ]
+        });
+        break;
+
+      default:
+        this.workspace_params.set(this.box_count, {
+          type: "unknown", value: 0
+        });
+        break;
+    }
   }
 
   deleteBox(box: Box){
@@ -516,8 +479,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
   onMouseDown(event: MouseEvent){
 
-    let contextMenu = this.contextMenu.nativeElement;
-    contextMenu.style.visibility = "hidden";
+    this.cancelConfig(event);
 
     this.moved = false;
 
@@ -607,6 +569,14 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
   onMouseUp(event: MouseEvent){
 
+    let isInBox = (box: Box) => {
+
+      let on_box:boolean = box.position.x < this.startx && this.startx < box.position.x + box.width && box.position.y < this.starty && this.starty < box.position.y + box.height;
+
+      return on_box;
+    }
+
+
     if(event.button == 0){//left button clicked
       if(this.dragging === -1){
         this.panning = false;//abort pannign!
@@ -631,13 +601,25 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
       }
 
       if(!this.moved){
-        if(this.onBox){
-          this.onBox = false;
-          this.showBoxConfig();
+
+        for(let box of this.workspace.values()){
+          if(isInBox(box)){
+            this.onBox = true;
+            switch(box.typ){
+              case 1:
+                this.onDenseLayerForm(event);
+                break;
+              case 2:
+                this.onLossModuleForm(event);
+                break;
+              default:
+                this.onContextMenu(event, false);
+                break;
+            }
+            return;
+          }
         }
-        else{
-          this.onContextMenu(event, false);
-        }
+        this.onContextMenu(event, false);
       }
     }
 
@@ -679,13 +661,52 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     console.log("show box config");//TODO: implement
   }
 
+  //context menu handling for every type of block
+  onDenseLayerForm(event: MouseEvent){
+    console.log("dense layer form");//TODO: implement
+
+    let form = this.denseLayerForm.nativeElement;
+
+    let x = event.offsetX, y = event.offsetY,
+    winWidth = window.innerWidth,
+    winHeight = window.innerHeight,
+    cmWidth = form.offsetWidth,
+    cmHeight = form.offsetHeight;
+
+    x = x > winWidth - cmWidth ? winWidth - cmWidth - 5 : x;
+    y = y > winHeight - cmHeight ? winHeight - cmHeight - 5 : y;
+    
+    form.style.left = `${x}px`;
+    form.style.top = `${y}px`;
+    form.style.visibility = "visible";
+  }
+
+  onLossModuleForm(event: MouseEvent){
+    console.log("loss module form");//TODO: implement
+
+    let form = this.lossModuleForm.nativeElement;
+
+    let x = event.offsetX, y = event.offsetY,
+    winWidth = window.innerWidth,
+    winHeight = window.innerHeight,
+    cmWidth = form.offsetWidth,
+    cmHeight = form.offsetHeight;
+
+    x = x > winWidth - cmWidth ? winWidth - cmWidth - 5 : x;
+    y = y > winHeight - cmHeight ? winHeight - cmHeight - 5 : y;
+    
+    form.style.left = `${x}px`;
+    form.style.top = `${y}px`;
+    form.style.visibility = "visible";
+  }
+
   onContextMenu(event: MouseEvent, moved:boolean){
 
+    event.preventDefault();
+
     if(moved){
-      event.preventDefault();
     }
     else{
-      event.preventDefault();
 
       let contextMenu = this.contextMenu.nativeElement;
       let shareMenu = this.shareMenu.nativeElement;
@@ -716,4 +737,28 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     event.preventDefault();
   }
 
+  cancelConfig(event: MouseEvent){
+    let contextMenu = this.contextMenu.nativeElement;
+    contextMenu.style.visibility = "hidden";
+
+    let denseLayerForm = this.denseLayerForm.nativeElement;
+    denseLayerForm.style.visibility = "hidden";
+
+    let lossModuleForm = this.lossModuleForm.nativeElement;
+    lossModuleForm.style.visibility = "hidden";
+  }
+
+
+
+  //handle form data updates
+
+  updateDenseLayer(event: any){
+
+    console.log(event);
+  
+  }
+
+  updateLossModule(event: any){
+  
+  }
 }

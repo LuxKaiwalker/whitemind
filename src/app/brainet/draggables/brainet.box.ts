@@ -36,11 +36,11 @@ export class Box {
         this.zIndex = zIndex;
 
         switch(this.typ){
-            case 0: this.message = 'Input';
+            case 0: this.message = 'Dataset Module';
             break;
-            case 1: this.message = 'Output';
+            case 1: this.message = 'Dense Layer';
             break;
-            case 2: this.message = 'Processing';
+            case 2: this.message = 'Loss Module';
             break;
             case 3: this.message = 'Special';
             break;
