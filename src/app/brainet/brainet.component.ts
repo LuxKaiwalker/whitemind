@@ -57,6 +57,10 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
   connectionArrow: {type:string, box?: Box, toPos:{x:number, y:number}} = {type: "", toPos: {x:0, y:0}}//empty string means no draw arrow mode, box_id = -1 = no box currently selected
 
+  //for context menu
+
+  onBox: boolean = false;
+
 
   //dragdrop variables
   dragging: number = -1;
@@ -310,6 +314,18 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
         this.connectionArrow.box = box;
         return;
       }
+
+      /*TODO: remove handle option
+      if(handle.type === "input"){//remove handle!
+
+        box.connections_in = box.connections_in.filter((value) => value !== this.connectionArrow.box?.id);
+
+        this.connectionArrow.type = handle.type;
+
+        this.connectionArrow.box = box;
+        return
+      }
+      */
     }
     
     if(this.connectionArrow.type === "output" && handle.type === "input"){
@@ -427,8 +443,6 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
         const posx = this.connectionArrow.box.position.x + this.connectionArrow.box.handles[0].box_pos.x;//here output is definetly at index 0. probably altering further alter
         const posy = this.connectionArrow.box.position.y + this.connectionArrow.box.handles[0].box_pos.y;
-
-        console.log("carrow drawing");
 
         this.canvasInstance.drawLine(posx, posy, this.connectionArrow.toPos.x, this.connectionArrow.toPos.y);
         this.canvasInstance.drawInputHandle(this.connectionArrow.toPos.x - this.inputHandle.height/2, this.connectionArrow.toPos.y - this.inputHandle.height/2, this.inputHandle, this.viewportTransform.scale);
@@ -617,7 +631,13 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
       }
 
       if(!this.moved){
-        this.onContextMenu(event, false);
+        if(this.onBox){
+          this.onBox = false;
+          this.showBoxConfig();
+        }
+        else{
+          this.onContextMenu(event, false);
+        }
       }
     }
 
@@ -653,6 +673,10 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     this.viewportTransform.scale = newScale;
 
     this.updateCanvas();
+  }
+
+  showBoxConfig(){
+    console.log("show box config");//TODO: implement
   }
 
   onContextMenu(event: MouseEvent, moved:boolean){

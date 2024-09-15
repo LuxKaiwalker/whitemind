@@ -36,68 +36,6 @@
 }
 
 
-p {
-  position: absolute;
-  
-  left: 35px;
-  right: 35px;
-
-
-  padding: 10px;
-}
-
-input {
-  position: absolute;
-  bottom: 10px;
-  left: 5px;
-  width: 40px;
-  height: 30px;
-  border: none;
-  outline: none;
-  font-size: 20px;
-  background-color: transparent;
-  color: #333;
-}
-
-button {
-  position: absolute;
-  font-size: 15px;
-  bottom: 0;
-  width: 50px;
-  left: 50px;
-  bottom: 10px;
-}
-
-[arrow-handle] {
-  position: absolute;
-  box-sizing: border-box;
-
-  width: 20px;
-  height: 20px;
-  border: 1px solid #333;
-  border-radius: 5px;
-
-  cursor: pointer;
-
-}
-
-
-
-
-*{
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
-}
-body{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #8B55E9 0%, #5D6BE6 100%)
-}
 .wrapper{
   visibility: hidden;
   position: absolute;
