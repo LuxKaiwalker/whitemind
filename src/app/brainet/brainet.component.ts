@@ -33,8 +33,10 @@ export class BrainetComponent implements OnInit, OnChanges {
   // Access the share menu element inside the context menu
   @ViewChild('shareMenu') shareMenu!: ElementRef<HTMLDivElement>;
 
+  @ViewChild('datasetForm') datasetForm!: ElementRef<HTMLDivElement>;
   @ViewChild('denseLayerForm') denseLayerForm!: ElementRef<HTMLDivElement>;
   @ViewChild('lossModuleForm') lossModuleForm!: ElementRef<HTMLDivElement>;
+  @ViewChild('trainingPredictForm') trainingPredictForm!: ElementRef<HTMLDivElement>;
 
   @ViewChild('contextmenu', { read: ElementRef, static: true }) contextmenu!: ElementRef;
 
@@ -64,6 +66,32 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
   //for context menu
 
   onBox: boolean = false;
+
+  //TODO make this somehow better
+  neuron_count: number = 0;
+  previous_count: number = 0;
+  option: string = "";
+  dataset: string = "";
+  current_box: Box = new Box(0, 0, 0, {x: 0, y: 0});
+    //for training
+  batch_size: number = 0;
+  epochs: number = 0;
+  early_stopping_distance: number = 0;
+
+  training_alg = {
+    type: "sgd",
+    value: 0.1,
+    parameters: [
+      {
+        type: "parameter",
+        value: 0.1
+      },
+      {
+        type: "parameter",
+        value: 500
+      }
+    ]
+  }
 
 
   //dragdrop variables
@@ -130,10 +158,12 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     //push data to the data object
   }
 
-  onConfigTrain(event: MouseEvent){
-    event.preventDefault();
-    console.log("config train");
+  load(){
+    console.log("this will be loaded now!");//TODO: implement
+  }
 
+  export(){
+    console.log("this will be exported now!");//TODO: implement
   }
 
   //api request handling
@@ -165,11 +195,13 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     }
     this.zindex_count++;
 
+    console.log(typ);
+
     switch(typ){
     
       //TODO:case 0
       case 1:
-        this.workspace_params.set(this.box_count, {
+        this.workspace_params.set(this.box_count - 1, {
           type: "dense",
           parameters: [
             {
@@ -604,13 +636,27 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
         for(let box of this.workspace.values()){
           if(isInBox(box)){
+
+            if(box.in_panel){
+              this.onContextMenu(event, true);//prevent context menu for panel boxes
+              return;
+            }
+
             this.onBox = true;
+            this.current_box = box;
+            if (this.workspace_params.has(box.id)) {
+              this.previous_count = this.workspace_params.get(box.id).parameters[1].value;
+            }
+
             switch(box.typ){
+              case 0:
+                this.onDatasetForm(event, box);
+                break;
               case 1:
-                this.onDenseLayerForm(event);
+                this.onDenseLayerForm(event, box);
                 break;
               case 2:
-                this.onLossModuleForm(event);
+                this.onLossModuleForm(event, box);
                 break;
               default:
                 this.onContextMenu(event, false);
@@ -662,8 +708,46 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
   }
 
   //context menu handling for every type of block
-  onDenseLayerForm(event: MouseEvent){
+
+  onTrainPredictForm(event: MouseEvent){
+    console.log("train predict form");//TODO: implement
+    let form = this.trainingPredictForm.nativeElement;
+
+    form.style.visibility = "visible";
+
+
+  }
+
+  onDatasetForm(event: MouseEvent, box: Box){
+    console.log("dataset form");//TODO: implement
+
+    let form = this.datasetForm.nativeElement;
+
+    let x = event.offsetX, y = event.offsetY,
+    winWidth = window.innerWidth,
+    winHeight = window.innerHeight,
+    cmWidth = form.offsetWidth,
+    cmHeight = form.offsetHeight;
+
+    x = x > winWidth - cmWidth ? winWidth - cmWidth - 5 : x;
+    y = y > winHeight - cmHeight ? winHeight - cmHeight - 5 : y;
+    
+    form.style.left = `${x}px`;
+    form.style.top = `${y}px`;
+    form.style.visibility = "visible";
+  }
+
+  onDenseLayerForm(event: MouseEvent, box: Box){
     console.log("dense layer form");//TODO: implement
+
+    console.log("box before: ");
+    console.log(this.current_box);
+
+    console.log("box after: ");
+    console.log(this.current_box);
+
+    console.log("box typ: ");
+    console.log(box.typ);
 
     let form = this.denseLayerForm.nativeElement;
 
@@ -681,7 +765,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     form.style.visibility = "visible";
   }
 
-  onLossModuleForm(event: MouseEvent){
+  onLossModuleForm(event: MouseEvent, box: Box){
     console.log("loss module form");//TODO: implement
 
     let form = this.lossModuleForm.nativeElement;
@@ -737,7 +821,11 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     event.preventDefault();
   }
 
-  cancelConfig(event: MouseEvent){
+  cancelConfig(event: MouseEvent){//later, do better handling via reset!
+
+    let trainingPredictForm = this.trainingPredictForm.nativeElement;
+    trainingPredictForm.style.visibility = "hidden";
+
     let contextMenu = this.contextMenu.nativeElement;
     contextMenu.style.visibility = "hidden";
 
@@ -746,19 +834,90 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
     let lossModuleForm = this.lossModuleForm.nativeElement;
     lossModuleForm.style.visibility = "hidden";
+
+    let datasetForm = this.datasetForm.nativeElement;
+    datasetForm.style.visibility = "hidden";
+
+
+    const resetEvent = new MouseEvent('reset', { bubbles: true });
+    this.trainingPredictForm.nativeElement.dispatchEvent(resetEvent);
+    this.contextMenu.nativeElement.dispatchEvent(resetEvent);
+    this.denseLayerForm.nativeElement.dispatchEvent(resetEvent);
+    this.lossModuleForm.nativeElement.dispatchEvent(resetEvent);
+    this.datasetForm.nativeElement.dispatchEvent(resetEvent);
   }
 
 
 
   //handle form data updates
 
+  updateTrainPredictForm(event: any){
+    console.log("update train predict form");//TODO: implement
+
+    let form = this.trainingPredictForm.nativeElement;
+
+    this.cancelConfig(event);
+
+  }
+
+  updateDataset(event: any){
+    console.log("update dataset");
+
+    let dataset = this.dataset;
+
+    //TODO: write to database
+
+    this.cancelConfig(event);
+  }
+
   updateDenseLayer(event: any){
 
-    console.log(event);
+    let num = this.neuron_count;
+    let option = this.option;
+
+    console.log(this.current_box.typ);
+    
+    //print all of workspace.oarams
+
+    for(const [key, value] of this.workspace_params){
+      console.log(key, value);
+    }
+
+    console.log(this.current_box.id, this.workspace_params.get(this.current_box.id));
+
+    if(num){
+      this.workspace_params.get(this.current_box.id).parameters[1].value = num;
+    }
+    if(option){
+      this.workspace_params.get(this.current_box.id).parameters[0].type = option;
+    }
+
+    this.neuron_count = 0;
+
+    this.cancelConfig(event);
   
   }
 
   updateLossModule(event: any){
   
+    let option = this.option;
+
+    if(option){
+      this.workspace_params.get(this.current_box.id).parameters[0].type = option;
+    }
+
+    this.cancelConfig(event);
+
   }
+
+
+  //file handling
+
+
+  //action!!!
+
+  train(event: any) {
+    console.log("start training"); //TODO: implement
+  }
+
 }

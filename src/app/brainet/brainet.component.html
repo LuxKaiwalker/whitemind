@@ -3,7 +3,7 @@
 
 <div class="ui w-full absolute  bg-light_gray dark:bg-gray text-dark dark:text-white" (mousemove)="mouseMove($event)"><!-- check cdk drop list group-->
 
-  <div class = "absolute w-40 h-14 z-40 bg-accent rounded-xl text-2xl text-center content-center items-center hover:bg-accent_dark" style = "left: 16.5px; top: 80%;"(click)="onConfigTrain($event)">
+  <div class = "absolute w-40 h-14 z-40 bg-accent rounded-xl text-2xl text-center content-center items-center hover:bg-accent_dark" style = "left: 16.5px; top: 80%;"(click)="onTrainPredictForm($event)">
     ConfigTraining
   </div>
   
@@ -16,20 +16,94 @@
 
 <canvas #canvas class = "canvas absolute w-full z-0 bg-transparent" (mousemove)="mouseMove($event)" (mousedown) = "onMouseDown($event)" (mouseup)="onMouseUp($event)" (mouseout)="onMouseOut($event)" (wheel)="onScroll($event)" (contextmenu)="onContextMenu($event, true)">Canvas not properly loaded</canvas>
 
+<!-- Training + predict context menu -->
+  <div #trainingPredictForm id="config-popup" class="flex fixed inset-0 justify-center items-center bg-gray-800 bg-opacity-50" style="z-index: 1000; visibility: hidden;">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-1/4">
+        <h2 class="text-xl font-semibold mb-4">Configuration Menu</h2>
+        <form id="config-form" class="space-y-2" (submit)="updateTrainPredictForm($event)">
+          <div class="relative">
+            <label for="configInput" class="block text-lg font-medium text-gray-700">
+              Epochs: {{this.epochs}}
+            </label>
+            <input type="text" id="configInput" name="configInput" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="enter something..." required [(ngModel)]="this.epochs">
+            
+            <label for="configInput" class="block text-lg font-medium text-gray-700">
+              Batch Size: {{this.batch_size}} 
+            </label>
+            <input type="text" id="configInput" name="configInput" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="enter something..." required [(ngModel)]="this.batch_size">
 
+            <label for="configInput" class="block text-lg font-medium text-gray-700">
+              Early Stopping Distance: {{this.early_stopping_distance}}
+            </label>
+            <input type="text" id="configInput" name="configInput" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="enter something..." required [(ngModel)]="this.early_stopping_distance">
+
+            <br>
+            <br>
+
+            <h4 class = "text-lg mb-1">
+              The Training Algorithm used is SGD.
+            </h4>
+
+            <label for="configInput" class="block text-lg font-medium text-gray-700">
+              Initial Learning Rate: {{this.training_alg.parameters[0].value}}
+            </label>
+            <input type="text" id="configInput" name="configInput" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="enter something..." required [(ngModel)]="this.training_alg.parameters[0].value">
+            
+            <label for="configInput" class="block text-lg font-medium text-gray-700">
+              Decay of Learning Rate: {{this.training_alg.parameters[1].value}} 
+            </label>
+            <input type="text" id="configInput" name="configInput" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="enter something..." required [(ngModel)]="this.training_alg.parameters[1].value">
+
+          </div>
+    
+          <div>
+            <button type="submit" class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" (click)="updateDataset($event)">Save</button>
+          </div>    
+          <div>
+            <button type="button" class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" (click)="train($event)">Start Training!</button>
+          </div>
+        </form>
+    </div>
+  </div>
+
+
+<!-- dataset context menu -->
+<div #datasetForm id="contextMenu" class="fixed bg-white rounded-lg shadow-lg z-50 w-96 p-6 space-y-4" style="visibility: hidden;">
+  <h3 class="text-center text-lg font-semibold mb-4">Configuration for Dataset Module</h3>
+  <form id="configForm" class="space-y-4" (submit)="updateDataset($event)">
+      <div class="relative">
+        <label for="configDropdown" class="block text-sm font-medium text-gray-700">
+          Current Dataset: {{this.dataset}}<br>
+          New Dataset:
+        </label>
+        <select id="configDropdown" name="configDropdown" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" [(ngModel)]="this.option">
+          <option value="option1">MNIST</option>
+        </select>
+      </div>
+
+      <div>
+        <button type="submit" class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" (click)="updateDataset($event)">Save</button>
+      </div>
+  </form>
+</div>
 
 <!-- dense layer context menu -->
 <div #denseLayerForm id="contextMenu" class="fixed bg-white rounded-lg shadow-lg z-50 w-96 p-6 space-y-4" style="visibility: hidden;">
   <h3 class="text-center text-lg font-semibold mb-4">Configuration for Dense Layer</h3>
   <form id="configForm" class="space-y-4" (submit)="updateDenseLayer($event);">
       <div>
-          <label for="configInput" class="block text-sm font-medium text-gray-700">Enter Neuron Count:</label>
-          <input type="text" id="configInput" name="configInput" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="CURRENT_NEURON_COUNT" required>
+          <label for="configInput" class="block text-lg font-medium text-gray-700">
+            Neurons Before: {{this.previous_count}} <br>
+            New Neuron Count: {{this.neuron_count}}
+          </label>
+          <input type="text" id="configInput" name="configInput" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="enter something..." required [(ngModel)]="this.neuron_count">
       </div>
 
       <div class="relative">
-        <label for="configDropdown" class="block text-sm font-medium text-gray-700">Select Activation Function:</label>
-        <select id="configDropdown" name="configDropdown" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <label for="configDropdown" class="block text-lg font-medium text-gray-700">Current Activation Function: {{this.option}}<br>
+          New Activation Function:
+        </label>
+        <select id="configDropdown" name="configDropdown" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" [(ngModel)]="this.option">
           <option value="option1">Option 1</option>
           <option value="option2">Option 2</option>
           <option value="option3">Option 3</option>
@@ -37,7 +111,7 @@
       </div>
 
       <div>
-        <button type="submit" class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Save</button>
+        <button type="submit" class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" (click)="updateDenseLayer($event)">Save</button>
       </div>
   </form>
 </div>
@@ -47,8 +121,11 @@
   <h3 class="text-center text-lg font-semibold mb-4">Configuration for Loss Module</h3>
   <form id="configForm" class="space-y-4" (submit)="updateLossModule($event)">
       <div class="relative">
-        <label for="configDropdown" class="block text-sm font-medium text-gray-700">Select Loss Function:</label>
-        <select id="configDropdown" name="configDropdown" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <label for="configDropdown" class="block text-sm font-medium text-gray-700">
+          Current Loss Function: {{this.option}}<br>
+          New Loss Function:
+        </label>
+        <select id="configDropdown" name="configDropdown" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" [(ngModel)]="this.option">
           <option value="option1">Option 1</option>
           <option value="option2">Option 2</option>
           <option value="option3">Option 3</option>
@@ -56,7 +133,7 @@
       </div>
 
       <div>
-        <button type="submit" class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Save</button>
+        <button type="submit" class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" (click)="updateLossModule($event)">Save</button>
       </div>
   </form>
 </div>
