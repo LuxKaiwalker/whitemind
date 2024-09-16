@@ -96,13 +96,14 @@ export class Canvas{
         this.ctx.lineTo(endX, endY);
         this.ctx.stroke();
 
-        this.drawArrowhead(midX, (startY + endY) / 2, endX - midX, endY - startY);
+        this.drawArrowhead(startX + (endX-startX)/4, startY, endX - startX);
+        this.drawArrowhead(startX + (endX-startX)*3/4, endY, endX - midX);
     }
     
-    drawArrowhead(x:number, y:number, dx:number, dy:number) {
-        let angle =  Math.PI/2;
-        if(dy  <= 0){
-            angle = -angle;
+    drawArrowhead(x:number, y:number, dx:number) {
+        let angle = 0;
+        if(dx  <= 0){
+            angle = Math.PI;
         }
         const length = 10; // Arrowhead size
     

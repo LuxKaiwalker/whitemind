@@ -3,7 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { NgFor } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
+import { MatMenuModule } from '@angular/material/menu';
 import { OverlayModule } from '@angular/cdk/overlay';
 
 import { HttpClient } from '@angular/common/http';
@@ -13,6 +13,7 @@ import { Canvas } from './canvas/brainet.canvas'
 
 import { Box } from './draggables/brainet.box';
 import { Handle } from './draggables/brainet.handle';
+import { TokenService } from '../token.service';
 
 @Component({
   selector: 'app-brainet',
@@ -32,18 +33,28 @@ export class BrainetComponent implements OnInit, OnChanges {
   // Access the share menu element inside the context menu
   @ViewChild('shareMenu') shareMenu!: ElementRef<HTMLDivElement>;
 
+  @ViewChild('datasetForm') datasetForm!: ElementRef<HTMLDivElement>;
+  @ViewChild('denseLayerForm') denseLayerForm!: ElementRef<HTMLDivElement>;
+  @ViewChild('lossModuleForm') lossModuleForm!: ElementRef<HTMLDivElement>;
+  @ViewChild('trainingPredictForm') trainingPredictForm!: ElementRef<HTMLDivElement>;
+
   @ViewChild('contextmenu', { read: ElementRef, static: true }) contextmenu!: ElementRef;
 
 
-constructor(private http: HttpClient) {}
+constructor(private http: HttpClient, private tokenService: TokenService) {}
 
 
   //api request setup
   readonly ROOT_URL = 'https://backmind.icinoxis.net';
 
+  //login data
+
+  token:string = "";
+
 
   //list of all boxes on screen or available
   workspace = new Map<number, Box>();//id  = number. probably we can even wipe out the id of the box.
+  workspace_params = new Map<number, any>();//id  = number. probably we can even wipe out the id of the box.
 
   box_count: number = 0;
   zindex_count: number = 10;
@@ -51,6 +62,36 @@ constructor(private http: HttpClient) {}
   canvasInstance!: Canvas;
 
   connectionArrow: {type:string, box?: Box, toPos:{x:number, y:number}} = {type: "", toPos: {x:0, y:0}}//empty string means no draw arrow mode, box_id = -1 = no box currently selected
+
+  //for context menu
+
+  onBox: boolean = false;
+
+  //TODO make this somehow better
+  neuron_count: number = 0;
+  previous_count: number = 0;
+  option: string = "";
+  dataset: string = "";
+  current_box: Box = new Box(0, 0, 0, {x: 0, y: 0});
+    //for training
+  batch_size: number = 0;
+  epochs: number = 0;
+  early_stopping_distance: number = 0;
+
+  training_alg = {
+    type: "sgd",
+    value: 0.1,
+    parameters: [
+      {
+        type: "parameter",
+        value: 0.1
+      },
+      {
+        type: "parameter",
+        value: 500
+      }
+    ]
+  }
 
 
   //dragdrop variables
@@ -88,10 +129,41 @@ constructor(private http: HttpClient) {}
       this.newPanelBox(1);
       this.newPanelBox(2);
 
+      this.token = this.tokenService.getToken();//get user token
+
+      console.log("token for the api: ");
+      console.log(this.token);
+
+
+      //manage api calls etc. etc.
+
       this.get();
+
+      this.loadBoxes();
   }
 
   ngOnChanges(){
+  }
+
+  //file handling
+
+  onSave(event:MouseEvent){
+    event.preventDefault();
+      
+    let data = {
+      "operations": [],
+      "general-information1": "This is a test file"
+    }
+
+    //push data to the data object
+  }
+
+  load(){
+    console.log("this will be loaded now!");//TODO: implement
+  }
+
+  export(){
+    console.log("this will be exported now!");//TODO: implement
   }
 
   //api request handling
@@ -100,6 +172,14 @@ constructor(private http: HttpClient) {}
     this.http.get(url).subscribe((response: any) => {console.log('Response:', response);});
   }
 
+  loadBoxes(){
+    this.get();//get the box data
+
+    //parse the data
+
+    let exapmledata = {"operations":[{"type":"add","modules":[{"type":"dense","parameters":[{"type":"relu","param0":0.01},{"value":200},{"value":"module1"}]},{"type":"input","parameters":[{"value":100},{"value":"module2"}]},{"type":"output","parameters":[{"type":"softmax"},{"value":10},{"type":"error_rate"},{"value":"module3"}]}],"connections":[{"from":"module2","to":"module1"},{"from":"module1","to":"module3"}]},{"type":"train","parameters":[{"value":10},{"value":32},{"type":"adam","param0":0.01},{"value":10}]},{"type":"predict","parameters":[]}],"general-information1":"This is a test file"};//example data
+
+  }
 
   // box handling
   newBox(typ: number, position: {x: number, y: number}) {
@@ -114,6 +194,51 @@ constructor(private http: HttpClient) {}
       lastBox.position = position;
     }
     this.zindex_count++;
+
+    console.log(typ);
+
+    switch(typ){
+    
+      //TODO:case 0
+      case 1:
+        this.workspace_params.set(this.box_count - 1, {
+          type: "dense",
+          parameters: [
+            {
+              type: "relu",
+              value: 0.01
+            },
+            {
+              value: 100
+            },
+            {
+              value: `module${this.box_count}`
+            }
+          ]
+        });
+        break;
+      case 2:
+        this.workspace_params.set(this.box_count, {
+          type: "loss",
+          parameters: [
+            {
+              type: "object",
+              value: "error_rate"
+            },
+            {
+              type: "parameter",
+              value: `module${this.box_count}`
+            }
+          ]
+        });
+        break;
+
+      default:
+        this.workspace_params.set(this.box_count, {
+          type: "unknown", value: 0
+        });
+        break;
+    }
   }
 
   deleteBox(box: Box){
@@ -184,6 +309,18 @@ constructor(private http: HttpClient) {}
         this.connectionArrow.box = box;
         return;
       }
+
+      /*TODO: remove handle option
+      if(handle.type === "input"){//remove handle!
+
+        box.connections_in = box.connections_in.filter((value) => value !== this.connectionArrow.box?.id);
+
+        this.connectionArrow.type = handle.type;
+
+        this.connectionArrow.box = box;
+        return
+      }
+      */
     }
     
     if(this.connectionArrow.type === "output" && handle.type === "input"){
@@ -302,8 +439,6 @@ constructor(private http: HttpClient) {}
         const posx = this.connectionArrow.box.position.x + this.connectionArrow.box.handles[0].box_pos.x;//here output is definetly at index 0. probably altering further alter
         const posy = this.connectionArrow.box.position.y + this.connectionArrow.box.handles[0].box_pos.y;
 
-        console.log("carrow drawing");
-
         this.canvasInstance.drawLine(posx, posy, this.connectionArrow.toPos.x, this.connectionArrow.toPos.y);
         this.canvasInstance.drawInputHandle(this.connectionArrow.toPos.x - this.inputHandle.height/2, this.connectionArrow.toPos.y - this.inputHandle.height/2, this.inputHandle, this.viewportTransform.scale);
       }
@@ -376,8 +511,7 @@ constructor(private http: HttpClient) {}
 
   onMouseDown(event: MouseEvent){
 
-    let contextMenu = this.contextMenu.nativeElement;
-    contextMenu.style.visibility = "hidden";
+    this.cancelConfig(event);
 
     this.moved = false;
 
@@ -467,6 +601,14 @@ constructor(private http: HttpClient) {}
 
   onMouseUp(event: MouseEvent){
 
+    let isInBox = (box: Box) => {
+
+      let on_box:boolean = box.position.x < this.startx && this.startx < box.position.x + box.width && box.position.y < this.starty && this.starty < box.position.y + box.height;
+
+      return on_box;
+    }
+
+
     if(event.button == 0){//left button clicked
       if(this.dragging === -1){
         this.panning = false;//abort pannign!
@@ -491,6 +633,38 @@ constructor(private http: HttpClient) {}
       }
 
       if(!this.moved){
+
+        for(let box of this.workspace.values()){
+          if(isInBox(box)){
+
+            if(box.in_panel){
+              this.onContextMenu(event, true);//prevent context menu for panel boxes
+              return;
+            }
+
+            this.onBox = true;
+            this.current_box = box;
+            if (this.workspace_params.has(box.id)) {
+              this.previous_count = this.workspace_params.get(box.id).parameters[1].value;
+            }
+
+            switch(box.typ){
+              case 0:
+                this.onDatasetForm(event, box);
+                break;
+              case 1:
+                this.onDenseLayerForm(event, box);
+                break;
+              case 2:
+                this.onLossModuleForm(event, box);
+                break;
+              default:
+                this.onContextMenu(event, false);
+                break;
+            }
+            return;
+          }
+        }
         this.onContextMenu(event, false);
       }
     }
@@ -529,13 +703,94 @@ constructor(private http: HttpClient) {}
     this.updateCanvas();
   }
 
+  showBoxConfig(){
+    console.log("show box config");//TODO: implement
+  }
+
+  //context menu handling for every type of block
+
+  onTrainPredictForm(event: MouseEvent){
+    console.log("train predict form");//TODO: implement
+    let form = this.trainingPredictForm.nativeElement;
+
+    form.style.visibility = "visible";
+
+
+  }
+
+  onDatasetForm(event: MouseEvent, box: Box){
+    console.log("dataset form");//TODO: implement
+
+    let form = this.datasetForm.nativeElement;
+
+    let x = event.offsetX, y = event.offsetY,
+    winWidth = window.innerWidth,
+    winHeight = window.innerHeight,
+    cmWidth = form.offsetWidth,
+    cmHeight = form.offsetHeight;
+
+    x = x > winWidth - cmWidth ? winWidth - cmWidth - 5 : x;
+    y = y > winHeight - cmHeight ? winHeight - cmHeight - 5 : y;
+    
+    form.style.left = `${x}px`;
+    form.style.top = `${y}px`;
+    form.style.visibility = "visible";
+  }
+
+  onDenseLayerForm(event: MouseEvent, box: Box){
+    console.log("dense layer form");//TODO: implement
+
+    console.log("box before: ");
+    console.log(this.current_box);
+
+    console.log("box after: ");
+    console.log(this.current_box);
+
+    console.log("box typ: ");
+    console.log(box.typ);
+
+    let form = this.denseLayerForm.nativeElement;
+
+    let x = event.offsetX, y = event.offsetY,
+    winWidth = window.innerWidth,
+    winHeight = window.innerHeight,
+    cmWidth = form.offsetWidth,
+    cmHeight = form.offsetHeight;
+
+    x = x > winWidth - cmWidth ? winWidth - cmWidth - 5 : x;
+    y = y > winHeight - cmHeight ? winHeight - cmHeight - 5 : y;
+    
+    form.style.left = `${x}px`;
+    form.style.top = `${y}px`;
+    form.style.visibility = "visible";
+  }
+
+  onLossModuleForm(event: MouseEvent, box: Box){
+    console.log("loss module form");//TODO: implement
+
+    let form = this.lossModuleForm.nativeElement;
+
+    let x = event.offsetX, y = event.offsetY,
+    winWidth = window.innerWidth,
+    winHeight = window.innerHeight,
+    cmWidth = form.offsetWidth,
+    cmHeight = form.offsetHeight;
+
+    x = x > winWidth - cmWidth ? winWidth - cmWidth - 5 : x;
+    y = y > winHeight - cmHeight ? winHeight - cmHeight - 5 : y;
+    
+    form.style.left = `${x}px`;
+    form.style.top = `${y}px`;
+    form.style.visibility = "visible";
+  }
+
   onContextMenu(event: MouseEvent, moved:boolean){
 
+    event.preventDefault();
+
     if(moved){
-      event.preventDefault();
     }
     else{
-      event.preventDefault();
 
       let contextMenu = this.contextMenu.nativeElement;
       let shareMenu = this.shareMenu.nativeElement;
@@ -564,6 +819,105 @@ constructor(private http: HttpClient) {}
 
   onContextContext(event: MouseEvent){
     event.preventDefault();
+  }
+
+  cancelConfig(event: MouseEvent){//later, do better handling via reset!
+
+    let trainingPredictForm = this.trainingPredictForm.nativeElement;
+    trainingPredictForm.style.visibility = "hidden";
+
+    let contextMenu = this.contextMenu.nativeElement;
+    contextMenu.style.visibility = "hidden";
+
+    let denseLayerForm = this.denseLayerForm.nativeElement;
+    denseLayerForm.style.visibility = "hidden";
+
+    let lossModuleForm = this.lossModuleForm.nativeElement;
+    lossModuleForm.style.visibility = "hidden";
+
+    let datasetForm = this.datasetForm.nativeElement;
+    datasetForm.style.visibility = "hidden";
+
+
+    const resetEvent = new MouseEvent('reset', { bubbles: true });
+    this.trainingPredictForm.nativeElement.dispatchEvent(resetEvent);
+    this.contextMenu.nativeElement.dispatchEvent(resetEvent);
+    this.denseLayerForm.nativeElement.dispatchEvent(resetEvent);
+    this.lossModuleForm.nativeElement.dispatchEvent(resetEvent);
+    this.datasetForm.nativeElement.dispatchEvent(resetEvent);
+  }
+
+
+
+  //handle form data updates
+
+  updateTrainPredictForm(event: any){
+    console.log("update train predict form");//TODO: implement
+
+    let form = this.trainingPredictForm.nativeElement;
+
+    this.cancelConfig(event);
+
+  }
+
+  updateDataset(event: any){
+    console.log("update dataset");
+
+    let dataset = this.dataset;
+
+    //TODO: write to database
+
+    this.cancelConfig(event);
+  }
+
+  updateDenseLayer(event: any){
+
+    let num = this.neuron_count;
+    let option = this.option;
+
+    console.log(this.current_box.typ);
+    
+    //print all of workspace.oarams
+
+    for(const [key, value] of this.workspace_params){
+      console.log(key, value);
+    }
+
+    console.log(this.current_box.id, this.workspace_params.get(this.current_box.id));
+
+    if(num){
+      this.workspace_params.get(this.current_box.id).parameters[1].value = num;
+    }
+    if(option){
+      this.workspace_params.get(this.current_box.id).parameters[0].type = option;
+    }
+
+    this.neuron_count = 0;
+
+    this.cancelConfig(event);
+  
+  }
+
+  updateLossModule(event: any){
+  
+    let option = this.option;
+
+    if(option){
+      this.workspace_params.get(this.current_box.id).parameters[0].type = option;
+    }
+
+    this.cancelConfig(event);
+
+  }
+
+
+  //file handling
+
+
+  //action!!!
+
+  train(event: any) {
+    console.log("start training"); //TODO: implement
   }
 
 }

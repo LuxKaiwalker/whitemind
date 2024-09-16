@@ -4,6 +4,8 @@ import { Router, RouterOutlet } from '@angular/router';
 import { FooterComponent } from '../footer/footer.component';
 import { HeaderComponent } from '../header/header.component';
 
+import { TokenService } from '../token.service';
+
 
 import { HttpClient } from '@angular/common/http';
 
@@ -16,20 +18,11 @@ import { HttpClient } from '@angular/common/http';
 })
 export class LoginComponent {
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private tokenService: TokenService) {}
 
 
   //api request setup
   readonly ROOT_URL = 'https://backmind.icinoxis.net';
-
-
-  //dragdrop variables
-  dragging: number = -1;
-  panning: boolean = false;
-  startx:number = 0;
-  starty:number = 0;
-  paneldrag: number = -1;
-
 
   //viewport variables
   viewportTransform = {
@@ -42,7 +35,9 @@ export class LoginComponent {
 
   moved:boolean = false;
 
-  //api request handling
+  token:string = "";
+
+  //api request handling (experiment)
   get(){
     let url = `${this.ROOT_URL}/`;
     this.http.get(url).subscribe((response: any) => {console.log('Response:', response);});
@@ -52,6 +47,12 @@ export class LoginComponent {
 
   onSubmit(event: any) {
     event.preventDefault();
+
+    //@note : http request to fix
     this.get();
+
+    this.token = "0a98vzfwhio3ruqjn";//this is a placeholder token
+
+    this.tokenService.setToken(this.token);
   }
 }

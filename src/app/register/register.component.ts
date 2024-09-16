@@ -4,6 +4,8 @@ import { Router, RouterOutlet } from '@angular/router';
 import { FooterComponent } from '../footer/footer.component';
 import { HeaderComponent } from '../header/header.component';
 
+import { TokenService } from '../token.service';
+
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
@@ -17,7 +19,7 @@ import { FormsModule } from '@angular/forms';
 export class RegisterComponent {
 
 
-  constructor(private router: Router, private http: HttpClient) { }
+  constructor(private router: Router, private http: HttpClient, private tokenService: TokenService) { }
 
   //api request setup
   readonly ROOT_URL = 'https://backmind.icinoxis.net';
@@ -25,6 +27,8 @@ export class RegisterComponent {
   username: string = "";
   password: string = "";
   confirmPassword: string = "";
+
+  token: string = "";
 
   register() {
     this.router.navigate(['/login']);
@@ -46,6 +50,9 @@ export class RegisterComponent {
 
       console.log('Data:', data);
 
+
+      // @note: http requeast to fix
+      /*
       const istakent = JSON.stringify({//switch to parse
         user: {
           email: `${username}`,
@@ -79,7 +86,11 @@ export class RegisterComponent {
           // Handle any cleanup or finalization logic here
         }
       });
+*/
+
+      this.token = "d9f8vz10qe8r3h1q";//this is a placeholder token
     }
+    
+    this.tokenService.setToken(this.token);
   }
-  
   }
