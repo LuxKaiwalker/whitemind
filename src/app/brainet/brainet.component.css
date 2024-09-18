@@ -17,6 +17,18 @@
   height: calc(100% - 60px);
 }
 
+[bar]
+{
+  z-index: 1;
+  position: absolute;
+  width: 11.5rem;
+  height: calc(100vh - 8rem);
+  left: 1rem;
+  border-radius: 10px;
+  margin-top: 1rem;
+  border: 0.1rem solid var(--accent);
+}
+
 [box]{
   font-size: 18px;
   width: 10px;

@@ -1,7 +1,7 @@
 <app-header></app-header>
 
-
-<div class="ui w-full absolute  bg-light_gray dark:bg-gray text-dark dark:text-white" (mousemove)="mouseMove($event)"><!-- check cdk drop list group-->
+<div class="bg-wBackground dark:bg-dBackground z-10" style="width: 100vw; height: calc(100vh - 6rem)">
+<div bar class="ui absolute  bg-wHeader dark:bg-dHeader" (mousemove)="mouseMove($event)"><!-- check cdk drop list group-->
 
   <div class = "absolute w-40 h-14 z-40 bg-accent rounded-xl text-2xl text-center content-center items-center hover:bg-accent_dark" style = "left: 16.5px; top: 80%;"(click)="onTrainPredictForm($event)">
     ConfigTraining
@@ -14,7 +14,7 @@
 </div>
 
 
-<canvas #canvas class = "canvas absolute w-full z-0 bg-transparent" (mousemove)="mouseMove($event)" (mousedown) = "onMouseDown($event)" (mouseup)="onMouseUp($event)" (mouseout)="onMouseOut($event)" (wheel)="onScroll($event)" (contextmenu)="onContextMenu($event, true)">Canvas not properly loaded</canvas>
+<canvas #canvas class = "canvas absolute w-full z-50 bg-transparent" (mousemove)="mouseMove($event)" (mousedown) = "onMouseDown($event)" (mouseup)="onMouseUp($event)" (mouseout)="onMouseOut($event)" (wheel)="onScroll($event)" (contextmenu)="onContextMenu($event, true)">Canvas not properly loaded</canvas>
 
 <!-- Training + predict context menu -->
   <div #trainingPredictForm id="config-popup" class="flex fixed inset-0 justify-center items-center bg-gray-800 bg-opacity-50" style="z-index: 1000; visibility: hidden;">
@@ -195,4 +195,4 @@
   </div>
 
 
-
+</div>

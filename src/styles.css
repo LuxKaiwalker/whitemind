@@ -3,4 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-
+:root
+{
+    --accent: #337ab7;
+}
