@@ -668,7 +668,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     }
 
     //draw bar
-    this.canvasInstance.drawBar(this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
+    //this.canvasInstance.drawBar(this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
 
     //draw boxes in panel
     for(const [key, box] of this.workspace){

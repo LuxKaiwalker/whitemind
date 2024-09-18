@@ -34,12 +34,12 @@ export class Canvas{
         this.ctx.arcTo(x, y, x + radius, y, radius);
         
         // Fill the bar with color
-        this.ctx.fillStyle = "#666";
+        this.ctx.fillStyle = "#101010";
         this.ctx.fill();
         
         // Add a border with rounded corners
-        this.ctx.lineWidth = 1 / scale;
-        this.ctx.strokeStyle = "#444"; // Border color
+        this.ctx.lineWidth = 0.5;
+        this.ctx.strokeStyle = "#337ab7"; // Border color
         this.ctx.stroke();
     
         // Reset shadow settings after drawing
