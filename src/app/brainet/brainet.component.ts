@@ -153,7 +153,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
   //file handling
 
-  async fetchUser():Promise<string>{
+  async fetchUser():Promise<any>{
 
     console.log("fetching user");
 
@@ -161,7 +161,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
   
     const payload = {};
   
-    fetch(`https://backmind.icinoxis.net/api/user/get`, {
+    return fetch(`https://backmind.icinoxis.net/api/user/get`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -174,19 +174,20 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
       console.log('Success:', data);
       this.user_id = data.user._id;
       console.log(data.user.project_ids);
-      if(data.project_ids){
+      if(data.user.project_ids[0]){//if not empty
+        console.log("is empty = data.user.project_ids[0]");
         is_empty = data.user.project_ids[0];
       }
       else{
+        console.log("data.user.project_ids[0]");
+        console.log(data.user.project_ids[0]);
         is_empty = "";
       }
+      return is_empty;
     });
-    console.log("is_empty");
-    console.log(is_empty);
-    return is_empty;
   }
 
-  async createProject(){
+  async createProject():Promise<string>{
 
     console.log("creating project");
 
@@ -199,7 +200,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
         visibility: "private"//TODO change later prolly
       }
     };
-    fetch(`https://backmind.icinoxis.net/api/project/create`, {
+    return fetch(`https://backmind.icinoxis.net/api/project/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -210,15 +211,14 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     .then((response) => response.json())
     .then((data) => {
       console.log('Success:', data);
-      project_id = data.project_id;
+      project_id = data.project._id;
+      return project_id;
     });
-
-    return project_id;
   }
 
   async fetchData(): Promise<number>{
 
-      //following is example data:
+      //following is example data (we may not use this anymore)
       this.file = {"project":{"_id":"string","name":"string","description":"string","owner_id":"string","visibility":"string","created_on":0,"last_edited":0,"camera_position":[0,0,1],"operations":{"add":{"modules":[{"type":"dense","position":[0,0],"parameters":[{"type":"object","value":"relu"},{"type":"parameter","value":100},{"type":"parameter","value":"module1"}]},{"type":"dense","position":[0,0],"parameters":[{"type":"object","value":"softmax"},{"type":"parameter","value":10},{"type":"parameter","value":"module2"}]},{"type":"loss","position":[0,0],"parameters":[{"type":"object","value":"error_rate"},{"type":"parameter","value":"module3"}]}],"connections":[{"from":"module1","to":"module2"},{"from":"module2","to":"module3"}]},"train":{"parameters":[{"type":"parameter","value":"module1"},{"type":"parameter","value":"module3"},{"type":"parameter","value":10},{"type":"parameter","value":128},{"type":"object","value":"sgd","parameters":[{"type":"parameter","value":0.1},{"type":"parameter","value":500}]},{"type":"parameter","value":10}]},"predict":{"parameters":[{"type":"parameter","value":"module1"},{"type":"parameter","value":"module3"}]}}}}
 
       //i will justz make a projectz if it is not done already
@@ -236,6 +236,10 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
       else{
         project_id = has_project;
       }
+
+
+      console.log("has_project after");
+      console.log(has_project);
 
       console.log("project_id");
 
