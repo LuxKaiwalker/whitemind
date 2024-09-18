@@ -50,6 +50,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
   //login data
 
   token:string = "";
+  user_id:string = "";
 
 
   //list of all boxes on screen or available
@@ -152,139 +153,121 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
   //file handling
 
-  initFile(){
-  
-    //@note get data from server
+  async fetchUser():Promise<string>{
 
-    //following is example data:
-    this.file = {
+    console.log("fetching user");
+
+    let is_empty:string = "";
+  
+    const payload = {};
+  
+    fetch(`https://backmind.icinoxis.net/api/user/get`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`,
+      },
+      body: JSON.stringify(payload),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log('Success:', data);
+      this.user_id = data.user._id;
+      console.log(data.user.project_ids);
+      if(data.project_ids){
+        is_empty = data.user.project_ids[0];
+      }
+      else{
+        is_empty = "";
+      }
+    });
+    console.log("is_empty");
+    console.log(is_empty);
+    return is_empty;
+  }
+
+  async createProject(){
+
+    console.log("creating project");
+
+    let project_id = "";
+
+    const payload = {
+      project: {
+        name: "project1",
+        description: "string",
+        visibility: "private"//TODO change later prolly
+      }
+    };
+    fetch(`https://backmind.icinoxis.net/api/project/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`,
+      },
+      body: JSON.stringify(payload),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log('Success:', data);
+      project_id = data.project_id;
+    });
+
+    return project_id;
+  }
+
+  async fetchData(): Promise<number>{
+
+      //following is example data:
+      this.file = {"project":{"_id":"string","name":"string","description":"string","owner_id":"string","visibility":"string","created_on":0,"last_edited":0,"camera_position":[0,0,1],"operations":{"add":{"modules":[{"type":"dense","position":[0,0],"parameters":[{"type":"object","value":"relu"},{"type":"parameter","value":100},{"type":"parameter","value":"module1"}]},{"type":"dense","position":[0,0],"parameters":[{"type":"object","value":"softmax"},{"type":"parameter","value":10},{"type":"parameter","value":"module2"}]},{"type":"loss","position":[0,0],"parameters":[{"type":"object","value":"error_rate"},{"type":"parameter","value":"module3"}]}],"connections":[{"from":"module1","to":"module2"},{"from":"module2","to":"module3"}]},"train":{"parameters":[{"type":"parameter","value":"module1"},{"type":"parameter","value":"module3"},{"type":"parameter","value":10},{"type":"parameter","value":128},{"type":"object","value":"sgd","parameters":[{"type":"parameter","value":0.1},{"type":"parameter","value":500}]},{"type":"parameter","value":10}]},"predict":{"parameters":[{"type":"parameter","value":"module1"},{"type":"parameter","value":"module3"}]}}}}
+
+      //i will justz make a projectz if it is not done already
+
+      const has_project = await this.fetchUser();
+      let project_id = "";
+
+      console.log("has_project");
+      console.log(has_project);
+
+      if(!has_project){
+        //create project
+        project_id = await this.createProject();
+      }
+      else{
+        project_id = has_project;
+      }
+
+      console.log("project_id");
+
+
+    //get project
+    const payload = {
       "project": {
-        "_id": "string",
-        "name": "string",
-        "description": "string",
-        "owner_id": "string",
-        "visibility": "string",
-        "created_on": 0,
-        "last_edited": 0,
-        "camera_position": [0, 0, 1],
-        "operations": {
-          "add": {
-            "modules": [
-              {
-                "type": "dense",
-                "position": [0, 0],
-                "parameters": [
-                  {
-                    "type": "object",
-                    "value": "relu"
-                  },
-                  {
-                    "type": "parameter",
-                    "value": 100
-                  },
-                  {
-                    "type": "parameter",
-                    "value": "module1"
-                  }
-                ]
-              },
-              {
-                "type": "dense",
-                "position": [0, 0],
-                "parameters": [
-                  {
-                    "type": "object",
-                    "value": "softmax"
-                  },
-                  {
-                    "type": "parameter",
-                    "value": 10
-                  },
-                  {
-                    "type": "parameter",
-                    "value": "module2"
-                  }
-                ]
-              },
-              {
-                "type": "loss",
-                "position": [0, 0],
-                "parameters": [
-                  {
-                    "type": "object",
-                    "value": "error_rate"
-                  },
-                  {
-                    "type": "parameter",
-                    "value": "module3"
-                  }
-                ]
-              }
-            ],
-            "connections": [
-              {
-                "from": "module1",
-                "to": "module2"
-              },
-              {
-                "from": "module2",
-                "to": "module3"
-              }
-            ]
-          },
-          "train": {
-            "parameters": [
-              {
-                "type": "parameter",
-                "value": "module1"
-              },
-              {
-                "type": "parameter",
-                "value": "module3"
-              },
-              {
-                "type": "parameter",
-                "value": 10
-              },
-              {
-                "type": "parameter",
-                "value": 128
-              },
-              {
-                "type": "object",
-                "value": "sgd",
-                "parameters": [
-                  {
-                    "type": "parameter",
-                    "value": 0.1
-                  },
-                  {
-                    "type": "parameter",
-                    "value": 500
-                  }
-                ]
-              },
-              {
-                "type": "parameter",
-                "value": 10
-              }
-            ]
-          },
-          "predict": {
-            "parameters": [
-              {
-                "type": "parameter",
-                "value": "module1"
-              },
-              {
-                "type": "parameter",
-                "value": "module3"
-              }
-            ]
-          }
-        }
+        "_id": `${project_id}`
       }
     }
+
+    fetch(`https://backmind.icinoxis.net/api/project/get`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`,
+      },
+      body: JSON.stringify(payload),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log('Success:', data);
+      this.file = data;
+    });
+
+    return 0;
+  }
+
+  async initFile(){  
+
+    let a = await this.fetchData();
+
 
     this.viewportTransform.x = this.file.project.camera_position[0];//init camera position
     this.viewportTransform.y = this.file.project.camera_position[1];
@@ -605,7 +588,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
         const workspace_lineto = this.workspace.get(lineTo);
 
         if(workspace_lineto){
-          let pos2 = {
+          let pos2 = {//TODO fix this later
             x: workspace_lineto.position.x + workspace_lineto.handles[1].box_pos.x,
             y: workspace_lineto.position.y + workspace_lineto.handles[1].box_pos.y
           };
@@ -633,10 +616,36 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
         continue;
       }
       if(box.connections_in.length === 0){//input handle is meant here.
-        box.handles[1].connected = false;
+        switch(box.typ){
+          case 0:
+            break;
+          case 1:
+            box.handles[1].connected = false;
+            break;
+          case 2:
+            box.handles[1].connected = false;
+            break;
+          case 3:
+            break;
+          default:
+            break;
+        }
       }
       else {
-        box.handles[1].connected = true;
+        switch(box.typ){
+          case 0:
+            break;
+          case 1:
+            box.handles[1].connected = true;
+            break;
+          case 2:
+            box.handles[1].connected = true;
+            break;
+          case 3:
+            break;
+          default:
+            break;
+        }
       }
       this.canvasInstance.drawBox(box, this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
       this.canvasInstance.drawHandles(box, this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
@@ -784,7 +793,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
               this.drawConnectionArrow(box.handles[index], box);
               return;
             }
-            else if(handleType == "config"){
+            else if(handleType == "delete"){
               if(!box.in_panel && this.connectionArrow.type === ""){
                 this.deleteBox(box);
               }

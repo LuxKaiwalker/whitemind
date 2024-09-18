@@ -5,6 +5,7 @@ import { FooterComponent } from '../footer/footer.component';
 import { HeaderComponent } from '../header/header.component';
 
 import { TokenService } from '../token.service';
+import { FormsModule } from '@angular/forms';
 
 
 import { HttpClient } from '@angular/common/http';
@@ -12,7 +13,7 @@ import { HttpClient } from '@angular/common/http';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [RouterOutlet, FooterComponent, HeaderComponent],
+  imports: [RouterOutlet, FooterComponent, HeaderComponent, FormsModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
@@ -20,20 +21,12 @@ export class LoginComponent {
 
   constructor(private http: HttpClient, private tokenService: TokenService) {}
 
+  email:string = "";
+  username:string = "";
+  password:string = "";
 
   //api request setup
   readonly ROOT_URL = 'https://backmind.icinoxis.net';
-
-  //viewport variables
-  viewportTransform = {
-    x: 0,
-    y: 0,
-    scale: 1
-  }
-  transx: number = 0;
-  transy: number = 0;
-
-  moved:boolean = false;
 
   token:string = "";
 
@@ -45,14 +38,26 @@ export class LoginComponent {
 
 
 
-  onSubmit(event: any) {
+  onSubmit(event: any, email:string, password:string){
     event.preventDefault();
 
-    //@note : http request to fix
-    this.get();
-
-    this.token = "0a98vzfwhio3ruqjn";//this is a placeholder token
-
-    this.tokenService.setToken(this.token);
+    
+    const payload = {
+      user: {
+        email: `${email}`,
+        plain_password: `${password}`
+      }
+    };
+    
+    fetch(`${this.ROOT_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+  })
+      .then((response) => response.json())
+      .then((data) => {console.log(data); this.token = data.token; 
+        this.tokenService.setToken(this.token);});
   }
 }

@@ -29,7 +29,7 @@ export class Handle {
 
             this.connected = false;
         }
-        else if(this.type == "special"){
+        else if(this.type == "special_output"){
             this.left = 120;
             this.top = 45;
             this.color = "#bad29f";//Celadon
@@ -37,10 +37,18 @@ export class Handle {
 
             this.connected = true;
         }
-        else if(this.type == "config"){
+        else if(this.type == "special_input"){
             this.left = 0;
             this.top = 45;
             this.color = "#ff9914";//princeton orange
+            this.box_pos.x = 0;
+
+            this.connected = false;
+        }
+        else if(this.type == "delete"){
+            this.left = 110;
+            this.top = 75;
+            this.color = "#123456";//Cdunno what this is
             this.box_pos.x = 0;
 
             this.connected = true;
