@@ -36,33 +36,35 @@ export class Box {
         this.zIndex = zIndex;
 
         switch(this.typ){
-            case 0: this.message = 'Dataset';
+            case 0: 
+                this.message = 'Dataset';
+                this.color = "#008080";//input
+                this.handles.push(new Handle('output'));
+                this.handles.push(new Handle('special_output'))
             break;
-            case 1: this.message = 'Dense';
+            case 1:
+                this.message = 'Dense';
+                this.color = "#FF6347";//output
+                this.handles.push(new Handle('output'));
+                this.handles.push(new Handle('input'));
             break;
-            case 2: this.message = 'Loss';
+            case 2: 
+                this.message = 'Loss';
+                this.color = "#FFD700";//processing
+                this.handles.push(new Handle('special_input'));//quick fix of a harder problem!
+                this.handles.push(new Handle('input'));
             break;
-            case 3: this.message = 'Special';
+            case 3: 
+                this.message = 'Special';
+                this.color = "#FFA07A";//special
             break;
-            default: this.message = 'Unknown';
-        }
-
-        switch(this.typ){
-            case 0: this.color = "#008080";//input
-            break;
-            case 1: this.color = "#FF6347";//output
-            break;
-            case 2: this.color = "#FFD700";//processing
-            break;
-            case 3: this.color = "#FFA07A";//special
-            break;
-            default: this.color = "#fff";
+            default: 
+                this.message = 'Unknown';
+                this.color = "#fff";
         }
 
 
         //handles init
-        this.handles.push(new Handle('output'));
-        this.handles.push(new Handle('input'));
-        this.handles.push(new Handle('config'));
+        this.handles.push(new Handle('delete'));
     }
 }

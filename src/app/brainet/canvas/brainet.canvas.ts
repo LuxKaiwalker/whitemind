@@ -201,13 +201,17 @@ export class Canvas{
 
             const connected = handle.connected;//custom handler needed later
 
-            if(!connected){
-                color = "#aaa"; 
-            }
+            //if(!connected){
+            //    color = "#aaa"; 
+            //}
 
 
             switch (handle.type){
                 case "output":
+                    handletype = 2;
+                break;
+
+                case "special_output":
                     handletype = 2;
                 break;
                 
@@ -215,7 +219,11 @@ export class Canvas{
                     handletype = 1;
                 break;
 
-                case "config":
+                case "special_input":
+                    handletype = 1;
+                break;
+
+                case "delete":
                     handletype = 1;
                 break;
 

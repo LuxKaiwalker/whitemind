@@ -24,8 +24,9 @@ export class RegisterComponent {
   //api request setup
   readonly ROOT_URL = 'https://backmind.icinoxis.net';
 
-  username: string = "";
+  email: string = "";
   password: string = "";
+  username: string = "";
   confirmPassword: string = "";
 
   token: string = "";
@@ -34,63 +35,45 @@ export class RegisterComponent {
     this.router.navigate(['/login']);
   }
 
-  onSubmit(event: any, username: string, password: string, confirmPassword: string) {
+  onSubmit(event: any, email: string, username:string, password: string, confirmPassword: string) {
     event.preventDefault();
 
     if (password !== confirmPassword) {
       alert("Passwords do not match.");
     } else {
-      const data = JSON.stringify({//switch to parse
+
+      const payload = {
         user: {
-          email: `${username}`,
-          brainet_tag: `${username}${password}`,
+          email: `${email}`,
+          brainet_tag: `${username}`,
           plain_password: `${password}`
         }
-      });
+      };
 
-      console.log('Data:', data);
-
-
-      // @note: http requeast to fix
-      /*
-      const istakent = JSON.stringify({//switch to parse
-        user: {
-          email: `${username}`,
-          brainet_tag: `${username}${password}`
-        }
-      });
-      const istaken = JSON.parse(istakent);
-
-      this.http.post(`${this.ROOT_URL}/api/user/is-taken`, istaken).subscribe({
-        next: (response: any) => {
-          console.log('User is taken:', response);
+      fetch(`${this.ROOT_URL}/api/user/is-taken`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        error: (error: any) => {
-          console.error('Error checking if user is taken:', error);
+        body: JSON.stringify({user: {
+          email: `${email}`,
+          brainet_tag: `${username}`
+        }}),
+      })
+        .then((response) => response.json())
+        .then((data) => {console.log('Success:', data); if (data.taken) {alert("Username is taken.");}
+    });
+      
+      fetch(`${this.ROOT_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        complete: () => {
-          // Handle any cleanup or finalization logic here
-        }
-      });
-
-      const send = JSON.stringify(data);
-
-      this.http.post(`${this.ROOT_URL}/api/auth/register`, send).subscribe({
-        next: (response: any) => {
-          console.log('User registered:', response);
-        },
-        error: (error: any) => {
-          console.error('Error registering user:', error);
-        },
-        complete: () => {
-          // Handle any cleanup or finalization logic here
-        }
-      });
-*/
-
-      this.token = "d9f8vz10qe8r3h1q";//this is a placeholder token
+        body: JSON.stringify(payload),
+      })
+        .then((response) => response.json())
+        .then((data) => {console.log('Success:', data); this.token = data.token; 
+          this.tokenService.setToken(this.token);});
     }
-    
-    this.tokenService.setToken(this.token);
   }
   }

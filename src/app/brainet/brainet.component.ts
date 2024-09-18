@@ -50,6 +50,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
   //login data
 
   token:string = "";
+  user_id:string = "";
 
 
   //list of all boxes on screen or available
@@ -92,6 +93,9 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
       }
     ]
   }
+
+  //THE MOST IMPORTANT THING:FILE
+  file:any = {};
 
 
   //dragdrop variables
@@ -137,9 +141,11 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
       //manage api calls etc. etc.
 
-      this.get();
+      //TODO: debug thiss
+      this.initFile();
 
-      this.loadBoxes();
+      console.log("finished intializing!");
+
   }
 
   ngOnChanges(){
@@ -147,44 +153,235 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
   //file handling
 
+  async fetchUser():Promise<any>{
+
+    console.log("fetching user");
+
+    let is_empty:string = "";
+  
+    const payload = {};
+  
+    return fetch(`https://backmind.icinoxis.net/api/user/get`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`,
+      },
+      body: JSON.stringify(payload),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log('Success:', data);
+      this.user_id = data.user._id;
+      console.log(data.user.project_ids);
+      if(data.user.project_ids[0]){//if not empty
+        console.log("is empty = data.user.project_ids[0]");
+        is_empty = data.user.project_ids[0];
+      }
+      else{
+        console.log("data.user.project_ids[0]");
+        console.log(data.user.project_ids[0]);
+        is_empty = "";
+      }
+      return is_empty;
+    });
+  }
+
+  async createProject():Promise<string>{
+
+    console.log("creating project");
+
+    let project_id = "";
+
+    const payload = {
+      project: {
+        name: "project1",
+        description: "string",
+        visibility: "private"//TODO change later prolly
+      }
+    };
+    return fetch(`https://backmind.icinoxis.net/api/project/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`,
+      },
+      body: JSON.stringify(payload),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log('Success:', data);
+      project_id = data.project._id;
+      return project_id;
+    });
+  }
+
+  async fetchData(): Promise<number>{
+
+      //following is example data (we may not use this anymore)
+      this.file = {"project":{"_id":"string","name":"string","description":"string","owner_id":"string","visibility":"string","created_on":0,"last_edited":0,"camera_position":[0,0,1],"operations":{"add":{"modules":[{"type":"dense","position":[0,0],"parameters":[{"type":"object","value":"relu"},{"type":"parameter","value":100},{"type":"parameter","value":"module1"}]},{"type":"dense","position":[0,0],"parameters":[{"type":"object","value":"softmax"},{"type":"parameter","value":10},{"type":"parameter","value":"module2"}]},{"type":"loss","position":[0,0],"parameters":[{"type":"object","value":"error_rate"},{"type":"parameter","value":"module3"}]}],"connections":[{"from":"module1","to":"module2"},{"from":"module2","to":"module3"}]},"train":{"parameters":[{"type":"parameter","value":"module1"},{"type":"parameter","value":"module3"},{"type":"parameter","value":10},{"type":"parameter","value":128},{"type":"object","value":"sgd","parameters":[{"type":"parameter","value":0.1},{"type":"parameter","value":500}]},{"type":"parameter","value":10}]},"predict":{"parameters":[{"type":"parameter","value":"module1"},{"type":"parameter","value":"module3"}]}}}}
+
+      //i will justz make a projectz if it is not done already
+
+      const has_project = await this.fetchUser();
+      let project_id = "";
+
+      console.log("has_project");
+      console.log(has_project);
+
+      if(!has_project){
+        //create project
+        project_id = await this.createProject();
+      }
+      else{
+        project_id = has_project;
+      }
+
+
+      console.log("has_project after");
+      console.log(has_project);
+
+      console.log("project_id");
+
+
+    //get project
+    const payload = {
+      "project": {
+        "_id": `${project_id}`
+      }
+    }
+
+    fetch(`https://backmind.icinoxis.net/api/project/get`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`,
+      },
+      body: JSON.stringify(payload),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log('Success:', data);
+      this.file = data;
+    });
+
+    return 0;
+  }
+
+  async initFile(){  
+
+    let a = await this.fetchData();
+
+
+    this.viewportTransform.x = this.file.project.camera_position[0];//init camera position
+    this.viewportTransform.y = this.file.project.camera_position[1];
+    this.viewportTransform.scale = this.file.project.camera_position[2];
+
+    for(const module of this.file.project.operations.add.modules){//init boxes
+      switch(module.type){
+        case "dataset":
+          this.newBox(0, {x: module.position[0], y: module.position[1]}, false);
+          this.workspace_params.set(this.box_count - 1, module);
+          this.workspace_params.get(this.box_count - 1).value = module;
+          break;
+        case "dense":
+          this.newBox(1, {x: module.position[0], y: module.position[1]}, false);
+          this.workspace_params.set(this.box_count - 1, module);
+          this.workspace_params.get(this.box_count - 1).value = module;
+          break;
+        case "loss":
+          this.newBox(2, {x: module.position[0], y: module.position[1]}, false);
+          this.workspace_params.set(this.box_count - 1, module);
+          this.workspace_params.get(this.box_count - 1).value = module;
+          break;
+
+        default:
+          throw new Error(`Invalid module type: ${module.type}`);
+      }
+    }
+
+    for(const connection of this.file.project.operations.add.connections){//init connections
+      const from = this.workspace_params.get(connection.from);
+      const to = this.workspace_params.get(connection.to);
+
+      if (from && to) {
+        const fromBox = this.workspace.get(from.value);
+        const toBox = this.workspace.get(to.value);
+        if (fromBox) {
+          fromBox.connections_out.push(to.value);
+        }
+        if (toBox) {
+          toBox.connections_in.push(from.value);
+        }
+      }
+    }
+
+    //init training parameters
+    //TODO: [0] and [1] must be implemented
+    this.batch_size = this.file.project.operations.train.parameters[3].value;
+    this.epochs = this.file.project.operations.train.parameters[2].value;
+    this.early_stopping_distance = this.file.project.operations.train.parameters[5].value;
+
+    console.log("this.file.project.operations.train.parameters[4].value");
+    console.log(this.file.project.operations.train.parameters[4]);
+
+    this.training_alg = this.file.project.operations.train.parameters[4]; 
+
+
+    //init predict parameters
+    //TODO
+  
+  }
+
+  exportFile(){
+    //change viewport
+
+    this.file.project.camera_position = [this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale];
+
+    //save boxes
+    this.file.project.operations.add.modules = [];
+    this.file.project.operations.add.connections = [];
+
+    for(const [key, value] of this.workspace_params){
+      this.file.project.operations.add.modules.push(value);
+    }
+
+
+    //save connections
+    for(const [key, box] of this.workspace){
+      for(const connection of box.connections_out){
+        this.file.project.operations.add.connections.push({from: box.id, to: connection});
+      }
+    }
+
+    //save training parameters
+    this.file.project.operations.train.parameters[2].value = this.epochs;
+    this.file.project.operations.train.parameters[3].value = this.batch_size;
+    this.file.project.operations.train.parameters[5].value = this.early_stopping_distance;
+    this.file.project.operations.train.parameters[4].value = this.training_alg;
+
+    //save predict parameters
+    //TODO
+  }
+
   onSave(event:MouseEvent){
     event.preventDefault();
       
-    let data = {
-      "operations": [],
-      "general-information1": "This is a test file"
-    }
+    this.exportFile();//save everything up
 
-    //push data to the data object
-  }
-
-  load(){
-    console.log("this will be loaded now!");//TODO: implement
-  }
-
-  export(){
-    console.log("this will be exported now!");//TODO: implement
-  }
-
-  //api request handling
-  get(){
-    let url = `${this.ROOT_URL}/`;
-    this.http.get(url).subscribe((response: any) => {console.log('Response:', response);});
-  }
-
-  loadBoxes(){
-    this.get();//get the box data
-
-    //parse the data
-
-    let exapmledata = {"operations":[{"type":"add","modules":[{"type":"dense","parameters":[{"type":"relu","param0":0.01},{"value":200},{"value":"module1"}]},{"type":"input","parameters":[{"value":100},{"value":"module2"}]},{"type":"output","parameters":[{"type":"softmax"},{"value":10},{"type":"error_rate"},{"value":"module3"}]}],"connections":[{"from":"module2","to":"module1"},{"from":"module1","to":"module3"}]},{"type":"train","parameters":[{"value":10},{"value":32},{"type":"adam","param0":0.01},{"value":10}]},{"type":"predict","parameters":[]}],"general-information1":"This is a test file"};//example data
-
+    //push data to the data object @note
   }
 
   // box handling
-  newBox(typ: number, position: {x: number, y: number}) {
+  newBox(typ: number, position: {x: number, y: number}, panelbox:boolean) {
 
     this.workspace.set(this.box_count, new Box(typ, this.box_count, this.zindex_count, position));
+
+    const currentBox = this.workspace.get(this.box_count);
+    if (currentBox) {
+      currentBox.in_panel = panelbox;
+    };
+
 
     this.box_count++;
 
@@ -258,7 +455,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
   newPanelBox(typ: number)
   {
-    this.newBox(typ, {x: 10 + 15/2, y: typ*100 + 30});//bit messy, needs imporvement
+    this.newBox(typ, {x: 10 + 15/2, y: typ*100 + 30}, true);//bit messy, needs imporvement
   }
 
 
@@ -395,7 +592,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
         const workspace_lineto = this.workspace.get(lineTo);
 
         if(workspace_lineto){
-          let pos2 = {
+          let pos2 = {//TODO fix this later
             x: workspace_lineto.position.x + workspace_lineto.handles[1].box_pos.x,
             y: workspace_lineto.position.y + workspace_lineto.handles[1].box_pos.y
           };
@@ -423,10 +620,36 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
         continue;
       }
       if(box.connections_in.length === 0){//input handle is meant here.
-        box.handles[1].connected = false;
+        switch(box.typ){
+          case 0:
+            break;
+          case 1:
+            box.handles[1].connected = false;
+            break;
+          case 2:
+            box.handles[1].connected = false;
+            break;
+          case 3:
+            break;
+          default:
+            break;
+        }
       }
       else {
-        box.handles[1].connected = true;
+        switch(box.typ){
+          case 0:
+            break;
+          case 1:
+            box.handles[1].connected = true;
+            break;
+          case 2:
+            box.handles[1].connected = true;
+            break;
+          case 3:
+            break;
+          default:
+            break;
+        }
       }
       this.canvasInstance.drawBox(box, this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
       this.canvasInstance.drawHandles(box, this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
@@ -574,7 +797,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
               this.drawConnectionArrow(box.handles[index], box);
               return;
             }
-            else if(handleType == "config"){
+            else if(handleType == "delete"){
               if(!box.in_panel && this.connectionArrow.type === ""){
                 this.deleteBox(box);
               }
