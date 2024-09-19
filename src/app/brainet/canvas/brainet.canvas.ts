@@ -181,6 +181,14 @@ export class Canvas{
         this.ctx.shadowColor = "transparent";
     }
 
+    drawPixel(x:number, y: number, transformx: number, transformy: number, scale: number){
+        x = (x-transformx)/scale;
+        y = (y-transformy)/scale;
+
+        this.ctx.fillStyle = "black";
+        this.ctx.fillRect(x, y, 1/scale, 1/scale,);
+    }
+
     drawHandles(box: Box, transformx: number, transformy: number, scale: number){
 
         if(box.in_panel){
