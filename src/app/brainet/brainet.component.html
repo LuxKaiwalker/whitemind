@@ -17,52 +17,77 @@
 <canvas #canvas class = "canvas absolute w-full z-50 bg-transparent" (mousemove)="mouseMove($event)" (mousedown) = "onMouseDown($event)" (mouseup)="onMouseUp($event)" (mouseout)="onMouseOut($event)" (wheel)="onScroll($event)" (contextmenu)="onContextMenu($event, true)">Canvas not properly loaded</canvas>
 
 <!-- Training + predict context menu -->
-  <div #trainingPredictForm id="config-popup" class="flex fixed inset-0 justify-center items-center bg-gray-800 bg-opacity-50" style="z-index: 1000; visibility: hidden;">
+<div #trainingPredictForm id="config-popup" class="flex fixed inset-0 justify-center items-center bg-gray-800 bg-opacity-50" style="z-index: 1000; visibility: hidden;">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-1/4">
+      <h2 class="text-xl font-semibold mb-4">Configuration Menu</h2>
+      <form id="config-form" class="space-y-2" (submit)="updateTrainPredictForm($event)">
+        <div class="relative">
+          <label for="configInput" class="block text-lg font-medium text-gray-700">
+            Epochs: {{this.epochs}}
+          </label>
+          <input type="text" id="configInput" name="configInput" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="enter something..." required [(ngModel)]="this.epochs">
+          
+          <label for="configInput" class="block text-lg font-medium text-gray-700">
+            Batch Size: {{this.batch_size}} 
+          </label>
+          <input type="text" id="configInput" name="configInput" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="enter something..." required [(ngModel)]="this.batch_size">
+
+          <label for="configInput" class="block text-lg font-medium text-gray-700">
+            Early Stopping Distance: {{this.early_stopping_distance}}
+          </label>
+          <input type="text" id="configInput" name="configInput" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="enter something..." required [(ngModel)]="this.early_stopping_distance">
+
+          <br>
+          <br>
+
+          <h4 class = "text-lg mb-1">
+            The Training Algorithm used is SGD.
+          </h4>
+
+          <label for="configInput" class="block text-lg font-medium text-gray-700">
+            Initial Learning Rate: {{this.training_alg.parameters[0].value}}
+          </label>
+          <input type="text" id="configInput" name="configInput" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="enter something..." required [(ngModel)]="this.training_alg.parameters[0].value">
+          
+          <label for="configInput" class="block text-lg font-medium text-gray-700">
+            Decay of Learning Rate: {{this.training_alg.parameters[1].value}} 
+          </label>
+          <input type="text" id="configInput" name="configInput" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="enter something..." required [(ngModel)]="this.training_alg.parameters[1].value">
+
+        </div>
+  
+        <div>
+          <button type="submit" class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" (click)="updateDataset($event)">Save</button>
+        </div>    
+        <div>
+          <button type="button" class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" (click)="train($event)">Save & Start Training!</button>
+        </div>
+      </form>
+  </div>
+</div>
+
+
+<!-- Training data menu -->
+  <div #trainingDataForm id="config-popup" class="flex fixed inset-0 justify-center items-center bg-gray-800 bg-opacity-50" style="z-index: 1000; visibility: hidden;">
     <div class="bg-white p-8 rounded-lg shadow-lg w-1/4">
-        <h2 class="text-xl font-semibold mb-4">Configuration Menu</h2>
-        <form id="config-form" class="space-y-2" (submit)="updateTrainPredictForm($event)">
-          <div class="relative">
-            <label for="configInput" class="block text-lg font-medium text-gray-700">
-              Epochs: {{this.epochs}}
-            </label>
-            <input type="text" id="configInput" name="configInput" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="enter something..." required [(ngModel)]="this.epochs">
+        <h2 class="text-xl font-semibold mb-4">Training Data</h2>
+
+          <p>
+            current data is {{this.trainingdata}}
+          </p>
             
-            <label for="configInput" class="block text-lg font-medium text-gray-700">
-              Batch Size: {{this.batch_size}} 
-            </label>
-            <input type="text" id="configInput" name="configInput" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="enter something..." required [(ngModel)]="this.batch_size">
-
-            <label for="configInput" class="block text-lg font-medium text-gray-700">
-              Early Stopping Distance: {{this.early_stopping_distance}}
-            </label>
-            <input type="text" id="configInput" name="configInput" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="enter something..." required [(ngModel)]="this.early_stopping_distance">
-
-            <br>
-            <br>
-
-            <h4 class = "text-lg mb-1">
-              The Training Algorithm used is SGD.
-            </h4>
-
-            <label for="configInput" class="block text-lg font-medium text-gray-700">
-              Initial Learning Rate: {{this.training_alg.parameters[0].value}}
-            </label>
-            <input type="text" id="configInput" name="configInput" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="enter something..." required [(ngModel)]="this.training_alg.parameters[0].value">
-            
-            <label for="configInput" class="block text-lg font-medium text-gray-700">
-              Decay of Learning Rate: {{this.training_alg.parameters[1].value}} 
-            </label>
-            <input type="text" id="configInput" name="configInput" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="enter something..." required [(ngModel)]="this.training_alg.parameters[1].value">
-
-          </div>
-    
           <div>
-            <button type="submit" class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" (click)="updateDataset($event)">Save</button>
-          </div>    
-          <div>
-            <button type="button" class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" (click)="train($event)">Start Training!</button>
+            <button type="button" class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" (click)="onUpdateTrain($event)">Update Training</button>
           </div>
-        </form>
+
+          <div>
+            <button type="button" class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" (click)="onStopTrain($event)">Stop Training</button>
+          </div>
+
+
+          <div>
+            <button type="button" class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" (click)="onCloseMenu($event)">Close</button>
+          </div>
     </div>
   </div>
 

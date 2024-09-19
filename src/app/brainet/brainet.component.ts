@@ -38,6 +38,9 @@ export class BrainetComponent implements OnInit, OnChanges {
   @ViewChild('lossModuleForm') lossModuleForm!: ElementRef<HTMLDivElement>;
   @ViewChild('trainingPredictForm') trainingPredictForm!: ElementRef<HTMLDivElement>;
 
+
+  @ViewChild('trainingDataForm') trainingDataForm!: ElementRef<HTMLDivElement>;
+
   @ViewChild('contextmenu', { read: ElementRef, static: true }) contextmenu!: ElementRef;
 
 
@@ -95,7 +98,13 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
   }
 
   //THE MOST IMPORTANT THING:FILE
-  file:any = {};
+  file: any = {};
+
+  //training data
+
+  trainingdata: any = {};
+
+  current_model: string = "";
 
 
   //dragdrop variables
@@ -120,7 +129,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
   //handle variable
   inputHandle:Handle = new Handle("input");
 
-  ngOnInit(){
+  async ngOnInit(){
       const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
       const ctx = this.myCanvas.nativeElement.getContext('2d');
 
@@ -142,10 +151,11 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
       //manage api calls etc. etc.
 
       //TODO: debug thiss
-      this.initFile();
+      await this.initFile();
 
       console.log("finished intializing!");
 
+      this.updateCanvas();
   }
 
   ngOnChanges(){
@@ -219,9 +229,9 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
   async fetchData(): Promise<number>{
 
       //following is example data (we may not use this anymore)
-      this.file = {"project":{"_id":"string","name":"string","description":"string","owner_id":"string","visibility":"string","created_on":0,"last_edited":0,"camera_position":[0,0,1],"operations":{"add":{"modules":[{"type":"dense","position":[0,0],"parameters":[{"type":"object","value":"relu"},{"type":"parameter","value":100},{"type":"parameter","value":"module1"}]},{"type":"dense","position":[0,0],"parameters":[{"type":"object","value":"softmax"},{"type":"parameter","value":10},{"type":"parameter","value":"module2"}]},{"type":"loss","position":[0,0],"parameters":[{"type":"object","value":"error_rate"},{"type":"parameter","value":"module3"}]}],"connections":[{"from":"module1","to":"module2"},{"from":"module2","to":"module3"}]},"train":{"parameters":[{"type":"parameter","value":"module1"},{"type":"parameter","value":"module3"},{"type":"parameter","value":10},{"type":"parameter","value":128},{"type":"object","value":"sgd","parameters":[{"type":"parameter","value":0.1},{"type":"parameter","value":500}]},{"type":"parameter","value":10}]},"predict":{"parameters":[{"type":"parameter","value":"module1"},{"type":"parameter","value":"module3"}]}}}}
+      this.file = {};
 
-      //i will justz make a projectz if it is not done already
+      //i will just make a project if it is not done already
 
       const has_project = await this.fetchUser();
       let project_id = "";
@@ -251,7 +261,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
       }
     }
 
-    fetch(`https://backmind.icinoxis.net/api/project/get`, {
+    return fetch(`https://backmind.icinoxis.net/api/project/get`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -261,38 +271,41 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     })
     .then((response) => response.json())
     .then((data) => {
-      console.log('Success:', data);
-      this.file = data;
+      console.log('Success:', data, JSON.stringify(data));
+      return data;
     });
-
-    return 0;
   }
 
   async initFile(){  
 
-    let a = await this.fetchData();
+    this.file = await this.fetchData();
+    delete this.file.project.created_on;
+    delete this.file.project.last_edited;
+    delete this.file.project.models;
+
+    delete this.file.project.owner_id;
+
+    console.log("this.file after deletion");
+    console.log(this.file, JSON.stringify(this.file));
 
 
     this.viewportTransform.x = this.file.project.camera_position[0];//init camera position
     this.viewportTransform.y = this.file.project.camera_position[1];
     this.viewportTransform.scale = this.file.project.camera_position[2];
 
-    for(const module of this.file.project.operations.add.modules){//init boxes
+    for(const module of this.file.project.components.add.modules){//init boxes
       switch(module.type){
         case "dataset":
-          this.newBox(0, {x: module.position[0], y: module.position[1]}, false);
+          this.newBox(0, {x: module.position[0], y: module.position[1]}, false, false);
           this.workspace_params.set(this.box_count - 1, module);
-          this.workspace_params.get(this.box_count - 1).value = module;
           break;
         case "dense":
-          this.newBox(1, {x: module.position[0], y: module.position[1]}, false);
+          this.newBox(1, {x: module.position[0], y: module.position[1]}, false, false);
           this.workspace_params.set(this.box_count - 1, module);
-          this.workspace_params.get(this.box_count - 1).value = module;
           break;
         case "loss":
-          this.newBox(2, {x: module.position[0], y: module.position[1]}, false);
+          this.newBox(2, {x: module.position[0], y: module.position[1]}, false, false);
           this.workspace_params.set(this.box_count - 1, module);
-          this.workspace_params.get(this.box_count - 1).value = module;
           break;
 
         default:
@@ -300,7 +313,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
       }
     }
 
-    for(const connection of this.file.project.operations.add.connections){//init connections
+    for(const connection of this.file.project.components.add.connections){//init connections
       const from = this.workspace_params.get(connection.from);
       const to = this.workspace_params.get(connection.to);
 
@@ -318,50 +331,78 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
     //init training parameters
     //TODO: [0] and [1] must be implemented
-    this.batch_size = this.file.project.operations.train.parameters[3].value;
-    this.epochs = this.file.project.operations.train.parameters[2].value;
-    this.early_stopping_distance = this.file.project.operations.train.parameters[5].value;
+    this.batch_size = this.file.project.components.train.parameters[3].value;
+    this.epochs = this.file.project.components.train.parameters[2].value;
+    this.early_stopping_distance = this.file.project.components.train.parameters[5].value;
 
-    console.log("this.file.project.operations.train.parameters[4].value");
-    console.log(this.file.project.operations.train.parameters[4]);
+    console.log("this.file.project.components.train.parameters[4].value");
+    console.log(this.file.project.components.train.parameters[4]);
 
-    this.training_alg = this.file.project.operations.train.parameters[4]; 
-
+    this.training_alg = this.file.project.components.train.parameters[4]; 
 
     //init predict parameters
     //TODO
   
   }
 
-  exportFile(){
+  async exportFile(){
     //change viewport
 
     this.file.project.camera_position = [this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale];
 
     //save boxes
-    this.file.project.operations.add.modules = [];
-    this.file.project.operations.add.connections = [];
+    this.file.project.components.add.modules = [];
+    this.file.project.components.add.connections = [];
+
 
     for(const [key, value] of this.workspace_params){
-      this.file.project.operations.add.modules.push(value);
+
+      let box = this.workspace.get(key);
+
+      let module = value;
+
+      module.position = [box?.position.x, box?.position.y];
+
+      this.file.project.components.add.modules.push(value);
     }
 
 
     //save connections
     for(const [key, box] of this.workspace){
       for(const connection of box.connections_out){
-        this.file.project.operations.add.connections.push({from: box.id, to: connection});
+        this.file.project.components.add.connections.push({from: box.id, to: connection});
       }
     }
 
+
     //save training parameters
-    this.file.project.operations.train.parameters[2].value = this.epochs;
-    this.file.project.operations.train.parameters[3].value = this.batch_size;
-    this.file.project.operations.train.parameters[5].value = this.early_stopping_distance;
-    this.file.project.operations.train.parameters[4].value = this.training_alg;
+    this.file.project.components.train.parameters[2].value = this.epochs;
+    this.file.project.components.train.parameters[3].value = this.batch_size;
+    this.file.project.components.train.parameters[5].value = this.early_stopping_distance;
+    this.file.project.components.train.parameters[4] = this.training_alg;
 
     //save predict parameters
     //TODO
+
+    //export file!
+
+    console.log("file to be exported:");
+    console.log(this.file, JSON.stringify(this.file));
+
+    const payload = this.file;
+
+    fetch(`https://backmind.icinoxis.net/api/project/update`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`,
+      },
+      body: JSON.stringify(payload),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log('Success:', data);
+    });
   }
 
   onSave(event:MouseEvent){
@@ -373,7 +414,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
   }
 
   // box handling
-  newBox(typ: number, position: {x: number, y: number}, panelbox:boolean) {
+  newBox(typ: number, position: {x: number, y: number}, panelbox:boolean, initparams: boolean) {
 
     this.workspace.set(this.box_count, new Box(typ, this.box_count, this.zindex_count, position));
 
@@ -381,7 +422,6 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     if (currentBox) {
       currentBox.in_panel = panelbox;
     };
-
 
     this.box_count++;
 
@@ -394,47 +434,68 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
     console.log(typ);
 
-    switch(typ){
+    if(initparams){//only if initparams is made!
+      switch(typ){
     
-      //TODO:case 0
-      case 1:
-        this.workspace_params.set(this.box_count - 1, {
-          type: "dense",
-          parameters: [
+        //TODO:case 0
+        case 1:
+          this.workspace_params.set(this.box_count - 1, 
             {
-              type: "relu",
-              value: 0.01
-            },
-            {
-              value: 100
-            },
-            {
-              value: `module${this.box_count}`
+              type: "dense",
+              position: [0, 0],
+              parameters: [{
+                  type: "object",
+                  value: "relu"
+              }, {
+                  type: "parameter",
+                  value: 100
+              }, {
+                  type: "parameter",
+                  value: `module${this.box_count}`
+              }]
             }
-          ]
-        });
-        break;
-      case 2:
-        this.workspace_params.set(this.box_count, {
-          type: "loss",
-          parameters: [
-            {
-              type: "object",
-              value: "error_rate"
-            },
-            {
-              type: "parameter",
-              value: `module${this.box_count}`
-            }
-          ]
-        });
-        break;
-
-      default:
-        this.workspace_params.set(this.box_count, {
-          type: "unknown", value: 0
-        });
-        break;
+            
+            
+            /*{
+            type: "dense",
+            parameters: [
+              {
+                type: "relu",
+                value: 0.01
+              },
+              {
+                value: 100
+              },
+              {
+                value: `module${this.box_count}`
+              }
+            ]
+          }*/);
+          break;
+        case 2:
+          this.workspace_params.set(this.box_count, {
+            type: "loss",
+            position: [0, 0],
+            parameters: [
+              {
+                type: "object",
+                value: "error_rate"
+              },
+              {
+                type: "parameter",
+                value: `module${this.box_count}`
+              }
+            ]
+          }
+        );
+          break;
+  
+        default:
+          this.workspace_params.set(this.box_count, {
+            type: "unknown", value: 0
+          });
+          break;
+      }
     }
   }
 
@@ -455,7 +516,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
   newPanelBox(typ: number)
   {
-    this.newBox(typ, {x: 10 + 15/2, y: typ*100 + 30}, true);//bit messy, needs imporvement
+    this.newBox(typ, {x: 10 + 15/2, y: typ*100 + 30}, true, true);//bit messy, needs imporvement
   }
 
 
@@ -1061,6 +1122,9 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     let datasetForm = this.datasetForm.nativeElement;
     datasetForm.style.visibility = "hidden";
 
+    let trainingDataForm = this.trainingDataForm.nativeElement;
+    trainingDataForm.style.visibility = "hidden";
+
 
     const resetEvent = new MouseEvent('reset', { bubbles: true });
     this.trainingPredictForm.nativeElement.dispatchEvent(resetEvent);
@@ -1068,6 +1132,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     this.denseLayerForm.nativeElement.dispatchEvent(resetEvent);
     this.lossModuleForm.nativeElement.dispatchEvent(resetEvent);
     this.datasetForm.nativeElement.dispatchEvent(resetEvent);
+    this.trainingDataForm.nativeElement.dispatchEvent(resetEvent);
   }
 
 
@@ -1088,7 +1153,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
     let dataset = this.dataset;
 
-    //TODO: write to database
+    //automate writing to database thanks to property binding
 
     this.cancelConfig(event);
   }
@@ -1112,7 +1177,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
       this.workspace_params.get(this.current_box.id).parameters[1].value = num;
     }
     if(option){
-      this.workspace_params.get(this.current_box.id).parameters[0].type = option;
+      this.workspace_params.get(this.current_box.id).parameters[0].value = option;
     }
 
     this.neuron_count = 0;
@@ -1139,8 +1204,97 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
   //action!!!
 
-  train(event: any) {
+  async train(event: any) {
     console.log("start training"); //TODO: implement
+
+    //export file & wait if to finish
+    let a = await this.exportFile();
+
+    //remove current menu
+
+    this.cancelConfig(event);
+
+    //start training
+
+    //show training menu (TODO)
+    let form = this.trainingDataForm.nativeElement;
+
+    form.style.visibility = "visible";
+
+    //start training
+    //Set training status to true
+
+    const payload = {
+      project: {
+        _id: this.file.project._id,
+      }
+    };
+    return fetch(`https://backmind.icinoxis.net/api/model/training-start`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`,
+      },
+      body: JSON.stringify(payload),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log('Success:', data);
+      this.current_model = data.project.model_id;
+    });
+
+    //TODO: implement stoptraining
   }
 
+  async onUpdateTrain(event: any){
+
+    //if training status is true:
+
+    const payload = {
+      model:{
+        _id: this.current_model,
+      }
+    };
+    return fetch(`https://backmind.icinoxis.net/api/project/model/training-status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`,
+      },
+      body: JSON.stringify(payload),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log('Success:', data);
+      this.trainingdata = data;
+    });
+    
+  }
+
+  async onStopTrain(event: any){
+
+    //if training started
+
+    const payload = {
+      model:{
+        _id: this.current_model,
+      }
+    };
+    return fetch(`https://backmind.icinoxis.net/api/project/model/training-status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.token}`,
+      },
+      body: JSON.stringify(payload),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log('Success:', data);
+    });
+  }
+
+  onCloseMenu(event: any){
+    this.cancelConfig(event);
+  }
 }
