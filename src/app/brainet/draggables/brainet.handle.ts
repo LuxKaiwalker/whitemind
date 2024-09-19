@@ -16,7 +16,8 @@ export class Handle {
         if(this.type == "output"){//declares new handle
             this.left = 120;
             this.top = 10;
-            this.color = "#BB4430";//persian red
+            this.color = "#FF9914";//princeton orange
+            //this.color = "#BB4430";//persian red
             this.box_pos.x = 160;
 
             this.connected = true;
@@ -24,7 +25,8 @@ export class Handle {
         else if(this.type == "input"){
             this.left = 0;
             this.top = 10;
-            this.color = "#008080";//teal
+            this.color = "#FF9914";//princeton orange
+            //this.color = "#008080";//teal
             this.box_pos.x = 0;
 
             this.connected = false;
@@ -40,7 +42,7 @@ export class Handle {
         else if(this.type == "special_input"){
             this.left = 0;
             this.top = 45;
-            this.color = "#ff9914";//princeton orange
+            this.color = "#BB4430";//Persian Red
             this.box_pos.x = 0;
 
             this.connected = false;

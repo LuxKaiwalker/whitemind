@@ -8,7 +8,7 @@ export class Canvas{
         this.ctx = ctx;
     }
 
-    drawBar(transformx: number, transformy: number, scale: number){
+    drawBar(transformx: number, transformy: number, scale: number, dark: boolean){
         const x = (10-transformx) / scale; // x-coordinate of the bar
         const y = (10-transformy) / scale; // y-coordinate of the bar
         const width = 115 / scale; // width of the bar
@@ -34,12 +34,22 @@ export class Canvas{
         this.ctx.arcTo(x, y, x + radius, y, radius);
         
         // Fill the bar with color
-        this.ctx.fillStyle = "#101010";
+        if(dark){
+            this.ctx.fillStyle = "#101010";
+        }
+        else{
+            this.ctx.fillStyle = "#f8f9fa";
+        }
         this.ctx.fill();
         
         // Add a border with rounded corners
         this.ctx.lineWidth = 0.5;
-        this.ctx.strokeStyle = "#337ab7"; // Border color
+        if(dark){
+            this.ctx.strokeStyle = "#337ab7"; // Border color
+        }
+        else{
+            this.ctx.strokeStyle = "#333"; // Border color
+        }
         this.ctx.stroke();
     
         // Reset shadow settings after drawing
@@ -60,6 +70,7 @@ export class Canvas{
         this.ctx.beginPath();
         this.ctx.moveTo(startX, startY);
         this.ctx.bezierCurveTo(controlX1, controlY1, controlX2, controlY2, endX, endY);
+        this.ctx.strokeStyle = "#FF9914"; // Set arrow color
         this.ctx.stroke();
         
         // Calculate arrowhead angle based on the tangent to the curve at the end point
@@ -79,6 +90,7 @@ export class Canvas{
             endX - arrowLength * Math.cos(angle + Math.PI / 6),
             endY - arrowLength * Math.sin(angle + Math.PI / 6)
         );
+        this.ctx.strokeStyle = "#FF9914"; // Set arrow color
         this.ctx.stroke();
     }
 
@@ -94,6 +106,7 @@ export class Canvas{
         this.ctx.lineTo(midX, endY);
 
         this.ctx.lineTo(endX, endY);
+        this.ctx.strokeStyle = "#FF9914";
         this.ctx.stroke();
 
         this.drawArrowhead(startX + (endX-startX)/4, startY, endX - startX);
@@ -118,6 +131,7 @@ export class Canvas{
             x - length * Math.cos(angle + Math.PI / 6),
             y - length * Math.sin(angle + Math.PI / 6)
         );
+        this.ctx.strokeStyle = "#FF9914"; // Set arrow color
         this.ctx.stroke();
     }   
 
@@ -189,6 +203,45 @@ export class Canvas{
         this.ctx.fillRect(x, y, 1/scale, 1/scale,);
     }
 
+    drawBinIcon(x: number, y: number, w: number, h: number, transformx: number, transformy: number, scale: number){
+        var canvas = document.getElementById("binCanvas");
+        var ctx = this.ctx.getContext("2d");
+
+        x = (x-transformx)/scale;
+        y = (y-transformy)/scale;
+
+        w = w/scale;
+        h = h/scale;
+
+        // Calculate the proportional sizes based on width and height
+        var lidHeight = h * 0.15; // Height for the lid (15% of total height)
+        var bodyHeight = h * 0.85; // Height for the body (85% of total height)
+        var handleHeight = lidHeight * 0.5; // Handle height (50% of lid height)
+
+        // Draw the trash can body
+        ctx.fillStyle = "#555"; // Grey color for the body
+        ctx.fillRect(x, y + lidHeight, w, bodyHeight); // x, y, width, height
+
+        // Draw the lid
+        ctx.fillStyle = "#777"; // Slightly lighter grey for the lid
+        ctx.fillRect(x - w * 0.1, y, w * 1.2, lidHeight); // Extend lid beyond body
+
+        // Draw the lid handle
+        ctx.fillStyle = "#333"; // Dark grey for the handle
+        ctx.fillRect(x + w * 0.3, y - handleHeight * 0.5, w * 0.4, handleHeight); // Center handle
+
+        // Draw bin lines to represent depth or bin openings
+        ctx.strokeStyle = "#333"; // Dark grey lines
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, y + lidHeight + bodyHeight * 0.5); // First line (middle of body)
+        ctx.lineTo(x + w, y + lidHeight + bodyHeight * 0.5); // Ending point of first line
+        ctx.moveTo(x, y + lidHeight + bodyHeight * 0.75); // Second line (near bottom)
+        ctx.lineTo(x + w, y + lidHeight + bodyHeight * 0.75);
+        ctx.stroke();
+
+    }
+
     drawHandles(box: Box, transformx: number, transformy: number, scale: number){
 
         if(box.in_panel){
@@ -232,7 +285,7 @@ export class Canvas{
                 break;
 
                 case "delete":
-                    handletype = 1;
+                    handletype = 3;
                 break;
 
                 default: handletype = 0;
@@ -277,6 +330,9 @@ export class Canvas{
                 this.ctx.arcTo(x, y, x, y + height, cornerRadius);  // Top-right corner
                 this.ctx.arcTo(x, y + height, x + width, y + height, cornerRadius); // Bottom-right corner
                 this.ctx.lineTo(x + width, y + height);
+            }
+            else if(handletype === 3){
+                //this.drawBinIcon(x, y, width, height, transformx, transformy, scale); something like that
             }
 
             if(!connected){//if empty!

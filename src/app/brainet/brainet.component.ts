@@ -50,6 +50,11 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
   //api request setup
   readonly ROOT_URL = 'https://backmind.icinoxis.net';
 
+  //darkmode?
+
+  isDarkModeEnabled = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+
   //login data
 
   token:string = "";
@@ -149,6 +154,9 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
 
       //manage api calls etc. etc.
+
+
+      this.updateCanvas();
 
       //TODO: debug thiss
       await this.initFile();
@@ -729,7 +737,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     }
 
     //draw bar
-    //this.canvasInstance.drawBar(this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
+    this.canvasInstance.drawBar(this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale, this.isDarkModeEnabled);
 
     //draw boxes in panel
     for(const [key, box] of this.workspace){
