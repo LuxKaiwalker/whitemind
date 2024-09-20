@@ -315,6 +315,11 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
           this.newBox(2, {x: module.position[0], y: module.position[1]}, false, false);
           this.workspace_params.set(this.box_count - 1, module);
           break;
+        case "unknown":
+          //ignore adding it!
+          //delete error module
+          delete this.file.project.components.add.modules[this.file.project.components.add.modules.indexOf(module)];  
+        break;
 
         default:
           throw new Error(`Invalid module type: ${module.type}`);
@@ -322,17 +327,27 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     }
 
     for(const connection of this.file.project.components.add.connections){//init connections
-      const from = this.workspace_params.get(connection.from);
-      const to = this.workspace_params.get(connection.to);
+      const from = connection.from;
+      const to = connection.to;
 
       if (from && to) {
-        const fromBox = this.workspace.get(from.value);
-        const toBox = this.workspace.get(to.value);
+
+        let fromNum:number = parseInt(from.replace("module", ""));
+        let toNum:number = parseInt(to.replace("module", ""));
+
+        const fromBox = this.workspace.get(fromNum);
+        const toBox = this.workspace.get(toNum);
+
+        console.log("fromBox");
+        console.log(fromBox);
+        console.log("toBox");
+        console.log(toBox);
+
         if (fromBox) {
-          fromBox.connections_out.push(to.value);
+          fromBox.connections_out.push(toNum);
         }
         if (toBox) {
-          toBox.connections_in.push(from.value);
+          toBox.connections_in.push(fromNum);
         }
       }
     }
@@ -363,22 +378,27 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     this.file.project.components.add.connections = [];
 
 
-    for(const [key, value] of this.workspace_params){
+    for(const [key, box] of this.workspace){
 
-      let box = this.workspace.get(key);
+      if(!box.in_panel){
+        let box_val = this.workspace_params.get(box.id);
 
-      let module = value;
+        console.log("box_val");
+        console.log(box_val);
 
-      module.position = [box?.position.x, box?.position.y];
+        if(box_val){
+          box_val.position = [box.position.x, box.position.y];
 
-      this.file.project.components.add.modules.push(value);
+          this.file.project.components.add.modules.push(box_val);
+        }
+      }
     }
 
 
     //save connections
     for(const [key, box] of this.workspace){
       for(const connection of box.connections_out){
-        this.file.project.components.add.connections.push({from: box.id, to: connection});
+        this.file.project.components.add.connections.push({from: `module${box.id}`, to: `module${connection}`});
       }
     }
 
