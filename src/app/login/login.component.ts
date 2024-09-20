@@ -19,7 +19,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class LoginComponent {
 
-  constructor(private http: HttpClient, private tokenService: TokenService) {}
+  constructor(private http: HttpClient, private tokenService: TokenService, private router:Router) {}
 
   email:string = "";
   username:string = "";
@@ -58,6 +58,6 @@ export class LoginComponent {
   })
       .then((response) => response.json())
       .then((data) => {console.log(data); this.token = data.token; 
-        this.tokenService.setToken(this.token);});
+        this.tokenService.setToken(this.token); if (this.token !== "") {alert("Login successful."); this.router.navigate(["/brainet"])} else {alert("Login failed. Please try again");}});
   }
 }
