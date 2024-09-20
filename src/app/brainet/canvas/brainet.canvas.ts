@@ -203,42 +203,72 @@ export class Canvas{
         this.ctx.fillRect(x, y, 1/scale, 1/scale,);
     }
 
-    drawBinIcon(x: number, y: number, w: number, h: number, transformx: number, transformy: number, scale: number){
-        var canvas = document.getElementById("binCanvas");
-        var ctx = this.ctx.getContext("2d");
+    drawBin(x: number, y: number, w: number, h: number, transformx: number, transformy: number, scale: number){
 
-        x = (x-transformx)/scale;
-        y = (y-transformy)/scale;
+        //x = (x-transformx)/scale;
+        //y = (y-transformy)/scale;
 
-        w = w/scale;
-        h = h/scale;
+        // Normalize to the SVG's 24x24 coordinate system
+        let scaleX = w / 24;
+        let scaleY = h / 24;
 
-        // Calculate the proportional sizes based on width and height
-        var lidHeight = h * 0.15; // Height for the lid (15% of total height)
-        var bodyHeight = h * 0.85; // Height for the body (85% of total height)
-        var handleHeight = lidHeight * 0.5; // Handle height (50% of lid height)
+        let lineWidth = 1/scale;
 
-        // Draw the trash can body
-        ctx.fillStyle = "#555"; // Grey color for the body
-        ctx.fillRect(x, y + lidHeight, w, bodyHeight); // x, y, width, height
+        //scaleX = scaleX/scale;
+        //scaleY = scaleY/scale;
+    
 
-        // Draw the lid
-        ctx.fillStyle = "#777"; // Slightly lighter grey for the lid
-        ctx.fillRect(x - w * 0.1, y, w * 1.2, lidHeight); // Extend lid beyond body
-
-        // Draw the lid handle
-        ctx.fillStyle = "#333"; // Dark grey for the handle
-        ctx.fillRect(x + w * 0.3, y - handleHeight * 0.5, w * 0.4, handleHeight); // Center handle
-
-        // Draw bin lines to represent depth or bin openings
-        ctx.strokeStyle = "#333"; // Dark grey lines
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(x, y + lidHeight + bodyHeight * 0.5); // First line (middle of body)
-        ctx.lineTo(x + w, y + lidHeight + bodyHeight * 0.5); // Ending point of first line
-        ctx.moveTo(x, y + lidHeight + bodyHeight * 0.75); // Second line (near bottom)
-        ctx.lineTo(x + w, y + lidHeight + bodyHeight * 0.75);
-        ctx.stroke();
+        this.ctx.lineWidth = 0.0001;    // Line width
+        // Start drawing the trash icon
+        this.ctx.beginPath();
+    
+        // Move to the starting point and draw the trash can using the path from the SVG
+        this.ctx.moveTo(x + 10 * scaleX, y + 2 * scaleY);
+        this.ctx.lineTo(x + 9 * scaleX, y + 3 * scaleY);
+        this.ctx.lineTo(x + 4 * scaleX, y + 3 * scaleY);
+        this.ctx.lineTo(x + 4 * scaleX, y + 5 * scaleY);
+        this.ctx.lineTo(x + 5 * scaleX, y + 5 * scaleY);
+        this.ctx.lineTo(x + 5 * scaleX, y + 20 * scaleY);
+        this.ctx.lineTo(x + 7 * scaleX, y + 22 * scaleY);
+        this.ctx.lineTo(x + 17 * scaleX, y + 22 * scaleY);
+        this.ctx.lineTo(x + 19 * scaleX, y + 20 * scaleY);
+        this.ctx.lineTo(x + 19 * scaleX, y + 5 * scaleY);
+        this.ctx.lineTo(x + 20 * scaleX, y + 5 * scaleY);
+        this.ctx.lineTo(x + 20 * scaleX, y + 3 * scaleY);
+        this.ctx.lineTo(x + 15 * scaleX, y + 3 * scaleY);
+        this.ctx.lineTo(x + 14 * scaleX, y + 2 * scaleY);
+        this.ctx.lineTo(x + 10 * scaleX, y + 2 * scaleY);
+        this.ctx.closePath();
+    
+        // Draw the body of the trash can
+        this.ctx.moveTo(x + 7 * scaleX, y + 5 * scaleY);
+        this.ctx.lineTo(x + 17 * scaleX, y + 5 * scaleY);
+        this.ctx.lineTo(x + 17 * scaleX, y + 20 * scaleY);
+        this.ctx.lineTo(x + 7 * scaleX, y + 20 * scaleY);
+        this.ctx.closePath();
+    
+        // Draw the left bin line
+        this.ctx.moveTo(x + 9 * scaleX, y + 7 * scaleY);
+        this.ctx.lineTo(x + 9 * scaleX, y + 18 * scaleY);
+        this.ctx.lineTo(x + 11 * scaleX, y + 18 * scaleY);
+        this.ctx.lineTo(x + 11 * scaleX, y + 7 * scaleY);
+        this.ctx.closePath();
+    
+        // Draw the right bin line
+        this.ctx.moveTo(x + 13 * scaleX, y + 7 * scaleY);
+        this.ctx.lineTo(x + 13 * scaleX, y + 18 * scaleY);
+        this.ctx.lineTo(x + 15 * scaleX, y + 18 * scaleY);
+        this.ctx.lineTo(x + 15 * scaleX, y + 7 * scaleY);
+        this.ctx.closePath();
+    
+        // Set stroke and fill styles (directly inside the function)
+        this.ctx.strokeStyle = '#000000';  // Black stroke
+        this.ctx.fillStyle = '#000000';    // Black fill
+    
+        // Fill and stroke the icon
+        this.ctx.fill();
+        this.ctx.stroke();
+        
 
     }
 
@@ -332,7 +362,7 @@ export class Canvas{
                 this.ctx.lineTo(x + width, y + height);
             }
             else if(handletype === 3){
-                //this.drawBinIcon(x, y, width, height, transformx, transformy, scale); something like that
+                this.drawBin(x, y, width, height, transformx, transformy, scale);// something like that
             }
 
             if(!connected){//if empty!
@@ -342,14 +372,16 @@ export class Canvas{
             this.ctx.fill();
             if(connected){
                 this.ctx.stroke();
-                // Draw arrow inside the box
-                this.ctx.fillStyle = 'white'; // Arrow color (white)
-                this.ctx.beginPath();
-                this.ctx.moveTo(x + handle.width/4, y + handle.height/4);  // Arrow start (left)
-                this.ctx.lineTo(x + handle.width/2, y + handle.height/2); // Arrow tip (center right)
-                this.ctx.lineTo(x + handle.width/4, y + (3/4)*handle.height); // Arrow end (bottom left)
-                this.ctx.closePath();
-                this.ctx.fill();
+                if(handletype !== 3){
+                    // Draw arrow inside the box
+                    this.ctx.fillStyle = 'white'; // Arrow color (white)
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x + handle.width/4, y + handle.height/4);  // Arrow start (left)
+                    this.ctx.lineTo(x + handle.width/2, y + handle.height/2); // Arrow tip (center right)
+                    this.ctx.lineTo(x + handle.width/4, y + (3/4)*handle.height); // Arrow end (bottom left)
+                    this.ctx.closePath();
+                    this.ctx.fill();
+                }
             }
         }
     }

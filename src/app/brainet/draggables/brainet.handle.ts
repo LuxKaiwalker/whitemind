@@ -48,12 +48,14 @@ export class Handle {
             this.connected = false;
         }
         else if(this.type == "delete"){
-            this.left = 110;
+            this.left = 68;
             this.top = 75;
             this.color = "#123456";//Cdunno what this is
             this.box_pos.x = 0;
 
             this.connected = true;
+
+            this.width = this.height = 24;
         }
         else{
             throw new Error(`Invalid handle type, given ${this.type}`);
