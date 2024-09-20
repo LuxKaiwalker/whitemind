@@ -8,7 +8,7 @@ export class Canvas{
         this.ctx = ctx;
     }
 
-    drawBar(transformx: number, transformy: number, scale: number){
+    drawBar(transformx: number, transformy: number, scale: number, dark: boolean){
         const x = (10-transformx) / scale; // x-coordinate of the bar
         const y = (10-transformy) / scale; // y-coordinate of the bar
         const width = 115 / scale; // width of the bar
@@ -34,12 +34,22 @@ export class Canvas{
         this.ctx.arcTo(x, y, x + radius, y, radius);
         
         // Fill the bar with color
-        this.ctx.fillStyle = "#101010";
+        if(dark){
+            this.ctx.fillStyle = "#101010";
+        }
+        else{
+            this.ctx.fillStyle = "#f8f9fa";
+        }
         this.ctx.fill();
         
         // Add a border with rounded corners
         this.ctx.lineWidth = 0.5;
-        this.ctx.strokeStyle = "#337ab7"; // Border color
+        if(dark){
+            this.ctx.strokeStyle = "#337ab7"; // Border color
+        }
+        else{
+            this.ctx.strokeStyle = "#333"; // Border color
+        }
         this.ctx.stroke();
     
         // Reset shadow settings after drawing
@@ -60,6 +70,7 @@ export class Canvas{
         this.ctx.beginPath();
         this.ctx.moveTo(startX, startY);
         this.ctx.bezierCurveTo(controlX1, controlY1, controlX2, controlY2, endX, endY);
+        this.ctx.strokeStyle = "#FF9914"; // Set arrow color
         this.ctx.stroke();
         
         // Calculate arrowhead angle based on the tangent to the curve at the end point
@@ -79,6 +90,7 @@ export class Canvas{
             endX - arrowLength * Math.cos(angle + Math.PI / 6),
             endY - arrowLength * Math.sin(angle + Math.PI / 6)
         );
+        this.ctx.strokeStyle = "#FF9914"; // Set arrow color
         this.ctx.stroke();
     }
 
@@ -94,6 +106,7 @@ export class Canvas{
         this.ctx.lineTo(midX, endY);
 
         this.ctx.lineTo(endX, endY);
+        this.ctx.strokeStyle = "#FF9914";
         this.ctx.stroke();
 
         this.drawArrowhead(startX + (endX-startX)/4, startY, endX - startX);
@@ -118,6 +131,7 @@ export class Canvas{
             x - length * Math.cos(angle + Math.PI / 6),
             y - length * Math.sin(angle + Math.PI / 6)
         );
+        this.ctx.strokeStyle = "#FF9914"; // Set arrow color
         this.ctx.stroke();
     }   
 
@@ -189,6 +203,75 @@ export class Canvas{
         this.ctx.fillRect(x, y, 1/scale, 1/scale,);
     }
 
+    drawBin(x: number, y: number, w: number, h: number, transformx: number, transformy: number, scale: number){
+
+        //x = (x-transformx)/scale;
+        //y = (y-transformy)/scale;
+
+        // Normalize to the SVG's 24x24 coordinate system
+        let scaleX = w / 24;
+        let scaleY = h / 24;
+
+        let lineWidth = 1/scale;
+
+        //scaleX = scaleX/scale;
+        //scaleY = scaleY/scale;
+    
+
+        this.ctx.lineWidth = 0.0001;    // Line width
+        // Start drawing the trash icon
+        this.ctx.beginPath();
+    
+        // Move to the starting point and draw the trash can using the path from the SVG
+        this.ctx.moveTo(x + 10 * scaleX, y + 2 * scaleY);
+        this.ctx.lineTo(x + 9 * scaleX, y + 3 * scaleY);
+        this.ctx.lineTo(x + 4 * scaleX, y + 3 * scaleY);
+        this.ctx.lineTo(x + 4 * scaleX, y + 5 * scaleY);
+        this.ctx.lineTo(x + 5 * scaleX, y + 5 * scaleY);
+        this.ctx.lineTo(x + 5 * scaleX, y + 20 * scaleY);
+        this.ctx.lineTo(x + 7 * scaleX, y + 22 * scaleY);
+        this.ctx.lineTo(x + 17 * scaleX, y + 22 * scaleY);
+        this.ctx.lineTo(x + 19 * scaleX, y + 20 * scaleY);
+        this.ctx.lineTo(x + 19 * scaleX, y + 5 * scaleY);
+        this.ctx.lineTo(x + 20 * scaleX, y + 5 * scaleY);
+        this.ctx.lineTo(x + 20 * scaleX, y + 3 * scaleY);
+        this.ctx.lineTo(x + 15 * scaleX, y + 3 * scaleY);
+        this.ctx.lineTo(x + 14 * scaleX, y + 2 * scaleY);
+        this.ctx.lineTo(x + 10 * scaleX, y + 2 * scaleY);
+        this.ctx.closePath();
+    
+        // Draw the body of the trash can
+        this.ctx.moveTo(x + 7 * scaleX, y + 5 * scaleY);
+        this.ctx.lineTo(x + 17 * scaleX, y + 5 * scaleY);
+        this.ctx.lineTo(x + 17 * scaleX, y + 20 * scaleY);
+        this.ctx.lineTo(x + 7 * scaleX, y + 20 * scaleY);
+        this.ctx.closePath();
+    
+        // Draw the left bin line
+        this.ctx.moveTo(x + 9 * scaleX, y + 7 * scaleY);
+        this.ctx.lineTo(x + 9 * scaleX, y + 18 * scaleY);
+        this.ctx.lineTo(x + 11 * scaleX, y + 18 * scaleY);
+        this.ctx.lineTo(x + 11 * scaleX, y + 7 * scaleY);
+        this.ctx.closePath();
+    
+        // Draw the right bin line
+        this.ctx.moveTo(x + 13 * scaleX, y + 7 * scaleY);
+        this.ctx.lineTo(x + 13 * scaleX, y + 18 * scaleY);
+        this.ctx.lineTo(x + 15 * scaleX, y + 18 * scaleY);
+        this.ctx.lineTo(x + 15 * scaleX, y + 7 * scaleY);
+        this.ctx.closePath();
+    
+        // Set stroke and fill styles (directly inside the function)
+        this.ctx.strokeStyle = '#000000';  // Black stroke
+        this.ctx.fillStyle = '#000000';    // Black fill
+    
+        // Fill and stroke the icon
+        this.ctx.fill();
+        this.ctx.stroke();
+        
+
+    }
+
     drawHandles(box: Box, transformx: number, transformy: number, scale: number){
 
         if(box.in_panel){
@@ -232,7 +315,7 @@ export class Canvas{
                 break;
 
                 case "delete":
-                    handletype = 1;
+                    handletype = 3;
                 break;
 
                 default: handletype = 0;
@@ -278,6 +361,9 @@ export class Canvas{
                 this.ctx.arcTo(x, y + height, x + width, y + height, cornerRadius); // Bottom-right corner
                 this.ctx.lineTo(x + width, y + height);
             }
+            else if(handletype === 3){
+                this.drawBin(x, y, width, height, transformx, transformy, scale);// something like that
+            }
 
             if(!connected){//if empty!
                 this.ctx.stroke();
@@ -286,14 +372,16 @@ export class Canvas{
             this.ctx.fill();
             if(connected){
                 this.ctx.stroke();
-                // Draw arrow inside the box
-                this.ctx.fillStyle = 'white'; // Arrow color (white)
-                this.ctx.beginPath();
-                this.ctx.moveTo(x + handle.width/4, y + handle.height/4);  // Arrow start (left)
-                this.ctx.lineTo(x + handle.width/2, y + handle.height/2); // Arrow tip (center right)
-                this.ctx.lineTo(x + handle.width/4, y + (3/4)*handle.height); // Arrow end (bottom left)
-                this.ctx.closePath();
-                this.ctx.fill();
+                if(handletype !== 3){
+                    // Draw arrow inside the box
+                    this.ctx.fillStyle = 'white'; // Arrow color (white)
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x + handle.width/4, y + handle.height/4);  // Arrow start (left)
+                    this.ctx.lineTo(x + handle.width/2, y + handle.height/2); // Arrow tip (center right)
+                    this.ctx.lineTo(x + handle.width/4, y + (3/4)*handle.height); // Arrow end (bottom left)
+                    this.ctx.closePath();
+                    this.ctx.fill();
+                }
             }
         }
     }
