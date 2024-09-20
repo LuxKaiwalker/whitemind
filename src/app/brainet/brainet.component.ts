@@ -1355,7 +1355,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     .then((response) => response.json())
     .then((data) => {
       console.log('Success:', data);
-      this.current_model = data.project.model;
+      this.current_model = data.model._id;
     });
 
     //TODO: implement stoptraining
@@ -1381,7 +1381,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     .then((response) => response.json())
     .then((data) => {
       console.log('Success:', data);
-      this.trainingdata = data;
+      this.trainingdata = JSON.stringify(data, undefined, 4);
     });
     
   }
@@ -1395,7 +1395,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
         _id: this.current_model,
       }
     };
-    return fetch(`https://backmind.icinoxis.net/api/project/model/training-status`, {
+    return fetch(`https://backmind.icinoxis.net/api/project/model/training-stop`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
