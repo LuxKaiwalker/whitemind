@@ -73,7 +73,7 @@ export class RegisterComponent {
       })
         .then((response) => response.json())
         .then((data) => {console.log('Success:', data); this.token = data.token; 
-          this.tokenService.setToken(this.token);});
+          this.tokenService.setToken(this.token); if (this.token !== "") {alert("Login successful."); this.router.navigate(["/brainet"])} else {alert("Registration failed. Please try again.");}});
     }
   }
   }

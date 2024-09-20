@@ -18,8 +18,10 @@ export class Box {
     
     connections_out: number[] = [];//for html interactivity: pointing to a box
     connections_in: number[] = [];//for html interactivity: pointing to a box
-    connections_special: number[] = [];//for html interactivity: pointing to a box
-    connections_config: number[] = [];//for html interactivity: pointing to a box
+
+    //inportant: curently only one connection is supported!
+    connections_special_in: number = -1;//for html interactivity: pointing to a box
+    connections_special_out: number = -1;//for html interactivity: pointing to a box
 
 
     handles: Handle[] = [];

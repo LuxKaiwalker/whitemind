@@ -3,11 +3,11 @@
 
 <div class="ui w-full absolute bg-wBackground dark:bg-dBackground text-dark dark:text-white" (mousemove)="mouseMove($event)"><!-- check cdk drop list group-->
 
-  <div class="absolute w-40 h-14 z-40 bg-accent rounded-xl text-2xl text-center content-center items-center hover:bg-accent_dark" style="left: 16.5px; top: 80%; border: 1px solid black;" (click)="onTrainPredictForm($event)">
+  <div class="absolute w-40 h-14 z-40 bg-accent rounded-xl text-xl text-center content-center items-center hover:bg-accent_dark" style="left: 16.5px; top: 80%; border: 1px solid black;" (click)="onTrainPredictForm($event)">
     ConfigTraining
   </div>
 
-  <div class="absolute w-40 h-14 z-40 bg-accent rounded-xl text-2xl text-center content-center items-center hover:bg-accent_dark" style="left: 16.5px; top: 90%; border: 1px solid black;" (click)="onSave($event)">
+  <div class="absolute w-40 h-14 z-40 bg-accent rounded-xl text-xl text-center content-center items-center hover:bg-accent_dark" style="left: 16.5px; top: 90%; border: 1px solid black;" (click)="onSave($event)">
     Save!
   </div>
 
@@ -129,9 +129,11 @@
           New Activation Function:
         </label>
         <select id="configDropdown" name="configDropdown" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" [(ngModel)]="this.option">
-          <option value="option1">Option 1</option>
-          <option value="option2">Option 2</option>
-          <option value="option3">Option 3</option>
+          <option value="reLU">ReLU</option>
+          <option value="hyperbolicTangent">HyperbolicTangent</option>
+          <option value="sigmoid">Sigmoid</option>
+          <option value="linear">Linear</option>
+          <option value="sorftmax">Softmax</option>
         </select>
       </div>
 
@@ -142,7 +144,7 @@
 </div>
 
 <!-- loss module context menu -->
-<div #lossModuleForm id="contextMenu" class="fixed bg-white rounded-lg shadow-lg z-50 w-96 p-6 space-y-4" style="visibility: hidden;">
+<div #lossModuleForm id="contextMenu" class="fixed rounded-lg shadow-lg z-50 w-96 p-6 space-y-4" style="visibility: hidden;">
   <h3 class="text-center text-lg font-semibold mb-4">Configuration for Loss Module</h3>
   <form id="configForm" class="space-y-4" (submit)="updateLossModule($event)">
       <div class="relative">
@@ -151,9 +153,8 @@
           New Loss Function:
         </label>
         <select id="configDropdown" name="configDropdown" class="mt-1 p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" [(ngModel)]="this.option">
-          <option value="option1">Option 1</option>
-          <option value="option2">Option 2</option>
-          <option value="option3">Option 3</option>
+          <option value="errorRate">ErrorRate</option>
+          <option value="crossEntropy">CrossEntropy</option>
         </select>
       </div>
 

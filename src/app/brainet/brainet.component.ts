@@ -377,14 +377,28 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     this.file.project.components.add.modules = [];
     this.file.project.components.add.connections = [];
 
+    for(const [key, box] of this.workspace_params){
+      console.log("key");
+      console.log(key);
+      console.log(box);
+    }
+
+    for(const [key, box] of this.workspace){
+      console.log("key w");
+      console.log(key);
+      console.log(box);
+    }
 
     for(const [key, box] of this.workspace){
 
       if(!box.in_panel){
         let box_val = this.workspace_params.get(box.id);
 
-        console.log("box_val");
-        console.log(box_val);
+        /*if(box.typ === 0){
+          console.log(box.id);
+          console.log("box_val");
+          console.log(box_val);
+        }*/
 
         if(box_val){
           box_val.position = [box.position.x, box.position.y];
@@ -404,6 +418,19 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
 
     //save training parameters
+
+    let m1:number = 0;
+    let m2:number = 0;
+
+    for(const [key, box] of this.workspace){
+      if(box.typ === 0 && box.connections_out.length > 0 && box.connections_special_out !== -1){
+        m1 = box.connections_out[0];
+        m2 = box.connections_special_out;
+      }
+    }
+
+    this.file.project.components.train.parameters[0].value = `module${m1}`;
+    this.file.project.components.train.parameters[0].value = `module${m2}`;
     this.file.project.components.train.parameters[2].value = this.epochs;
     this.file.project.components.train.parameters[3].value = this.batch_size;
     this.file.project.components.train.parameters[5].value = this.early_stopping_distance;
@@ -464,6 +491,16 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
     if(initparams){//only if initparams is made!
       switch(typ){
+
+        case 0:
+
+        console.log("set box type 0!");
+          this.workspace_params.set(this.box_count - 1, {
+            type: "dataset",
+            position: [0, 0],
+            parameters: []
+          });
+          break;
     
         //TODO:case 0
         case 1:
@@ -481,27 +518,10 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
                   type: "parameter",
                   value: `module${this.box_count}`
               }]
-            }
-            
-            
-            /*{
-            type: "dense",
-            parameters: [
-              {
-                type: "relu",
-                value: 0.01
-              },
-              {
-                value: 100
-              },
-              {
-                value: `module${this.box_count}`
-              }
-            ]
-          }*/);
+            });
           break;
         case 2:
-          this.workspace_params.set(this.box_count, {
+          this.workspace_params.set(this.box_count - 1, {
             type: "loss",
             position: [0, 0],
             parameters: [
@@ -519,7 +539,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
           break;
   
         default:
-          this.workspace_params.set(this.box_count, {
+          this.workspace_params.set(this.box_count - 1, {
             type: "unknown", value: 0
           });
           break;
@@ -536,6 +556,13 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
       }
       if(b.connections_in.includes(box.id)){
         b.connections_in.splice(b.connections_in.indexOf(box.id), 1);
+      }
+
+      if(b.connections_special_out === box.id){
+        b.connections_special_out = -1;
+      }
+      if(b.connections_special_in === box.id){
+        b.connections_special_in = -1;
       }
 
       this.workspace.delete(box.id);
@@ -582,6 +609,9 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
   drawConnectionArrow(handle: Handle, box: Box){
 
+    console.log("drawConnectionArrow");
+    console.log(this.connectionArrow);
+
     //connection arrow guard for panel boxes
     if(box.in_panel){
       return;
@@ -590,6 +620,12 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     if(this.connectionArrow.type === ""){//if empty, handle the arrow updates in updatecanvas
 
       if(handle.type === "output"){
+        this.connectionArrow.type = handle.type;
+
+        this.connectionArrow.box = box;
+        return;
+      }
+      else if(handle.type === "special_output"){
         this.connectionArrow.type = handle.type;
 
         this.connectionArrow.box = box;
@@ -613,6 +649,12 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
       this.connectionArrow.type = "";
       if(this.connectionArrow.box !== undefined){
         this.addArrow(this.connectionArrow.box, box, "output", "input");
+      }
+    }
+    else if (this.connectionArrow.type === "special_output" && handle.type === "special_input"){
+      this.connectionArrow.type = "";
+      if(this.connectionArrow.box !== undefined){
+        this.addArrow(this.connectionArrow.box, box, "special_output", "special_input");
       }
     }
     else{
@@ -646,6 +688,16 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
       const toBox = this.workspace.get(to.id);
       if (toBox) {
         toBox.connections_in.push(from.id);
+      }
+    }
+    else if (typeFrom === "special_output" && typeTo === "special_input"){
+      const fromBox = this.workspace.get(from.id);
+      if (fromBox) {
+        fromBox.connections_special_out = to.id;
+      }
+      const toBox = this.workspace.get(to.id);
+      if (toBox) {
+        toBox.connections_special_in = from.id;
       }
     }
     else{
@@ -700,6 +752,36 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
         
           this.canvasInstance.drawLine(pos1.x, pos1.y, pos2.x, pos2.y);
         }
+      }
+
+      let specialLineTo = box.connections_special_out;
+
+      let special_pos1 = {
+        x: box.position.x + box.handles[0].box_pos.x,
+        y: box.position.y + box.handles[0].box_pos.y
+      };
+
+      const workspace_special_lineto = this.workspace.get(specialLineTo);
+
+      if(workspace_special_lineto){
+        let special_pos2 = {//TODO fix this later
+          x: workspace_special_lineto.position.x + workspace_special_lineto.handles[1].box_pos.x,//ccheck this indexes later
+          y: workspace_special_lineto.position.y + workspace_special_lineto.handles[1].box_pos.y
+        };
+      
+      
+        if(current && pos){//include guard if we just want to draw box
+          if (lineFrom === current.id) {
+            special_pos1.x = pos.x + box.handles[1].box_pos.x;
+            special_pos1.y = pos.y + box.handles[1].box_pos.y;
+          }
+          if (specialLineTo === current.id && workspace_special_lineto) {
+            special_pos2.x = pos.x + workspace_special_lineto.handles[2].box_pos.x;
+            special_pos2.y = pos.y + workspace_special_lineto.handles[2].box_pos.y;
+          }
+        }
+      
+        this.canvasInstance.drawLine(special_pos1.x, special_pos1.y, special_pos2.x, special_pos2.y);
       }
     }
 
@@ -882,6 +964,11 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
           else{
             let handleType = isOnHandle(box);
             if(handleType == "output" || handleType == "input"){
+              let index = box.handles.findIndex((handle) => handle.type === handleType);
+              this.drawConnectionArrow(box.handles[index], box);
+              return;
+            }
+            else if(handleType == "special_output" || handleType == "special_input"){
               let index = box.handles.findIndex((handle) => handle.type === handleType);
               this.drawConnectionArrow(box.handles[index], box);
               return;
@@ -1257,7 +1344,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
         _id: this.file.project._id,
       }
     };
-    return fetch(`https://backmind.icinoxis.net/api/model/training-start`, {
+    return fetch(`https://backmind.icinoxis.net/api/project/model/training-start`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1268,7 +1355,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     .then((response) => response.json())
     .then((data) => {
       console.log('Success:', data);
-      this.current_model = data.project.model_id;
+      this.current_model = data.project.model;
     });
 
     //TODO: implement stoptraining
