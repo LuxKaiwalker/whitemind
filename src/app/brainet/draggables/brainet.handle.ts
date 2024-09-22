@@ -35,7 +35,7 @@ export class Handle {
             this.left = 120;
             this.top = 45;
             this.color = "#bad29f";//Celadon
-            this.box_pos.x = 0;
+            this.box_pos.x = 160;
 
             this.connected = true;
         }

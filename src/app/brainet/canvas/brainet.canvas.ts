@@ -94,7 +94,7 @@ export class Canvas{
         this.ctx.stroke();
     }
 
-    drawLine(startX: number, startY: number, endX: number, endY: number){
+    drawLine(startX: number, startY: number, endX: number, endY: number, special:boolean){
         this.ctx.beginPath();
         this.ctx.lineWidth = 3;
 
@@ -106,14 +106,19 @@ export class Canvas{
         this.ctx.lineTo(midX, endY);
 
         this.ctx.lineTo(endX, endY);
-        this.ctx.strokeStyle = "#FF9914";
+        if(special){
+            this.ctx.strokeStyle = "#AAAAAA";
+        }
+        else{
+            this.ctx.strokeStyle = "#FF9914";
+        }
         this.ctx.stroke();
 
-        this.drawArrowhead(startX + (endX-startX)/4, startY, endX - startX);
-        this.drawArrowhead(startX + (endX-startX)*3/4, endY, endX - midX);
+        this.drawArrowhead(startX + (endX-startX)/4, startY, endX - startX, special);
+        this.drawArrowhead(startX + (endX-startX)*3/4, endY, endX - midX, special);
     }
     
-    drawArrowhead(x:number, y:number, dx:number) {
+    drawArrowhead(x:number, y:number, dx:number, special:boolean) {
         let angle = 0;
         if(dx  <= 0){
             angle = Math.PI;
@@ -131,7 +136,12 @@ export class Canvas{
             x - length * Math.cos(angle + Math.PI / 6),
             y - length * Math.sin(angle + Math.PI / 6)
         );
-        this.ctx.strokeStyle = "#FF9914"; // Set arrow color
+        if(special){
+            this.ctx.strokeStyle = "#AAAAAA"; // Set arrow
+        }
+        else{
+            this.ctx.strokeStyle = "#FF9914"; // Set arrow color
+        }
         this.ctx.stroke();
     }   
 
@@ -386,7 +396,7 @@ export class Canvas{
         }
     }
 
-    drawInputHandle(x: number, y: number, handle: Handle, scale: number){
+    drawSingleHandle(x: number, y: number, handle: Handle, scale: number){
         let height = handle.height;
         let width = handle.width;
         let color = handle.color;

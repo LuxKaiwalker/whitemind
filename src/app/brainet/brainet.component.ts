@@ -14,6 +14,7 @@ import { Canvas } from './canvas/brainet.canvas'
 import { Box } from './draggables/brainet.box';
 import { Handle } from './draggables/brainet.handle';
 import { TokenService } from '../token.service';
+import { findIndex } from 'rxjs';
 
 @Component({
   selector: 'app-brainet',
@@ -133,6 +134,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
   //handle variable
   inputHandle:Handle = new Handle("input");
+  specialInputHandle:Handle = new Handle("special_input");
 
   async ngOnInit(){
       const canvas: HTMLCanvasElement = this.myCanvas.nativeElement;
@@ -750,23 +752,25 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
             }
           }
         
-          this.canvasInstance.drawLine(pos1.x, pos1.y, pos2.x, pos2.y);
+          this.canvasInstance.drawLine(pos1.x, pos1.y, pos2.x, pos2.y, false);
         }
       }
+
+      //draw the special connection arrow
 
       let specialLineTo = box.connections_special_out;
 
       let special_pos1 = {
-        x: box.position.x + box.handles[0].box_pos.x,
-        y: box.position.y + box.handles[0].box_pos.y
+        x: box.position.x + box.handles[1].box_pos.x,
+        y: box.position.y + box.handles[1].box_pos.y
       };
 
       const workspace_special_lineto = this.workspace.get(specialLineTo);
 
       if(workspace_special_lineto){
         let special_pos2 = {//TODO fix this later
-          x: workspace_special_lineto.position.x + workspace_special_lineto.handles[1].box_pos.x,//ccheck this indexes later
-          y: workspace_special_lineto.position.y + workspace_special_lineto.handles[1].box_pos.y
+          x: workspace_special_lineto.position.x + workspace_special_lineto.handles[0].box_pos.x,//ccheck this indexes later
+          y: workspace_special_lineto.position.y + workspace_special_lineto.handles[0].box_pos.y
         };
       
       
@@ -781,7 +785,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
           }
         }
       
-        this.canvasInstance.drawLine(special_pos1.x, special_pos1.y, special_pos2.x, special_pos2.y);
+        this.canvasInstance.drawLine(special_pos1.x, special_pos1.y, special_pos2.x, special_pos2.y, true);
       }
     }
 
@@ -822,6 +826,37 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
             break;
         }
       }
+
+      if(box.connections_special_in === -1){//special input handle is meant here.
+        switch(box.typ){
+          case 0:
+            break;
+          case 1:
+            break;
+          case 2:
+            box.handles[0].connected = false;
+            break;
+          case 3:
+            break;
+          default:
+            break;
+        }
+      }
+      else{
+        switch(box.typ){
+          case 0:
+            break;
+          case 1:
+            break;
+          case 2:
+            box.handles[0].connected = true;
+            break;
+          case 3:
+            break;
+          default:
+            break;
+        }
+      }
       this.canvasInstance.drawBox(box, this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
       this.canvasInstance.drawHandles(box, this.viewportTransform.x, this.viewportTransform.y, this.viewportTransform.scale);
     }
@@ -830,11 +865,21 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
     if(this.connectionArrow.type !== ""){
       if (this.connectionArrow.box) {
 
-        const posx = this.connectionArrow.box.position.x + this.connectionArrow.box.handles[0].box_pos.x;//here output is definetly at index 0. probably altering further alter
-        const posy = this.connectionArrow.box.position.y + this.connectionArrow.box.handles[0].box_pos.y;
+        if(this.connectionArrow.type === "output"){
+          const posx = this.connectionArrow.box.position.x + this.connectionArrow.box.handles[0].box_pos.x;//here output is definetly at index 0. probably altering further alter
+          const posy = this.connectionArrow.box.position.y + this.connectionArrow.box.handles[0].box_pos.y;
 
-        this.canvasInstance.drawLine(posx, posy, this.connectionArrow.toPos.x, this.connectionArrow.toPos.y);
-        this.canvasInstance.drawInputHandle(this.connectionArrow.toPos.x - this.inputHandle.height/2, this.connectionArrow.toPos.y - this.inputHandle.height/2, this.inputHandle, this.viewportTransform.scale);
+          this.canvasInstance.drawLine(posx, posy, this.connectionArrow.toPos.x, this.connectionArrow.toPos.y, false);
+          this.canvasInstance.drawSingleHandle(this.connectionArrow.toPos.x - this.inputHandle.height/2, this.connectionArrow.toPos.y - this.inputHandle.height/2, this.inputHandle, this.viewportTransform.scale);
+        }
+
+        if(this.connectionArrow.type === "special_output"){
+          const posx = this.connectionArrow.box.position.x + this.connectionArrow.box.handles[1].box_pos.x;//here output is definetly at index 0. probably altering further alter
+          const posy = this.connectionArrow.box.position.y + this.connectionArrow.box.handles[1].box_pos.y;
+
+          this.canvasInstance.drawLine(posx, posy, this.connectionArrow.toPos.x, this.connectionArrow.toPos.y, true);
+          this.canvasInstance.drawSingleHandle(this.connectionArrow.toPos.x - this.specialInputHandle.height/2, this.connectionArrow.toPos.y - this.specialInputHandle.height/2, this.specialInputHandle, this.viewportTransform.scale);
+        }
       }
     }
 
