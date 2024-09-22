@@ -145,10 +145,6 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
       this.canvasInstance = new Canvas(ctx);
 
-      this.newPanelBox(0);
-      this.newPanelBox(1);
-      this.newPanelBox(2);
-
       this.token = this.tokenService.getToken();//get user token
 
       console.log("token for the api: ");
@@ -164,6 +160,11 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
       await this.initFile();
 
       console.log("finished intializing!");
+
+
+      this.newPanelBox(0);
+      this.newPanelBox(1);
+      this.newPanelBox(2);
 
       this.updateCanvas();
   }
