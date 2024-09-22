@@ -14,7 +14,6 @@ import { Canvas } from './canvas/brainet.canvas'
 import { Box } from './draggables/brainet.box';
 import { Handle } from './draggables/brainet.handle';
 import { TokenService } from '../token.service';
-import { findIndex } from 'rxjs';
 
 @Component({
   selector: 'app-brainet',
@@ -66,7 +65,7 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
   workspace = new Map<number, Box>();//id  = number. probably we can even wipe out the id of the box.
   workspace_params = new Map<number, any>();//id  = number. probably we can even wipe out the id of the box.
 
-  box_count: number = 0;
+  box_count: number = 1;
   zindex_count: number = 10;
 
   canvasInstance!: Canvas;
@@ -157,7 +156,10 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
       this.updateCanvas();
 
       //TODO: debug thiss
-      await this.initFile();
+
+      if(this.token !== ""){
+        await this.initFile();
+      }
 
       console.log("finished intializing!");
 
@@ -1089,9 +1091,13 @@ constructor(private http: HttpClient, private tokenService: TokenService) {}
 
             this.onBox = true;
             this.current_box = box;
-            if (this.workspace_params.has(box.id)) {
+            if (this.workspace_params.has(box.id) && box.typ !== 0) {
               this.previous_count = this.workspace_params.get(box.id).parameters[1].value;
             }
+
+
+            console.log("left clicked following box type!:");
+            console.log(box.typ);
 
             switch(box.typ){
               case 0:
