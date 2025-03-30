@@ -1,6 +1,3 @@
-## Whitemind
-
-
 ### Attention: this version of WhiteMind deprecated and no longer maintained. To view the newest version, feel free to visit out current website [here](https://whitemind.net/)
 
 
